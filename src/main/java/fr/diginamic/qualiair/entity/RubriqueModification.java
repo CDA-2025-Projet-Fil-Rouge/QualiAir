@@ -1,16 +1,16 @@
-package fr.diginamic.qualiair.entities;
+package fr.diginamic.qualiair.entity;
 
-import fr.diginamic.qualiair.entities.composite.UtilisateurTopic;
+import fr.diginamic.qualiair.entity.composite.UtilisateurRubrique;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "topic_modification")
-public class TopicModification
+@Table(name = "rubrique_modification")
+public class RubriqueModification
 {
     @EmbeddedId
-    private UtilisateurTopic id;
+    private UtilisateurRubrique id;
     
     @Column(name = "date_modification")
     private LocalDateTime dateModification;
@@ -22,12 +22,12 @@ public class TopicModification
     @JoinColumn(name = "id_utilisateur")
     private Utilisateur utilisateur;
     
-    @MapsId("topicId")
+    @MapsId("rubriqueId")
     @ManyToOne
-    @JoinColumn(name = "id_topic")
-    private Topic topic;
+    @JoinColumn(name = "id_rubrique")
+    private Rubrique rubrique;
     
-    public TopicModification()
+    public RubriqueModification()
     {
     }
     
@@ -35,7 +35,7 @@ public class TopicModification
      * Getter
      * @return id
      */
-    public UtilisateurTopic getId()
+    public UtilisateurRubrique getId()
     {
         return id;
     }
@@ -114,19 +114,19 @@ public class TopicModification
     
     /**
      * Getter
-     * @return topic
+     * @return rubrique
      */
-    public Topic getTopic()
+    public Rubrique getRubrique()
     {
-        return topic;
+        return rubrique;
     }
     
     /**
      * Setter
-     * @param topic sets value
+     * @param rubrique sets value
      */
-    public void setTopic(Topic topic)
+    public void setRubrique(Rubrique rubrique)
     {
-        this.topic = topic;
+        this.rubrique = rubrique;
     }
 }

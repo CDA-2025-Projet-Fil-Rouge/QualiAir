@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.entities;
+package fr.diginamic.qualiair.entity;
 
 /**
  * Les différents types de relevés pour la méteo

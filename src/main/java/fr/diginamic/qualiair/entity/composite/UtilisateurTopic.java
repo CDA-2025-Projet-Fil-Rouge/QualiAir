@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.entities.composite;
+package fr.diginamic.qualiair.entity.composite;
 
 import jakarta.persistence.Embeddable;
 

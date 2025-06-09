@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.entities;
+package fr.diginamic.qualiair.entity;
 
 import jakarta.persistence.*;
 
@@ -6,31 +6,32 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
-@Table(name = "topic")
-public class Topic
+@Table(name = "rubrique")
+public class Rubrique
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     private String nom;
+    private String description;
+    @Column(name = "priorite_affichage_indice")
+    private int prioriteAffichageIndice;
     @Column(name = "date_creation")
     private LocalDateTime dateCreation;
     
     @ManyToOne
     @JoinColumn(name = "id_createur")
     private Utilisateur createur;
+    
     @ManyToOne
     @JoinColumn(name = "id_rubrique")
     private Rubrique rubrique;
     
-    @OneToMany(mappedBy = "topic")
-    private Set<TopicModification> topicModifications;
+    @OneToMany(mappedBy = "rubrique")
+    private Set<RubriqueModification> rubriqueModifications;
     
-    @OneToMany(mappedBy = "topic")
-    private Set<Message> messages;
-    
-    public Topic()
+    public Rubrique()
     {
     }
     
@@ -59,6 +60,42 @@ public class Topic
     public void setNom(String nom)
     {
         this.nom = nom;
+    }
+    
+    /**
+     * Getter
+     * @return description
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    /**
+     * Setter
+     * @param description sets value
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+    
+    /**
+     * Getter
+     * @return prioriteAffichageIndice
+     */
+    public int getPrioriteAffichageIndice()
+    {
+        return prioriteAffichageIndice;
+    }
+    
+    /**
+     * Setter
+     * @param prioriteAffichageIndice sets value
+     */
+    public void setPrioriteAffichageIndice(int prioriteAffichageIndice)
+    {
+        this.prioriteAffichageIndice = prioriteAffichageIndice;
     }
     
     /**
@@ -117,37 +154,19 @@ public class Topic
     
     /**
      * Getter
-     * @return topicModifications
+     * @return rubriqueModifications
      */
-    public Set<TopicModification> getTopicModifications()
+    public Set<RubriqueModification> getRubriqueModifications()
     {
-        return topicModifications;
+        return rubriqueModifications;
     }
     
     /**
      * Setter
-     * @param topicModifications sets value
+     * @param rubriqueModifications sets value
      */
-    public void setTopicModifications(Set<TopicModification> topicModifications)
+    public void setRubriqueModifications(Set<RubriqueModification> rubriqueModifications)
     {
-        this.topicModifications = topicModifications;
-    }
-    
-    /**
-     * Getter
-     * @return messages
-     */
-    public Set<Message> getMessages()
-    {
-        return messages;
-    }
-    
-    /**
-     * Setter
-     * @param messages sets value
-     */
-    public void setMessages(Set<Message> messages)
-    {
-        this.messages = messages;
+        this.rubriqueModifications = rubriqueModifications;
     }
 }

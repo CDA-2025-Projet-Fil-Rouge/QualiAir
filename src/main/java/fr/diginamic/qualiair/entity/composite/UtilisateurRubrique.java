@@ -1,44 +1,44 @@
-package fr.diginamic.qualiair.entities.composite;
+package fr.diginamic.qualiair.entity.composite;
 
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 
 /**
- * Clef composite pour Message Modification
+ * Clef composite pour Rubrique Modification
  */
 @Embeddable
-public class UtilisateurMessage
+public class UtilisateurRubrique
 {
     private Long utilisateurId;
-    private Long messageId;
+    private Long rubriqueId;
     
-    public UtilisateurMessage()
+    public UtilisateurRubrique()
     {
     }
     
-    public UtilisateurMessage(Long messageId, Long utilisateurId)
+    public UtilisateurRubrique(Long rubriqueId, Long utilisateurId)
     {
-        this.messageId = messageId;
+        this.rubriqueId = rubriqueId;
         this.utilisateurId = utilisateurId;
     }
     
     /**
      * Getter
-     * @return messageId
+     * @return rubriqueId
      */
-    public Long getMessageId()
+    public Long getRubriqueId()
     {
-        return messageId;
+        return rubriqueId;
     }
     
     /**
      * Setter
-     * @param messageId sets value
+     * @param rubriqueId sets value
      */
-    public void setMessageId(Long messageId)
+    public void setRubriqueId(Long rubriqueId)
     {
-        this.messageId = messageId;
+        this.rubriqueId = rubriqueId;
     }
     
     /**
@@ -66,14 +66,14 @@ public class UtilisateurMessage
         {
             return false;
         }
-        UtilisateurMessage that = (UtilisateurMessage) o;
-        return Objects.equals(utilisateurId, that.utilisateurId) && Objects.equals(messageId,
-                                                                                   that.messageId);
+        UtilisateurRubrique that = (UtilisateurRubrique) o;
+        return Objects.equals(utilisateurId, that.utilisateurId) && Objects.equals(rubriqueId,
+                                                                                   that.rubriqueId);
     }
     
     @Override
     public int hashCode()
     {
-        return Objects.hash(utilisateurId, messageId);
+        return Objects.hash(utilisateurId, rubriqueId);
     }
 }

@@ -1,6 +1,6 @@
-package fr.diginamic.qualiair.entities;
+package fr.diginamic.qualiair.entity;
 
-import fr.diginamic.qualiair.entities.composite.UtilisateurMessage;
+import fr.diginamic.qualiair.entity.composite.UtilisateurMessage;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

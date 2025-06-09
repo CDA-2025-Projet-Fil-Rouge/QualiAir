@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.entities;
+package fr.diginamic.qualiair.entity;
 
 /**
  * Les roles disponibles pour un utilisateur
