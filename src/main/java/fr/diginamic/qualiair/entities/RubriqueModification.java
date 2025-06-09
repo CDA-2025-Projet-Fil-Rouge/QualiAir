@@ -26,4 +26,107 @@ public class RubriqueModification
     @ManyToOne
     @JoinColumn(name = "id_rubrique")
     private Rubrique rubrique;
+    
+    public RubriqueModification()
+    {
+    }
+    
+    /**
+     * Getter
+     * @return id
+     */
+    public UtilisateurRubrique getId()
+    {
+        return id;
+    }
+    
+    /**
+     * Getter
+     * @return dateModification
+     */
+    public LocalDateTime getDateModification()
+    {
+        return dateModification;
+    }
+    
+    /**
+     * Setter
+     * @param dateModification sets value
+     */
+    public void setDateModification(LocalDateTime dateModification)
+    {
+        this.dateModification = dateModification;
+    }
+    
+    /**
+     * Getter
+     * @return raison
+     */
+    public String getRaison()
+    {
+        return raison;
+    }
+    
+    /**
+     * Setter
+     * @param raison sets value
+     */
+    public void setRaison(String raison)
+    {
+        this.raison = raison;
+    }
+    
+    /**
+     * Getter
+     * @return commentaire
+     */
+    public String getCommentaire()
+    {
+        return commentaire;
+    }
+    
+    /**
+     * Setter
+     * @param commentaire sets value
+     */
+    public void setCommentaire(String commentaire)
+    {
+        this.commentaire = commentaire;
+    }
+    
+    /**
+     * Getter
+     * @return utilisateur
+     */
+    public Utilisateur getUtilisateur()
+    {
+        return utilisateur;
+    }
+    
+    /**
+     * Setter
+     * @param utilisateur sets value
+     */
+    public void setUtilisateur(Utilisateur utilisateur)
+    {
+        this.utilisateur = utilisateur;
+    }
+    
+    /**
+     * Getter
+     * @return rubrique
+     */
+    public Rubrique getRubrique()
+    {
+        return rubrique;
+    }
+    
+    /**
+     * Setter
+     * @param rubrique sets value
+     */
+    public void setRubrique(Rubrique rubrique)
+    {
+        this.rubrique = rubrique;
+    }
 }

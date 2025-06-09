@@ -4,6 +4,9 @@ import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 
+/**
+ * Clef composite pour Rubrique Modification
+ */
 @Embeddable
 public class UtilisateurRubrique
 {

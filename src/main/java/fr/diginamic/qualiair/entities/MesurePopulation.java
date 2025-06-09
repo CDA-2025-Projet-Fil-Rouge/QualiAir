@@ -12,4 +12,22 @@ public class MesurePopulation extends Mesure
     public MesurePopulation()
     {
     }
+    
+    /**
+     * Getter
+     * @return valeur
+     */
+    public int getValeur()
+    {
+        return valeur;
+    }
+    
+    /**
+     * Setter
+     * @param valeur sets value
+     */
+    public void setValeur(int valeur)
+    {
+        this.valeur = valeur;
+    }
 }

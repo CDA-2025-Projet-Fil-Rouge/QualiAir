@@ -21,4 +21,67 @@ public class Region
     public Region()
     {
     }
+    
+    /**
+     * Getter
+     * @return id
+     */
+    public Long getId()
+    {
+        return id;
+    }
+    
+    /**
+     * Getter
+     * @return nom
+     */
+    public String getNom()
+    {
+        return nom;
+    }
+    
+    /**
+     * Setter
+     * @param nom sets value
+     */
+    public void setNom(String nom)
+    {
+        this.nom = nom;
+    }
+    
+    /**
+     * Getter
+     * @return code
+     */
+    public int getCode()
+    {
+        return code;
+    }
+    
+    /**
+     * Setter
+     * @param code sets value
+     */
+    public void setCode(int code)
+    {
+        this.code = code;
+    }
+    
+    /**
+     * Getter
+     * @return departements
+     */
+    public Set<Departement> getDepartements()
+    {
+        return departements;
+    }
+    
+    /**
+     * Setter
+     * @param departements sets value
+     */
+    public void setDepartements(Set<Departement> departements)
+    {
+        this.departements = departements;
+    }
 }

@@ -12,4 +12,22 @@ public class MesurePrevisionProbabilite extends MesurePrevision
     public MesurePrevisionProbabilite()
     {
     }
+    
+    /**
+     * Getter
+     * @return probabilite
+     */
+    public double getProbabilite()
+    {
+        return probabilite;
+    }
+    
+    /**
+     * Setter
+     * @param probabilite sets value
+     */
+    public void setProbabilite(double probabilite)
+    {
+        this.probabilite = probabilite;
+    }
 }

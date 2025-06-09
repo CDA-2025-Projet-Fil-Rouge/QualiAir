@@ -4,6 +4,9 @@ import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
 
+/**
+ * Clef composite pour Topic Modification
+ */
 @Embeddable
 public class UtilisateurTopic
 {

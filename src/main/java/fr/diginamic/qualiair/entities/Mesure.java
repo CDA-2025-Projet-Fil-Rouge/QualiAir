@@ -26,4 +26,85 @@ public class Mesure
     public Mesure()
     {
     }
+    
+    /**
+     * Getter
+     * @return id
+     */
+    public Long getId()
+    {
+        return id;
+    }
+    
+    /**
+     * Getter
+     * @return nom
+     */
+    public String getNom()
+    {
+        return nom;
+    }
+    
+    /**
+     * Setter
+     * @param nom sets value
+     */
+    public void setNom(String nom)
+    {
+        this.nom = nom;
+    }
+    
+    /**
+     * Getter
+     * @return date
+     */
+    public LocalDateTime getDate()
+    {
+        return date;
+    }
+    
+    /**
+     * Setter
+     * @param date sets value
+     */
+    public void setDate(LocalDateTime date)
+    {
+        this.date = date;
+    }
+    
+    /**
+     * Getter
+     * @return dateEnregistrement
+     */
+    public LocalDateTime getDateEnregistrement()
+    {
+        return dateEnregistrement;
+    }
+    
+    /**
+     * Setter
+     * @param dateEnregistrement sets value
+     */
+    public void setDateEnregistrement(LocalDateTime dateEnregistrement)
+    {
+        this.dateEnregistrement = dateEnregistrement;
+    }
+    
+    /**
+     * Getter
+     * @return coordonnee
+     */
+    public Coordonnee getCoordonnee()
+    {
+        return coordonnee;
+    }
+    
+    /**
+     * Setter
+     * @param coordonnee sets value
+     */
+    public void setCoordonnee(Coordonnee coordonnee)
+    {
+        this.coordonnee = coordonnee;
+    }
 }

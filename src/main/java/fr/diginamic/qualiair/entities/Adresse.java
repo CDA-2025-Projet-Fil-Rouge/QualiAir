@@ -27,4 +27,85 @@ public class Adresse
     public Adresse()
     {
     }
+    
+    /**
+     * Getter
+     * @return id
+     */
+    public Long getId()
+    {
+        return id;
+    }
+    
+    /**
+     * Getter
+     * @return numeroRue
+     */
+    public String getNumeroRue()
+    {
+        return numeroRue;
+    }
+    
+    /**
+     * Setter
+     * @param numeroRue sets value
+     */
+    public void setNumeroRue(String numeroRue)
+    {
+        this.numeroRue = numeroRue;
+    }
+    
+    /**
+     * Getter
+     * @return libelleRue
+     */
+    public String getLibelleRue()
+    {
+        return libelleRue;
+    }
+    
+    /**
+     * Setter
+     * @param libelleRue sets value
+     */
+    public void setLibelleRue(String libelleRue)
+    {
+        this.libelleRue = libelleRue;
+    }
+    
+    /**
+     * Getter
+     * @return commune
+     */
+    public Commune getCommune()
+    {
+        return commune;
+    }
+    
+    /**
+     * Setter
+     * @param commune sets value
+     */
+    public void setCommune(Commune commune)
+    {
+        this.commune = commune;
+    }
+    
+    /**
+     * Getter
+     * @return utilisateurs
+     */
+    public Set<Utilisateur> getUtilisateurs()
+    {
+        return utilisateurs;
+    }
+    
+    /**
+     * Setter
+     * @param utilisateurs sets value
+     */
+    public void setUtilisateurs(Set<Utilisateur> utilisateurs)
+    {
+        this.utilisateurs = utilisateurs;
+    }
 }
