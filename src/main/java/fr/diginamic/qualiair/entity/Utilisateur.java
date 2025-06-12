@@ -13,8 +13,10 @@ public class Utilisateur
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String prenom;
+    @Column(nullable = false)
     private String nom;
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
@@ -25,9 +27,9 @@ public class Utilisateur
     @Column(name = "mot_de_passe", nullable = false)
     private String motDePasse;
     private RoleUtilisateur role;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_adresse")
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_adresse", nullable = false)
     private Adresse adresse;
     
     @OneToMany(mappedBy = "createur")

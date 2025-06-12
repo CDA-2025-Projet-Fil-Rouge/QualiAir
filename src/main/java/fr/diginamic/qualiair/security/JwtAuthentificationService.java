@@ -71,11 +71,10 @@ public class JwtAuthentificationService {
 
     public Boolean validateToken(String token) {
         try {
-            Claims claims = Jwts.parser()
+            Jwts.parser()
                     .verifyWith(getSecuredKey())
                     .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
+                    .parseSignedClaims(token);
             return true;
         } catch (ExpiredJwtException e) {
             System.out.println("Token expiré");

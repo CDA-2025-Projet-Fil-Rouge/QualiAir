@@ -25,3 +25,6 @@ mappage many to one coord <- commune
 ## META
 
 ajout des nullables et indexes
+
+## Utilisateur
+Modification erd pour ajouter motDePasse
