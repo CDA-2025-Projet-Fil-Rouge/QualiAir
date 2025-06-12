@@ -13,8 +13,12 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.stream.Stream;
 
+/**
+ * Implémentation du service JWT utilisant la librairie JJWT.
+ * Gère la génération, la validation et l'extraction d'informations des tokens.
+ */
 @Service
-public class JwtAuthentificationService {
+public class JwtAuthentificationService implements IJwtAuthentificationService {
     @Value("${jwt.expires_in}")
     private Integer EXPIRES_IN;
 
@@ -24,10 +28,15 @@ public class JwtAuthentificationService {
     @Value("${jwt.secret}")
     private String JWT_SECRET;
 
+    /**
+     * Génère une clé secrète basée sur la clé définie dans les propriétés
+     * pour signer et vérifier les tokens JWT.
+     */
     private SecretKey getSecuredKey() {
         return Keys.hmacShaKeyFor(JWT_SECRET.getBytes());
     }
 
+    @Override
     public ResponseCookie generateToken(Utilisateur user) {
         System.out.println("Role: " + user.getRole());
         String jwt = Jwts.builder()
@@ -43,6 +52,7 @@ public class JwtAuthentificationService {
                 .build();
     }
 
+    @Override
     public String getSubject(String token) {
         return Jwts.parser()
                 .verifyWith(getSecuredKey())
@@ -52,6 +62,7 @@ public class JwtAuthentificationService {
                 .getSubject();
     }
 
+    @Override
     public String getEmailFromCookie(HttpServletRequest request) throws Exception {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -69,6 +80,7 @@ public class JwtAuthentificationService {
         throw new Exception("Nothing found with cookie");
     }
 
+    @Override
     public Boolean validateToken(String token) {
         try {
             Jwts.parser()

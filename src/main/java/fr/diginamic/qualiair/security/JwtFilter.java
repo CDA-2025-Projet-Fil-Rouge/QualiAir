@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
-    JwtAuthentificationService jwtAuthentificationService;
+    IJwtAuthentificationService IJwtAuthentificationService;
 
     @Value("${jwt.cookie}")
     private String TOKEN_COOKIE;
@@ -40,9 +40,9 @@ public class JwtFilter extends OncePerRequestFilter {
             Stream.of(req.getCookies()).filter(cookie -> cookie.getName().equals(TOKEN_COOKIE)).map(Cookie::getValue)
                     .forEach(token ->
                     {
-                        if (jwtAuthentificationService.validateToken(token)) {
+                        if (IJwtAuthentificationService.validateToken(token)) {
 
-                            String email = jwtAuthentificationService.getSubject(token);
+                            String email = IJwtAuthentificationService.getSubject(token);
 
                             try {
                                 Utilisateur user = utilisateurService.getUser(email);

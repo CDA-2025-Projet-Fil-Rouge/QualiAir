@@ -3,7 +3,7 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
-import fr.diginamic.qualiair.security.JwtAuthentificationService;
+import fr.diginamic.qualiair.security.IJwtAuthentificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +23,7 @@ public class UtilisateurService {
     @Autowired
     BCryptPasswordEncoder bcrypt;
     @Autowired
-    JwtAuthentificationService jwtAuthentificationService;
+    IJwtAuthentificationService IJwtAuthentificationService;
 
     public Utilisateur getUser(String email) {
         return utilisateurRepository.findByEmail(email)
@@ -33,7 +33,7 @@ public class UtilisateurService {
     public ResponseCookie logUser(Utilisateur user) throws Exception {
         Utilisateur utilisateur = getUser(user.getEmail());
         if (bcrypt.matches(user.getMotDePasse(), utilisateur.getMotDePasse())) {
-            return jwtAuthentificationService.generateToken(utilisateur);
+            return IJwtAuthentificationService.generateToken(utilisateur);
         }
         throw new BadCredentialsException("Email ou mot de passe incorrect");
     }
