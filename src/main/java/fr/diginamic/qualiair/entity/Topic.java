@@ -25,9 +25,6 @@ public class Topic
     private Rubrique rubrique;
     
     @OneToMany(mappedBy = "topic")
-    private Set<TopicModification> topicModifications;
-    
-    @OneToMany(mappedBy = "topic")
     private Set<Message> messages;
     
     public Topic()
@@ -113,24 +110,6 @@ public class Topic
     public void setRubrique(Rubrique rubrique)
     {
         this.rubrique = rubrique;
-    }
-    
-    /**
-     * Getter
-     * @return topicModifications
-     */
-    public Set<TopicModification> getTopicModifications()
-    {
-        return topicModifications;
-    }
-    
-    /**
-     * Setter
-     * @param topicModifications sets value
-     */
-    public void setTopicModifications(Set<TopicModification> topicModifications)
-    {
-        this.topicModifications = topicModifications;
     }
     
     /**

@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 public class Message
@@ -24,9 +23,6 @@ public class Message
     @ManyToOne
     @JoinColumn(name = "id_createur")
     private Utilisateur createur;
-    
-    @OneToMany(mappedBy = "message")
-    private Set<MessageModification> messageModifications;
     
     public Message()
     {
@@ -165,23 +161,5 @@ public class Message
     public void setCreateur(Utilisateur createur)
     {
         this.createur = createur;
-    }
-    
-    /**
-     * Getter
-     * @return messageModifications
-     */
-    public Set<MessageModification> getMessageModifications()
-    {
-        return messageModifications;
-    }
-    
-    /**
-     * Setter
-     * @param messageModifications sets value
-     */
-    public void setMessageModifications(Set<MessageModification> messageModifications)
-    {
-        this.messageModifications = messageModifications;
     }
 }

@@ -1,9 +1,10 @@
 ## Forum
 
-Si on conserve l'historique des modifications, plus de sens de passer par une many to many que notre design erd :
+~~Si on conserve l'historique des modifications, plus de sens de passer par une many to many que notre design erd :~~
 
-- evite des fkey sans trop de sens
-- ex de table Utilisateur_Modification_Message (id message, id utilisateur, date)
+~~  evite des fkey sans trop de sens
+
+- ex de table Utilisateur_Modification_Message (id message, id utilisateur, date)~~
 
 modifier erd avec nom rubrique
 

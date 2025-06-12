@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "rubrique")
@@ -27,9 +26,6 @@ public class Rubrique
     @ManyToOne
     @JoinColumn(name = "id_rubrique")
     private Rubrique rubrique;
-    
-    @OneToMany(mappedBy = "rubrique")
-    private Set<RubriqueModification> rubriqueModifications;
     
     public Rubrique()
     {
@@ -150,23 +146,5 @@ public class Rubrique
     public void setRubrique(Rubrique rubrique)
     {
         this.rubrique = rubrique;
-    }
-    
-    /**
-     * Getter
-     * @return rubriqueModifications
-     */
-    public Set<RubriqueModification> getRubriqueModifications()
-    {
-        return rubriqueModifications;
-    }
-    
-    /**
-     * Setter
-     * @param rubriqueModifications sets value
-     */
-    public void setRubriqueModifications(Set<RubriqueModification> rubriqueModifications)
-    {
-        this.rubriqueModifications = rubriqueModifications;
     }
 }
