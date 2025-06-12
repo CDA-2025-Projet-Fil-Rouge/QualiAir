@@ -1,8 +1,10 @@
 package fr.diginamic.qualiair.entity;
 
 import jakarta.persistence.*;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -12,21 +14,31 @@ public class Topic
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String nom;
-    @Column(name = "date_creation")
+
+    @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
+
+    @Column(name = "date_modification")
+    private LocalDateTime dateModification;
     
-    @ManyToOne
-    @JoinColumn(name = "id_createur")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_createur", nullable = false)
     private Utilisateur createur;
+
     @ManyToOne
-    @JoinColumn(name = "id_rubrique")
+    @JoinColumn(name= "id_modificateur")
+    private Utilisateur modificateur;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_rubrique", nullable = false)
     private Rubrique rubrique;
     
     @OneToMany(mappedBy = "topic")
-    private Set<Message> messages;
-    
+    private Set<Message> messages = new HashSet<>();
+
     public Topic()
     {
     }
@@ -75,7 +87,24 @@ public class Topic
     {
         this.dateCreation = dateCreation;
     }
-    
+
+    /**
+     * Getter
+     * @return dateModification
+     */
+    public LocalDateTime getDateModification() {
+        return dateModification;
+    }
+
+    /**
+     * Setter
+     *
+     * @param dateModification sets value
+     */
+    public void setDateModification(LocalDateTime dateModification) {
+        this.dateModification = dateModification;
+    }
+
     /**
      * Getter
      * @return createur
@@ -93,7 +122,24 @@ public class Topic
     {
         this.createur = createur;
     }
-    
+
+    /**
+     * Getter
+     * @return modificateur
+     */
+    public Utilisateur getModificateur() {
+        return modificateur;
+    }
+
+    /**
+     * Setter
+     *
+     * @param modificateur sets value
+     */
+    public void setModificateur(Utilisateur modificateur) {
+        this.modificateur = modificateur;
+    }
+
     /**
      * Getter
      * @return rubrique
@@ -129,4 +175,6 @@ public class Topic
     {
         this.messages = messages;
     }
+
+
 }
