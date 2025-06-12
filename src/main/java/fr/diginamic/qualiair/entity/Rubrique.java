@@ -26,10 +26,6 @@ public class Rubrique
     @JoinColumn(name = "id_createur", nullable = false)
     private Utilisateur createur;
 
-    @ManyToOne
-    @JoinColumn(name= "id_modificateur")
-    private Utilisateur modificateur;
-
     @OneToMany(mappedBy = "rubrique")
     private Set<Topic> topics = new HashSet<>();
     
@@ -117,7 +113,9 @@ public class Rubrique
     {
         this.dateCreation = dateCreation;
     }
-    
+
+
+
     /**
      * Getter
      * @return createur
@@ -136,19 +134,4 @@ public class Rubrique
         this.createur = createur;
     }
 
-    /**
-     * Getter
-     * @return modificateur
-     */
-    public Utilisateur getModificateur() {
-        return modificateur;
-    }
-
-    /**
-     * Setter
-     * @param modificateur sets value
-     */
-    public void setModificateur(Utilisateur modificateur) {
-        this.modificateur = modificateur;
-    }
 }
