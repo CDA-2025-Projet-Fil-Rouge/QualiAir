@@ -13,18 +13,23 @@ public class Utilisateur
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String prenom;
+    @Column(nullable = false)
     private String nom;
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
     @Column(name = "date_inscription")
     private LocalDateTime dateInscription;
+    @Column(unique = true, nullable = false)
     private String email;
+    @Column(name = "mot_de_passe", nullable = false)
+    private String motDePasse;
     private RoleUtilisateur role;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_adresse")
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_adresse", nullable = false)
     private Adresse adresse;
     
     @OneToMany(mappedBy = "createur")
@@ -34,13 +39,7 @@ public class Utilisateur
     @OneToMany(mappedBy = "createur")
     private Set<Rubrique> rubriques;
     
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<MessageModification> messageModifications;
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<TopicModification> topicModifications;
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<RubriqueModification> rubriqueModifications;
-    
+
     public Utilisateur()
     {
     }
@@ -143,7 +142,23 @@ public class Utilisateur
     {
         this.email = email;
     }
-    
+
+    /**
+     * Getter
+     * @return motDePasse
+     */
+    public String getMotDePasse() {
+        return motDePasse;
+    }
+
+    /**
+     * Setter
+     * @param motDePasse sets value
+     */
+    public void setMotDePasse(String motDePasse) {
+        this.motDePasse = motDePasse;
+    }
+
     /**
      * Getter
      * @return role
@@ -232,59 +247,5 @@ public class Utilisateur
     public void setRubriques(Set<Rubrique> rubriques)
     {
         this.rubriques = rubriques;
-    }
-    
-    /**
-     * Getter
-     * @return messageModifications
-     */
-    public Set<MessageModification> getMessageModifications()
-    {
-        return messageModifications;
-    }
-    
-    /**
-     * Setter
-     * @param messageModifications sets value
-     */
-    public void setMessageModifications(Set<MessageModification> messageModifications)
-    {
-        this.messageModifications = messageModifications;
-    }
-    
-    /**
-     * Getter
-     * @return topicModifications
-     */
-    public Set<TopicModification> getTopicModifications()
-    {
-        return topicModifications;
-    }
-    
-    /**
-     * Setter
-     * @param topicModifications sets value
-     */
-    public void setTopicModifications(Set<TopicModification> topicModifications)
-    {
-        this.topicModifications = topicModifications;
-    }
-    
-    /**
-     * Getter
-     * @return rubriqueModifications
-     */
-    public Set<RubriqueModification> getRubriqueModifications()
-    {
-        return rubriqueModifications;
-    }
-    
-    /**
-     * Setter
-     * @param rubriqueModifications sets value
-     */
-    public void setRubriqueModifications(Set<RubriqueModification> rubriqueModifications)
-    {
-        this.rubriqueModifications = rubriqueModifications;
     }
 }
