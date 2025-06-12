@@ -2,16 +2,11 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
-import fr.diginamic.qualiair.dto.insertion.DtoFromCsv;
-import fr.diginamic.qualiair.entity.Commune;
-import fr.diginamic.qualiair.entity.Coordonnee;
-import fr.diginamic.qualiair.entity.Departement;
-import fr.diginamic.qualiair.entity.Region;
+import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.CommuneMapper;
-import fr.diginamic.qualiair.mapper.CoordonneeMapper;
-import fr.diginamic.qualiair.mapper.DepartementMapper;
-import fr.diginamic.qualiair.mapper.RegionMapper;
+import fr.diginamic.qualiair.exception.FunctionnalException;
+import fr.diginamic.qualiair.exception.ParsedDataException;
+import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +21,7 @@ public class RecensementParserService {
 
     @Autowired
     private CsvParser parser;
+
     @Autowired
     private CoordonneeService coordonneeService;
     @Autowired
@@ -36,8 +31,6 @@ public class RecensementParserService {
     @Autowired
     private DepartementService departementService;
     @Autowired
-    private CacheService cacheService;
-    @Autowired
     private CommuneMapper communeMapper;
     @Autowired
     private DepartementMapper departementMapper;
@@ -45,97 +38,101 @@ public class RecensementParserService {
     private RegionMapper regionMapper;
     @Autowired
     private CoordonneeMapper coordonneeMapper;
+    @Autowired
+    private MesurePopulationService mesurePopulationService;
+    @Autowired
+    private MesureMapper mesureMapper;
+    @Autowired
+    private RecensementCsvMapper recensementCsvMapper;
+
     @Value("${recensement.fichier.communes-with-pop.path}")
-    private String pathFichier1;
+    private String pathFichierPop;
     @Value("${recensement.fichier.communes-with-coord.path}")
-    private String pathFichier2;
-
-
-    // could go to a mapper
-    private CommuneCoordDto getFichierCommuneCoordDto(String[] tokens) {
-        CommuneCoordDto dto = new CommuneCoordDto();
-        dto.setCodeCommuneINSEE(tokens[0]);
-        dto.setNomCommunePostal(tokens[1]);
-        dto.setCodePostal(tokens[2]);
-        dto.setLatitude(tokens[5]);
-        dto.setLongitude(tokens[6]);
-        dto.setNomCommuneComplet(tokens[10]);
-        dto.setCodeDepartement(tokens[11]);
-        dto.setNomDepartement(tokens[12]);
-        dto.setCodeRegion(tokens[13]);
-        dto.setNomRegion(tokens[14]);
-        return dto;
-    }
-
-    // could go to a mapper
-    private CommuneHabitantDto getFichierCommuneHabitantDto(String[] tokens) {
-        CommuneHabitantDto dto = new CommuneHabitantDto();
-        dto.setNomCommune(tokens[6]);
-        dto.setPopulationTotale(tokens[7]);
-        return dto;
-    }
-
-    private List<DtoFromCsv> parseListVilleFromFichier(String pathFichier) throws IOException, FileNotFoundException {
-        List<String> lines = parser.parseFile(pathFichier);
-        lines.removeFirst(); //skip header
-
-        List<DtoFromCsv> list = new ArrayList<>();
-
-        for (String line : lines) {
-            String[] tokens = line.split(",");
-            if (pathFichier.equals(pathFichier1)) {
-
-                CommuneCoordDto dto = getFichierCommuneCoordDto(tokens);
-                list.add(dto);
-            }
-            if (pathFichier.equals(pathFichier2)) {
-                CommuneHabitantDto dto = getFichierCommuneHabitantDto(tokens);
-                list.add(dto);
-            } else {
-                throw new FileNotFoundException("File not found for this path: " + pathFichier);
-            }
-        }
-
-        return list;
-    }
+    private String pathFichierCoord;
 
     @Transactional
-    public void saveCommunesFromFichier() throws FileNotFoundException, IOException {
+    public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
+        validateFilePaths();
 
-        if (pathFichier1 == null) {
-            throw new FileNotFoundException("Couldn't find file 1");
+        List<CommuneCoordDto> coordDtos = parseCoordFile(pathFichierCoord);
+        saveEntitiesFromCoordDtos(coordDtos);
+
+        List<CommuneHabitantDto> popDtos = parsePopFile(pathFichierPop);
+        savePopulationFromDtos(popDtos);
+    }
+
+    private void validateFilePaths() throws FileNotFoundException {
+        if (pathFichierCoord == null) {
+            throw new FileNotFoundException("Missing coordinate file");
         }
-        if (pathFichier2 == null) {
-            throw new FileNotFoundException("Couldn't find file 2");
+        if (pathFichierPop == null) {
+            throw new FileNotFoundException("Missing population file");
         }
+    }
 
-        List<DtoFromCsv> fichier1List = parseListVilleFromFichier(pathFichier1);
+    private List<CommuneCoordDto> parseCoordFile(String path) throws IOException {
+        List<String> lines = parser.parseFile(path);
+        lines.removeFirst(); // skip header
+        return lines.stream()
+                .map(line -> line.split(","))
+                .filter(tokens -> tokens.length >= 14)
+                .map(recensementCsvMapper::mapToCommuneCoordDto)
+                .toList();
+    }
 
-        for (DtoFromCsv dto : fichier1List) {
+    private List<CommuneHabitantDto> parsePopFile(String path) throws IOException {
+        List<String> lines = parser.parseFile(path);
+        lines.removeFirst(); // skip header
+        return lines.stream()
+                .map(line -> line.split(","))
+                .filter(tokens -> tokens.length >= 8)
+                .map(recensementCsvMapper::mapToCommuneHabitantDto)
+                .toList();
+    }
 
-            Region region = regionMapper.toEntityFromCommuneCoordDto(dto);
-            regionService.findOrCreate(region);
+    private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) {
+        for (CommuneCoordDto dto : dtos) {
+            Region region = regionService.findOrCreate(regionMapper.toEntityFromCommuneCoordDto(dto));
 
             Departement departement = departementMapper.toEntityFromCommuneCoordDto(dto);
             departement.setRegion(region);
-            departementService.findOrCreate(departement);
+            departement = departementService.findOrCreate(departement);
 
-            Coordonnee coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
-            coordonneeService.findOrCreate(coordonnee);
+
+            Coordonnee coordonnee = null;
+            try {
+                coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
+                coordonnee = coordonneeService.findOrCreate(coordonnee);
+            } catch (Exception e) {
+                continue;
+            }
 
             Commune commune = communeMapper.toEntityFromCommuneCoordDto(dto);
-            commune.setCoordonnee(coordonnee);
             commune.setDepartement(departement);
+            commune.setCoordonnee(coordonnee);
             communeService.findOrCreate(commune);
         }
-
-        List<DtoFromCsv> fichier2List = parseListVilleFromFichier(pathFichier2);
-        for (DtoFromCsv dto : fichier2List) {
-            Commune commune = communeMapper.toEntityFromCommuneHabitantDto(dto);
-            communeService.updateByName(commune);
-        }
-
-
     }
 
+    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) {
+        for (CommuneHabitantDto dto : dtos) {
+            String name = dto.getNomCommune();
+            String popStr = dto.getPopulationMunicipale();
+
+            if (popStr == null) {
+                throw new ParsedDataException("La population ne peut pas être nulle pour " + name);
+            }
+
+            Commune commune = communeService.getFromCache(name);
+
+            if (commune == null || commune.getCoordonnee() == null) {
+                throw new FunctionnalException("Coordonnée manquante pour la commune : " + name);
+            }
+
+            MesurePopulation mesure = new MesurePopulation();
+            mesure.setCoordonnee(commune.getCoordonnee());
+
+            mesurePopulationService.save(mesure);
+        }
+    }
 }
