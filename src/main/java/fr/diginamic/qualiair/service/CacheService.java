@@ -4,9 +4,7 @@ import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.repository.*;
 import fr.diginamic.qualiair.utils.MesureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +12,7 @@ import java.util.Map;
 
 import static fr.diginamic.qualiair.utils.CoordonneeUtils.toKey;
 
-@Configuration
-@Profile("commandLineApp")
+@Service
 public class CacheService {
     private final Map<String, Commune> communeMap = new HashMap<>();
     private final Map<String, Region> regionMap = new HashMap<>();
@@ -34,51 +31,90 @@ public class CacheService {
     @Autowired
     private MesurePopulationRepository mesurePopulationRepository;
 
-    @Bean
-    @Profile("commandLineApp")
-    public Map<String, Commune> loadExistingCommunes() {
+
+    public void loadAllCaches() {
+        loadExistingCommunes();
+        loadExistingRegions();
+        loadExistingDepartements();
+        loadExistingCoordonnees();
+        loadExistingMesurePopulation();
+    }
+
+    public void loadExistingCommunes() {
         List<Commune> communeList = communeRepository.findAll();
         System.out.println("cache loaded");
         communeList.forEach(commune -> communeMap.put(commune.getNom(), commune));
-        return communeMap;
+
     }
 
-    @Bean
-    @Profile("commandLineApp")
-    public Map<String, Region> loadExistingRegions() {
+    public void loadExistingRegions() {
         List<Region> regionList = regionRepository.findAll();
         System.out.println("cache loaded");
         regionList.forEach(region -> regionMap.put(region.getNom(), region));
-        return regionMap;
     }
 
-    @Bean
-    @Profile("commandLineApp")
-    public Map<String, Departement> loadExistingDepartements() {
+    public void loadExistingDepartements() {
         List<Departement> departementList = departementRepository.findAll();
         System.out.println("cache loaded");
         departementList.forEach(departement -> departementMap.put(departement.getNom(), departement));
-        return departementMap;
     }
 
-    @Bean
-    @Profile("commandLineApp")
-    public Map<String, Coordonnee> loadExistingCoordonnees() {
+    public void loadExistingCoordonnees() {
         List<Coordonnee> coordonnees = coordonneRepository.findAll();
         coordonnees.forEach(c ->
                 coordonneeMap.put(toKey(c.getLatitude(), c.getLongitude()), c)
         );
+    }
+
+    public void loadExistingMesurePopulation() {
+        List<MesurePopulation> mesuresPopulation = mesurePopulationRepository.findAll();
+        mesuresPopulation.forEach(m -> mesurePopulationMap.put(MesureUtils.toKey(m), m));
+    }
+
+    /**
+     * Getter
+     *
+     * @return communeMap
+     */
+    public Map<String, Commune> getCommuneMap() {
+        return communeMap;
+    }
+
+    /**
+     * Getter
+     *
+     * @return regionMap
+     */
+    public Map<String, Region> getRegionMap() {
+        return regionMap;
+    }
+
+    /**
+     * Getter
+     *
+     * @return departementMap
+     */
+    public Map<String, Departement> getDepartementMap() {
+        return departementMap;
+    }
+
+    /**
+     * Getter
+     *
+     * @return coordonneeMap
+     */
+    public Map<String, Coordonnee> getCoordonneeMap() {
         return coordonneeMap;
     }
 
-    @Bean
-    @Profile("commandLineApp")
-    public Map<String, MesurePopulation> loadExistingMesurePopulation() {
-        List<MesurePopulation> mesuresPopulation = mesurePopulationRepository.findAll();
-        mesuresPopulation.forEach(m -> mesurePopulationMap.put(MesureUtils.toKey(m), m));
+    /**
+     * Getter
+     *
+     * @return mesurePopulationMap
+     */
+    public Map<String, MesurePopulation> getMesurePopulationMap() {
         return mesurePopulationMap;
     }
-
 
     public void clearCaches() {
         communeMap.clear();

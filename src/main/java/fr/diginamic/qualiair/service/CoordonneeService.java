@@ -13,11 +13,13 @@ import static fr.diginamic.qualiair.utils.CoordonneeUtils.toKey;
 public class CoordonneeService {
 
     @Autowired
-    private Map<String, Coordonnee> cache;
+    private CacheService cacheService;
     @Autowired
     private CoordonneRepository coordonneRepository;
 
     public Coordonnee findOrCreate(Coordonnee coordonnee) {
+        Map<String, Coordonnee> cache = cacheService.getCoordonneeMap();
+
         String key = toKey(coordonnee.getLatitude(), coordonnee.getLongitude());
 
         if (cache.get(key) != null) {

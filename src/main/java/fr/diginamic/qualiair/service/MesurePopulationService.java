@@ -12,12 +12,12 @@ import static fr.diginamic.qualiair.utils.MesureUtils.toKey;
 @Service
 public class MesurePopulationService {
     @Autowired
-    MesurePopulationRepository mesurePopulationRepository;
+    private MesurePopulationRepository mesurePopulationRepository;
     @Autowired
-    private Map<String, MesurePopulation> cache;
+    private CacheService cacheService;
 
     public MesurePopulation save(MesurePopulation mesure) {
-
+        Map<String, MesurePopulation> cache = cacheService.getMesurePopulationMap();
         String key = toKey(mesure);
         if (cache.get(key) != null) {
             return cache.get(key);
