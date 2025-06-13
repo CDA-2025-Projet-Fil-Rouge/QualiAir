@@ -7,7 +7,6 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import org.springframework.stereotype.Component;
 
 /**
  * Classe utilitaire pour les classes de services dédiées au Forum :
@@ -50,5 +49,13 @@ public final class ForumUtils {
     public static Message findMessageOrThrow(MessageRepository repo, Long id) throws FileNotFoundException {
         return repo.findById(id)
                 .orElseThrow(() -> new FileNotFoundException("Message introuvable"));
+    }
+
+    public static boolean ensureMatchingIds(Long entityId, Long dtoId) {
+        if (entityId.equals(dtoId)) {
+            return true;
+        } else {
+            throw new IllegalArgumentException("L'identifiant de l'URL et celui du corps ne correspondent pas.");
+        }
     }
 }

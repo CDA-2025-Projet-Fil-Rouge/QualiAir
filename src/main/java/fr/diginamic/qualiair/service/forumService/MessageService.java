@@ -54,6 +54,7 @@ public class MessageService {
      * @return le message créé sous forme de DTO.
      * @throws BusinessRuleException si le message ne respecte pas les règles métier.
      * @throws IllegalArgumentException si le topic lié est introuvable.
+     * @throws FileNotFoundException si le topic associé n'est pas trouvé
      */
     public MessageDto createMessage(MessageDto dto, Utilisateur createur)
             throws BusinessRuleException, FileNotFoundException {
@@ -78,18 +79,36 @@ public class MessageService {
      * @throws AccessDeniedException si l'utilisateur n'est ni admin ni auteur du message.
      * @throws IllegalArgumentException si le message est introuvable ou invalide.
      * @throws BusinessRuleException si le message modifié ne respecte pas les règles métier.
+     * @throws FileNotFoundException si le message n'est pas trouvé
      */
     public MessageDto updateMessage(Long idMessage, MessageDto dto, Utilisateur modificateur)
             throws BusinessRuleException, FileNotFoundException {
-        Message message = ForumUtils.findMessageOrThrow(messageRepository, dto.getId());
 
+        ForumUtils.ensureMatchingIds(idMessage, dto.getId());
+        Message message = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
         UtilisateurUtils.checkAuthorOrAdmin(modificateur, dto.getIdCreateur());
+        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());
 
         message.setContenu(dto.getContenu());
+        message.setTopic(topic);
         message.setDateModification(LocalDateTime.now());
         message.setModificateur(modificateur);
         messageValidator.validate(message);
         messageRepository.save(message);
         return messageMapper.toDto(message);
+    }
+
+    /**
+     *  Suppression d'un message existant si l'utilisateur est l'auteur ou un administrateur.
+     *
+     * @param idMessage identifiant du message à supprimer.
+     * @param user l'utilisateur connecté tentant la suppression.
+     * @throws FileNotFoundException si le message n'est pas trouvé
+     */
+    public void deleteMessage(Long idMessage, Utilisateur user) throws FileNotFoundException {
+        Message messageASupprimer = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
+        UtilisateurUtils.checkAuthorOrAdmin(user, messageASupprimer.getCreateur().getId());
+
+        messageRepository.delete(messageASupprimer);
     }
 }

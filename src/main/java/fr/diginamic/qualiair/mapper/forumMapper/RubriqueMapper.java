@@ -25,6 +25,10 @@ public class RubriqueMapper {
         dto.setPrioriteAffichageIndice(rubrique.getPrioriteAffichageIndice());
         dto.setDateCreation(rubrique.getDateCreation());
         dto.setIdCreateur(rubrique.getCreateur().getId());
+        if (rubrique.getModificateur() != null) {
+            dto.setIdModificateur(rubrique.getModificateur().getId());
+            dto.setDateModification(rubrique.getDateModification());
+        }
         return dto;
     }
 

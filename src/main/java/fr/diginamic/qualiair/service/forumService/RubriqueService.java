@@ -4,8 +4,10 @@ import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.entity.Rubrique;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapper;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
+import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.RubriqueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +58,32 @@ public class RubriqueService {
         Rubrique rubrique = rubriqueMapper.toEntity(dto);
         rubrique.setCreateur(createur);
         rubrique.setDateCreation(LocalDateTime.now());
+        rubriqueValidator.validate(rubrique);
+        rubriqueRepository.save(rubrique);
+        return rubriqueMapper.toDto(rubrique);
+    }
+
+    /**
+     * Met à jour une rubrique existante si l'utilisateur est un administrateur.
+     *
+     * @param idRubrique identifiant de la rubrique à modifier.
+     * @param dto les nouvelles données de la rubrique.
+     * @param modificateur l'utilisateur connecté tentant la modification.
+     * @return la rubrique modifiée sous forme de DTO.
+     * @throws AccessDeniedException si l'utilisateur n'est pas admin.
+     * @throws IllegalArgumentException si la rubrique est introuvable ou invalide.
+     * @throws BusinessRuleException si la rubrique modifiée ne respecte pas les règles métier.
+     */
+    public RubriqueDto updateRubrique(Long idRubrique, RubriqueDto dto, Utilisateur modificateur)
+        throws BusinessRuleException, FileNotFoundException {
+
+        ForumUtils.ensureMatchingIds(idRubrique, dto.getId());
+        Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, idRubrique);
+        UtilisateurUtils.isAdmin(modificateur);
+
+        rubrique.setNom(dto.getNom());
+        rubrique.setDateModification(LocalDateTime.now());
+        rubrique.setModificateur(modificateur);
         rubriqueValidator.validate(rubrique);
         rubriqueRepository.save(rubrique);
         return rubriqueMapper.toDto(rubrique);

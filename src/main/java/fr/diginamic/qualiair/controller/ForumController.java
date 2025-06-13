@@ -121,6 +121,45 @@ public class ForumController {
         MessageDto created = messageService.createMessage(dto, createur);
         return ResponseEntity.ok(created);
     }
+
+    /**
+     * Met à jour un message existant, uniquement si l'utilisateur est son auteur ou un administrateur.
+     *
+     * @param id       l'identifiant de la rubrique à mettre à jour
+     * @param dto      les nouvelles données de la rubrique
+     * @param request  la requête HTTP contenant l'identité de l'utilisateur
+     * @return la rubrique mise à jour
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @PutMapping("/update-rubrique/{id}")
+    public ResponseEntity<RubriqueDto> updateRubrique(
+            @PathVariable Long id,
+            @RequestBody RubriqueDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur modificateur = httpRequestUtils.getUtilisateurFromRequest(request);
+        RubriqueDto updated = rubriqueService.updateRubrique(id, dto, modificateur);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Met à jour un topic existant, uniquement si l'utilisateur est son auteur ou un administrateur.
+     * @param id       l'identifiant du topic à mettre à jour
+     * @param dto      les nouvelles données du topic
+     * @param request  la requête HTTP contenant l'identité de l'utilisateur
+     * @return le topic mis à jour
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @PutMapping("/update-topic/{id}")
+    public ResponseEntity<TopicDto> updateTopic(
+            @PathVariable Long id,
+            @RequestBody TopicDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur modificateur = httpRequestUtils.getUtilisateurFromRequest(request);
+        TopicDto updated = topicService.updateTopic(id, dto, modificateur);
+        return ResponseEntity.ok(updated);
+    }
+
+
     /**
      * Met à jour un message existant, uniquement si l'utilisateur est son auteur ou un administrateur.
      *
@@ -139,5 +178,16 @@ public class ForumController {
         MessageDto updated = messageService.updateMessage(id, dto, modificateur);
         return ResponseEntity.ok(updated);
     }
+
+    @DeleteMapping("/delete-message/{id}")
+    public ResponseEntity<?> deleteMessage(
+            @PathVariable Long id,
+            HttpServletRequest request
+    ) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        messageService.deleteMessage(id, user);
+        return ResponseEntity.ok("Message supprimé");
+    }
+
 }
 

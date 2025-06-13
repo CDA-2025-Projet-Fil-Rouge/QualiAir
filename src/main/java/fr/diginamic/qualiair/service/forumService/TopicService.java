@@ -1,6 +1,8 @@
 package fr.diginamic.qualiair.service.forumService;
 
+import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
+import fr.diginamic.qualiair.entity.Message;
 import fr.diginamic.qualiair.entity.Rubrique;
 import fr.diginamic.qualiair.entity.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
@@ -10,8 +12,10 @@ import fr.diginamic.qualiair.mapper.forumMapper.TopicMapper;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
 import fr.diginamic.qualiair.utils.ForumUtils;
+import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.TopicValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -62,6 +66,34 @@ public class TopicService {
 
         Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, dto.getId());
         topic.setRubrique(rubrique);
+        topicValidator.validate(topic);
+        topicRepository.save(topic);
+        return topicMapper.toDto(topic);
+    }
+
+    /**
+     * Met à jour un topic existant si l'utilisateur est l'auteur ou un administrateur.
+     *
+     * @param idTopic identifiant du topic à modifier.
+     * @param dto les nouvelles données du topic.
+     * @param modificateur l'utilisateur connecté tentant la modification.
+     * @return le topic modifié sous forme de DTO.
+     * @throws AccessDeniedException si l'utilisateur n'est ni admin ni auteur du topic.
+     * @throws IllegalArgumentException si le topic est introuvable ou invalide.
+     * @throws BusinessRuleException si le topic modifié ne respecte pas les règles métier.
+     */
+    public TopicDto updateTopic(Long idTopic, TopicDto dto, Utilisateur modificateur)
+            throws BusinessRuleException, FileNotFoundException {
+        ForumUtils.ensureMatchingIds(idTopic, dto.getId());
+        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, idTopic);
+
+        UtilisateurUtils.checkAuthorOrAdmin(modificateur, dto.getIdCreateur());
+        Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, dto.getIdRubrique());
+
+        topic.setNom(dto.getNom());
+        topic.setRubrique(rubrique);
+        topic.setDateModification(LocalDateTime.now());
+        topic.setModificateur(modificateur);
         topicValidator.validate(topic);
         topicRepository.save(topic);
         return topicMapper.toDto(topic);
