@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static fr.diginamic.qualiair.utils.MesureUtils.toKey;
+
 @Service
 public class MesurePopulationService {
     @Autowired
@@ -15,11 +17,13 @@ public class MesurePopulationService {
     private Map<String, MesurePopulation> cache;
 
     public MesurePopulation save(MesurePopulation mesure) {
-        if (cache.get(mesure.getNom()) != null) {
-            return cache.get(mesure.getNom());
+
+        String key = toKey(mesure);
+        if (cache.get(key) != null) {
+            return cache.get(key);
         }
         mesurePopulationRepository.save(mesure);
-        cache.put(mesure.getNom(), mesure);
+        cache.put(key, mesure);
         return mesure;
     }
 }

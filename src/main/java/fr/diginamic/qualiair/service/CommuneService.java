@@ -1,7 +1,6 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.entity.Commune;
-import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +35,9 @@ public class CommuneService {
 
     public Commune getFromCache(String communeName) {
         Commune existing = communeCache.get(communeName);
-        if (communeCache.get(communeName) == null) {
-            throw new FunctionnalException("Commune doesn't exist for: " + communeName);
-        }
+//        if (communeCache.get(communeName) == null) {
+//            throw new FunctionnalException("Commune doesn't exist for: " + communeName);
+//        }
         return existing;
     }
 }

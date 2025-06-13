@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.repository.*;
+import fr.diginamic.qualiair.utils.MesureUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,7 +75,7 @@ public class CacheService {
     @Profile("commandLineApp")
     public Map<String, MesurePopulation> loadExistingMesurePopulation() {
         List<MesurePopulation> mesuresPopulation = mesurePopulationRepository.findAll();
-        mesuresPopulation.forEach(m -> mesurePopulationMap.put(m.getNom(), m));
+        mesuresPopulation.forEach(m -> mesurePopulationMap.put(MesureUtils.toKey(m), m));
         return mesurePopulationMap;
     }
 

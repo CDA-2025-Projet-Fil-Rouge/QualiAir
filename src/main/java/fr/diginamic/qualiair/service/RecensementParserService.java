@@ -4,10 +4,9 @@ import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.exception.FunctionnalException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
+import fr.diginamic.qualiair.repository.MesureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +48,8 @@ public class RecensementParserService {
     private String pathFichierPop;
     @Value("${recensement.fichier.communes-with-coord.path}")
     private String pathFichierCoord;
+    @Autowired
+    private MesureRepository mesureRepository;
 
     @Transactional
     public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
@@ -84,7 +85,7 @@ public class RecensementParserService {
         List<String> lines = parser.parseFile(path);
         lines.removeFirst(); // skip header
         return lines.stream()
-                .map(line -> line.split(","))
+                .map(line -> line.split(";"))
                 .filter(tokens -> tokens.length >= 8)
                 .map(recensementCsvMapper::mapToCommuneHabitantDto)
                 .toList();
@@ -97,7 +98,6 @@ public class RecensementParserService {
             Departement departement = departementMapper.toEntityFromCommuneCoordDto(dto);
             departement.setRegion(region);
             departement = departementService.findOrCreate(departement);
-
 
             Coordonnee coordonnee = null;
             try {
@@ -116,20 +116,16 @@ public class RecensementParserService {
 
     private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) {
         for (CommuneHabitantDto dto : dtos) {
-            String name = dto.getNomCommune();
-            String popStr = dto.getPopulationMunicipale();
 
-            if (popStr == null) {
-                throw new ParsedDataException("La population ne peut pas être nulle pour " + name);
-            }
+            String name = dto.getNomCommune();
 
             Commune commune = communeService.getFromCache(name);
-
-            if (commune == null || commune.getCoordonnee() == null) {
-                throw new FunctionnalException("Coordonnée manquante pour la commune : " + name);
+            if (commune == null) {
+                continue;
             }
 
-            MesurePopulation mesure = new MesurePopulation();
+            MesurePopulation mesure = mesureMapper.toEntityFromCommuneCoordDto(dto);
+
             mesure.setCoordonnee(commune.getCoordonnee());
 
             mesurePopulationService.save(mesure);
