@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
+import fr.diginamic.qualiair.entity.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.security.JwtAuthentificationService;
 import fr.diginamic.qualiair.service.UtilisateurService;
@@ -66,6 +67,16 @@ public class ForumController {
         Utilisateur createur = utilisateurService.getUser(
                 jwtAuthentificationService.getEmailFromCookie(request));
         RubriqueDto created = rubriqueService.createRubrique(dto, createur);
+        return ResponseEntity.ok(created);
+    }
+
+    @PostMapping("/create-topic")
+    public ResponseEntity<TopicDto> createTopic(
+            @RequestBody TopicDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur createur = utilisateurService.getUser(
+                jwtAuthentificationService.getEmailFromCookie(request));
+        TopicDto created = topicService.createTopic(dto, createur);
         return ResponseEntity.ok(created);
     }
 }

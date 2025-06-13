@@ -20,4 +20,10 @@ public class TopicMapper {
         }
         return dto;
     }
+
+    public Topic toEntity(TopicDto dto) {
+        Topic entity = new Topic();
+        entity.setNom(dto.getNom());
+        return entity;
+    }
 }
