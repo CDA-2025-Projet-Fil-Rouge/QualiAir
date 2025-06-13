@@ -27,8 +27,8 @@ public class RecensementCsvMapper {
 //        System.out.println(tokens.length);
         CommuneHabitantDto dto = new CommuneHabitantDto();
         dto.setNomCommune(tokens[6].trim().replace(" ", ""));
-        dto.setPopulationTotale(tokens[7]);
-        dto.setPopulationMunicipale(tokens[8]);
+        dto.setPopulationTotale(tokens[9].trim().replace(" ", ""));
+        dto.setPopulationMunicipale(tokens[7].trim().replace(" ", ""));
         return dto;
     }
 }
