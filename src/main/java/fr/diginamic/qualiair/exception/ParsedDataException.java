@@ -1,6 +1,9 @@
 package fr.diginamic.qualiair.exception;
 
-public class ParsedDataException extends RuntimeException {
+/**
+ * Erreur de parsing de fichier csv
+ */
+public class ParsedDataException extends Exception {
     public ParsedDataException(String message) {
         super(message);
     }

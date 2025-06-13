@@ -1,6 +1,9 @@
 package fr.diginamic.qualiair.exception;
 
-public class FunctionnalException extends RuntimeException {
+/**
+ * Erreur fonctionnelle
+ */
+public class FunctionnalException extends Exception {
     public FunctionnalException(String message) {
         super(message);
     }

@@ -8,8 +8,17 @@ import java.time.LocalDateTime;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.toInt;
 
+/**
+ * Mesure Mapper
+ */
 @Component
 public class MesureMapper {
+    /**
+     * Map a dto from csv to entity
+     *
+     * @param dto dto from csv
+     * @return entity
+     */
     public MesurePopulation toEntityFromCommuneCoordDto(CommuneHabitantDto dto) {
         MesurePopulation mesure = new MesurePopulation();
         mesure.setNom("Population");

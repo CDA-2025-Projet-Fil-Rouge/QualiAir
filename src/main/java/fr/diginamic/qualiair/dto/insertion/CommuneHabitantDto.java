@@ -4,9 +4,7 @@ package fr.diginamic.qualiair.dto.insertion;
  * DTO containing useful elements from the file communeWithHab
  */
 public class CommuneHabitantDto implements DtoFromCsv {
-    //    private String codeRegion;
-//    private String nomRegion;
-//    private String codeDepartment;
+
     private String nomCommune;
     private String populationMunicipale;
     private String populationTotale;

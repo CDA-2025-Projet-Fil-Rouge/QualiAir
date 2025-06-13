@@ -9,14 +9,29 @@ import java.util.Map;
 
 import static fr.diginamic.qualiair.utils.CoordonneeUtils.toKey;
 
+/**
+ * Cordinates service
+ */
 @Service
 public class CoordonneeService {
 
+    /**
+     * Cache service
+     */
     @Autowired
     private CacheService cacheService;
+    /**
+     * Coordinates repository
+     */
     @Autowired
     private CoordonneRepository coordonneRepository;
 
+    /**
+     * Find from cache or create an entity and add it to the cache
+     *
+     * @param coordonnee commune entity
+     * @return existing or created entity
+     */
     public Coordonnee findOrCreate(Coordonnee coordonnee) {
         Map<String, Coordonnee> cache = cacheService.getCoordonneeMap();
 

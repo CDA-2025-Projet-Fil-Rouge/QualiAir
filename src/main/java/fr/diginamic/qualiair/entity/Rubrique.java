@@ -3,6 +3,8 @@ package fr.diginamic.qualiair.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "rubrique")
@@ -11,21 +13,22 @@ public class Rubrique
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String nom;
+    @Column(nullable = false)
     private String description;
-    @Column(name = "priorite_affichage_indice")
-    private int prioriteAffichageIndice;
-    @Column(name = "date_creation")
+    @Column(name = "priorite_affichage_indice", nullable = false)
+    private int prioriteAffichageIndice = 0;
+    @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
     
-    @ManyToOne
-    @JoinColumn(name = "id_createur")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_createur", nullable = false)
     private Utilisateur createur;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_rubrique")
-    private Rubrique rubrique;
+
+    @OneToMany(mappedBy = "rubrique")
+    private Set<Topic> topics = new HashSet<>();
     
     public Rubrique()
     {
@@ -111,7 +114,9 @@ public class Rubrique
     {
         this.dateCreation = dateCreation;
     }
-    
+
+
+
     /**
      * Getter
      * @return createur
@@ -129,22 +134,5 @@ public class Rubrique
     {
         this.createur = createur;
     }
-    
-    /**
-     * Getter
-     * @return rubrique
-     */
-    public Rubrique getRubrique()
-    {
-        return rubrique;
-    }
-    
-    /**
-     * Setter
-     * @param rubrique sets value
-     */
-    public void setRubrique(Rubrique rubrique)
-    {
-        this.rubrique = rubrique;
-    }
+
 }
