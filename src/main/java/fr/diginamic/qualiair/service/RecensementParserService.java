@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
 import fr.diginamic.qualiair.repository.MesureRepository;
@@ -73,7 +74,7 @@ public class RecensementParserService {
      * @throws FileNotFoundException error finding the file
      */
     @Transactional
-    public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
+    public void saveCommunesFromFichier() throws IOException, FileNotFoundException, ParsedDataException {
         validateFilePaths();
         cacheService.loadAllCaches();
 
@@ -145,7 +146,7 @@ public class RecensementParserService {
      *
      * @param dtos list of dtos
      */
-    private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) {
+    private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) throws ParsedDataException {
         for (CommuneCoordDto dto : dtos) {
             Region region = regionService.findOrCreate(regionMapper.toEntityFromCommuneCoordDto(dto));
 
@@ -173,7 +174,7 @@ public class RecensementParserService {
      *
      * @param dtos list of dtos
      */
-    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) {
+    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) throws ParsedDataException {
         for (CommuneHabitantDto dto : dtos) {
 
             String name = dto.getNomCommune();

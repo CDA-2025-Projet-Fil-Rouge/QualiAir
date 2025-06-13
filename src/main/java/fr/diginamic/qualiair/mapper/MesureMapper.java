@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.mapper;
 
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.MesurePopulation;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,7 @@ public class MesureMapper {
      * @param dto dto from csv
      * @return entity
      */
-    public MesurePopulation toEntityFromCommuneCoordDto(CommuneHabitantDto dto) {
+    public MesurePopulation toEntityFromCommuneCoordDto(CommuneHabitantDto dto) throws ParsedDataException {
         MesurePopulation mesure = new MesurePopulation();
         mesure.setNom("Population");
         mesure.setDate(LocalDateTime.now());

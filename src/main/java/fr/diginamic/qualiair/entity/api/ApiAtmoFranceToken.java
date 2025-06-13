@@ -2,41 +2,20 @@ package fr.diginamic.qualiair.entity.api;
 
 import java.time.LocalDateTime;
 
-public class ApiAtmoFranceToken {
+public class ApiAtmoFranceToken extends ApiToken {
 
-    /**
-     * Bearer token required to access the api, valid for 1h
-     */
-    private String bearerToken;
+
     /**
      * Time the token was acquired at
      */
-    private LocalDateTime localDateTimeTokenObtention;
+    private final LocalDateTime localDateTimeTokenObtention;
 
     public ApiAtmoFranceToken() {
+        this.localDateTimeTokenObtention = LocalDateTime.now();
     }
 
-    public ApiAtmoFranceToken(String bearerToken, LocalDateTime localDateTimeTokenObtention) {
-        this.bearerToken = bearerToken;
-        this.localDateTimeTokenObtention = localDateTimeTokenObtention;
-    }
-
-    /**
-     * Getter
-     *
-     * @return bearerToken
-     */
-    public String getBearerToken() {
-        return bearerToken;
-    }
-
-    /**
-     * Setter
-     *
-     * @param bearerToken sets value
-     */
-    public void setBearerToken(String bearerToken) {
-        this.bearerToken = bearerToken;
+    public ApiAtmoFranceToken(ApiToken bearerToken, LocalDateTime localDateTimeTokenObtention) {
+        this.localDateTimeTokenObtention = LocalDateTime.now();
     }
 
     /**
@@ -48,12 +27,4 @@ public class ApiAtmoFranceToken {
         return localDateTimeTokenObtention;
     }
 
-    /**
-     * Setter
-     *
-     * @param localDateTimeTokenObtention sets value
-     */
-    public void setLocalDateTimeTokenObtention(LocalDateTime localDateTimeTokenObtention) {
-        this.localDateTimeTokenObtention = localDateTimeTokenObtention;
-    }
 }

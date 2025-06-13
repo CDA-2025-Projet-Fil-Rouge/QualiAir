@@ -1,5 +1,7 @@
 package fr.diginamic.qualiair.controller;
 
+import fr.diginamic.qualiair.exception.ExternalApiResponseException;
+import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.service.ApiAtmoFranceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class ApiAtmoFranceController {
      * @return ?
      */
     @PostMapping("/air-quality/national-data/date/{date}")
-    public ResponseEntity<String> loadDailyFranceAirQualityData(@PathVariable String date) {
+    public ResponseEntity<String> loadDailyFranceAirQualityData(@PathVariable String date) throws ExternalApiResponseException, FileNotFoundException {
         apiAtmoFranceService.loadDailyFranceAirQualityData(date);
         return ResponseEntity.ok().body("Données chargées en base avec succès");
     }

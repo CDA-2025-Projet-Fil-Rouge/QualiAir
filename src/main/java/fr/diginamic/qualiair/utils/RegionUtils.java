@@ -4,7 +4,7 @@ import fr.diginamic.qualiair.exception.ParsedDataException;
 
 public class RegionUtils {
 
-    public static int toInt(String string) {
+    public static int toInt(String string) throws ParsedDataException {
         if (string.trim().isEmpty()) {
             throw new ParsedDataException("Le code region est invalide");
         }

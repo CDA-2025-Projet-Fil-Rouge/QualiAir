@@ -1,14 +1,18 @@
 package fr.diginamic.qualiair.entity.api;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class UtilisateurAtmoFrance {
 
-    private final String username;
-    private final String password;
+    @Value("${external.api.atmo.identifiant}")
+    private String username;
+    @Value("${external.api.atmo.mot-de-passe}")
+    private String password;
 
 
-    public UtilisateurAtmoFrance(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public UtilisateurAtmoFrance() {
     }
 
     /**

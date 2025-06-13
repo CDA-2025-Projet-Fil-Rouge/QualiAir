@@ -8,7 +8,7 @@ public class CoordonneeUtils {
         return lat + "|" + lon;
     }
 
-    public static Double toDouble(String coordinate) {
+    public static Double toDouble(String coordinate) throws ParsedDataException {
         if (coordinate.trim().isEmpty()) {
             throw new ParsedDataException("coordonnée invalide");
         }
