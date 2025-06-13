@@ -1,6 +1,9 @@
 package fr.diginamic.qualiair.exception;
 
-public class BusinessRuleException extends RuntimeException {
+/**
+ * Erreur de validation de règles metier sur une entité JPA
+ */
+public class BusinessRuleException extends Exception {
     public BusinessRuleException(String message) {
         super(message);
     }

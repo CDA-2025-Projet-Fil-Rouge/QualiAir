@@ -9,13 +9,28 @@ import java.util.Map;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.toKey;
 
+/**
+ * MesurePopulation Service
+ */
 @Service
 public class MesurePopulationService {
+    /**
+     * MesurePopulation Repository
+     */
     @Autowired
     private MesurePopulationRepository mesurePopulationRepository;
+    /**
+     * CacheService
+     */
     @Autowired
     private CacheService cacheService;
 
+    /**
+     * Find from cache or create an entity and add it to the cache
+     *
+     * @param mesure commune entity
+     * @return existing or created entity
+     */
     public MesurePopulation save(MesurePopulation mesure) {
         Map<String, MesurePopulation> cache = cacheService.getMesurePopulationMap();
         String key = toKey(mesure);

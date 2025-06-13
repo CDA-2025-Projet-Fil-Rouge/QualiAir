@@ -7,9 +7,18 @@ import org.springframework.stereotype.Component;
 
 import static fr.diginamic.qualiair.utils.CommuneUtils.toInt;
 
+/**
+ * Mapper for Commune
+ */
 @Component
 public class CommuneMapper {
 
+    /**
+     * Map a dto from csv to entity
+     *
+     * @param dto dto from csv
+     * @return entity
+     */
     public Commune toEntityFromCommuneCoordDto(CommuneCoordDto dto) {
         Commune commune = new Commune();
 

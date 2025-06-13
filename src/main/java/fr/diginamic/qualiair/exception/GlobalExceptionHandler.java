@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
 
     //todo proper error mapping
 
+
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<String> handleIllegalArgumentException(FileNotFoundException e) {
         logger.error(e.getMessage());

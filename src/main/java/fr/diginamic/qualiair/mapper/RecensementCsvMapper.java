@@ -4,11 +4,19 @@ import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import org.springframework.stereotype.Component;
 
+/**
+ * RecensementCsv files mapper
+ */
 @Component
 public class RecensementCsvMapper {
 
+    /**
+     * Map a split csv line into a dto
+     *
+     * @param tokens tokens from csv line
+     * @return dto
+     */
     public CommuneCoordDto mapToCommuneCoordDto(String[] tokens) {
-//        System.out.println(tokens.length);
         CommuneCoordDto dto = new CommuneCoordDto();
         dto.setCodeCommuneINSEE(tokens[0]);
         dto.setNomCommunePostal(tokens[1]);
@@ -23,8 +31,13 @@ public class RecensementCsvMapper {
         return dto;
     }
 
+    /**
+     * Map a split csv line into a dto
+     *
+     * @param tokens tokens from csv line
+     * @return dto
+     */
     public CommuneHabitantDto mapToCommuneHabitantDto(String[] tokens) {
-//        System.out.println(tokens.length);
         CommuneHabitantDto dto = new CommuneHabitantDto();
         dto.setNomCommune(tokens[6].trim().replace(" ", ""));
         dto.setPopulationTotale(tokens[9].trim().replace(" ", ""));

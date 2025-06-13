@@ -17,9 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * Recensement Parser Service
+ * Contains methods to parse, map and persist entities from csv files
+ */
 @Service
 public class RecensementParserService {
+    /**
+     * logger
+     */
     private static final Logger logger = LoggerFactory.getLogger(RecensementParserService.class);
     @Autowired
     private CsvParser parser;
@@ -47,14 +53,25 @@ public class RecensementParserService {
     private MesureMapper mesureMapper;
     @Autowired
     private RecensementCsvMapper recensementCsvMapper;
-
-    @Value("${recensement.fichier.communes-with-pop.path}")
-    private String pathFichierPop;
-    @Value("${recensement.fichier.communes-with-coord.path}")
-    private String pathFichierCoord;
     @Autowired
     private MesureRepository mesureRepository;
+    /**
+     * File path for file with cities + population
+     */
+    @Value("${recensement.fichier.communes-with-pop.path}")
+    private String pathFichierPop;
+    /**
+     * File path for file with cities + coordinates
+     */
+    @Value("${recensement.fichier.communes-with-coord.path}")
+    private String pathFichierCoord;
 
+    /**
+     * Recensement Parser service orchestrator
+     *
+     * @throws IOException           error parsing the file
+     * @throws FileNotFoundException error finding the file
+     */
     @Transactional
     public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
         validateFilePaths();
@@ -75,6 +92,11 @@ public class RecensementParserService {
         cacheService.clearCaches();
     }
 
+    /**
+     * Confirms the file exists
+     *
+     * @throws FileNotFoundException file not found
+     */
     private void validateFilePaths() throws FileNotFoundException {
         if (pathFichierCoord == null) {
             throw new FileNotFoundException("Missing coordinate file");
@@ -84,6 +106,13 @@ public class RecensementParserService {
         }
     }
 
+    /**
+     * Parses the coordinate file and maps it to dtos
+     *
+     * @param path file path
+     * @return List of dtos
+     * @throws IOException exception parsing the file
+     */
     private List<CommuneCoordDto> parseCoordFile(String path) throws IOException {
         List<String> lines = parser.parseFile(path);
         lines.removeFirst(); // skip header
@@ -94,6 +123,13 @@ public class RecensementParserService {
                 .toList();
     }
 
+    /**
+     * Parses the pop fils and maps it to dtos
+     *
+     * @param path file paths
+     * @return list of dtos
+     * @throws IOException exception parsing the file
+     */
     private List<CommuneHabitantDto> parsePopFile(String path) throws IOException {
         List<String> lines = parser.parseFile(path);
         lines.removeFirst(); // skip header
@@ -104,6 +140,11 @@ public class RecensementParserService {
                 .toList();
     }
 
+    /**
+     * This method iterates over the list of dtos, creates Region, Departement Coordonees and Commune entities while setting up their relationships and persists them
+     *
+     * @param dtos list of dtos
+     */
     private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) {
         for (CommuneCoordDto dto : dtos) {
             Region region = regionService.findOrCreate(regionMapper.toEntityFromCommuneCoordDto(dto));
@@ -127,6 +168,11 @@ public class RecensementParserService {
         }
     }
 
+    /**
+     * This method iterates over the list of dtos, creates MesurePopulation entities while setting up their relationships and persists them
+     *
+     * @param dtos list of dtos
+     */
     private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) {
         for (CommuneHabitantDto dto : dtos) {
 

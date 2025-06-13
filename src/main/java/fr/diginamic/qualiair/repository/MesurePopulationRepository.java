@@ -4,6 +4,9 @@ import fr.diginamic.qualiair.entity.MesurePopulation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * MesurePopulation repository
+ */
 @Repository
 public interface MesurePopulationRepository extends JpaRepository<MesurePopulation, Long> {
 }
