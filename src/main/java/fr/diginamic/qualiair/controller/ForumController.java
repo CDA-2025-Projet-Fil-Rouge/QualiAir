@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.controller;
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
+import fr.diginamic.qualiair.entity.Message;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.security.JwtAuthentificationService;
 import fr.diginamic.qualiair.service.UtilisateurService;
@@ -86,6 +87,17 @@ public class ForumController {
                 jwtAuthentificationService.getEmailFromCookie(request));
         MessageDto created = messageService.createMessage(dto, createur);
         return ResponseEntity.ok(created);
+    }
+
+    @PutMapping("/update-message/{id}")
+    public ResponseEntity<MessageDto> updateMessage(
+            @PathVariable Long id,
+            @RequestBody MessageDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur modificateur = utilisateurService.getUser(
+                jwtAuthentificationService.getEmailFromCookie(request));
+        MessageDto updated = messageService.updateMessage(id, dto, modificateur);
+        return ResponseEntity.ok(updated);
     }
  }
 
