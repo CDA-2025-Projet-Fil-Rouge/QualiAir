@@ -1,5 +1,7 @@
 package fr.diginamic.qualiair.dto.forumDto;
 
+import jakarta.validation.constraints.NotBlank;
+
 import java.time.LocalDateTime;
 
 public class MessageDto {

@@ -20,4 +20,10 @@ public class MessageMapper{
         }
         return messageDto;
     }
+
+    public Message toEntity(MessageDto dto) {
+        Message entity = new Message();
+        entity.setContenu(dto.getContenu());
+        return entity;
+    }
 }

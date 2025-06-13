@@ -3,8 +3,6 @@ package fr.diginamic.qualiair.controller;
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
-import fr.diginamic.qualiair.entity.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.security.JwtAuthentificationService;
 import fr.diginamic.qualiair.service.UtilisateurService;
@@ -79,5 +77,15 @@ public class ForumController {
         TopicDto created = topicService.createTopic(dto, createur);
         return ResponseEntity.ok(created);
     }
-}
+
+    @PostMapping("/create-message")
+    public ResponseEntity<MessageDto> createMessage(
+            @RequestBody MessageDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur createur = utilisateurService.getUser(
+                jwtAuthentificationService.getEmailFromCookie(request));
+        MessageDto created = messageService.createMessage(dto, createur);
+        return ResponseEntity.ok(created);
+    }
+ }
 
