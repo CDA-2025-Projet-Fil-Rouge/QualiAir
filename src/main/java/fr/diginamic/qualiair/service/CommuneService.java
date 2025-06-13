@@ -12,7 +12,7 @@ import java.util.Map;
 public class CommuneService {
 
     @Autowired
-    private Map<String, Commune> communeCache;
+    private CacheService cacheService;
     @Autowired
     private CommuneRepository communeRepository;
     @Autowired
@@ -24,6 +24,8 @@ public class CommuneService {
 
     public Commune findOrCreate(Commune commune) {
 
+        Map<String, Commune> communeCache = cacheService.getCommuneMap();
+
         if (communeCache.get(commune.getNom()) != null) {
             return communeCache.get(commune.getNom());
         }
@@ -34,6 +36,7 @@ public class CommuneService {
     }
 
     public Commune getFromCache(String communeName) {
+        Map<String, Commune> communeCache = cacheService.getCommuneMap();
         Commune existing = communeCache.get(communeName);
 //        if (communeCache.get(communeName) == null) {
 //            throw new FunctionnalException("Commune doesn't exist for: " + communeName);

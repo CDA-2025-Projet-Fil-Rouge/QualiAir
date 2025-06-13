@@ -12,13 +12,15 @@ import java.util.Map;
 public class RegionService {
 
     @Autowired
-    private Map<String, Region> regionCache;
+    private CacheService cacheService;
     @Autowired
     private RegionRepository regionRepository;
     @Autowired
     private RegionValidator regionValidator;
 
     public Region findOrCreate(Region region) {
+        Map<String, Region> regionCache = cacheService.getRegionMap();
+
         if (regionCache.get(region.getNom()) != null) {
             return regionCache.get(region.getNom());
         }

@@ -12,13 +12,14 @@ import java.util.Map;
 public class DepartementService {
 
     @Autowired
-    private Map<String, Departement> departementCache;
+    private CacheService cacheService;
     @Autowired
     private DepartementRepository departementRepository;
     @Autowired
     private DepartementValidator departementValidator;
 
     public Departement findOrCreate(Departement departement) {
+        Map<String, Departement> departementCache = cacheService.getDepartementMap();
 
         if (departementCache.get(departement.getNom()) != null) {
             return departementCache.get(departement.getNom());
