@@ -2,6 +2,9 @@ package fr.diginamic.qualiair.dto.forumDto;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO représentant une rubrique du forum.
+ */
 public class RubriqueDto {
     private Long id;
     private String nom;

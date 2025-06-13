@@ -1,9 +1,10 @@
 package fr.diginamic.qualiair.dto.forumDto;
 
-import jakarta.validation.constraints.NotBlank;
-
 import java.time.LocalDateTime;
 
+/**
+ * DTO représentant un message posté dans un topic du forum.
+ */
 public class MessageDto {
 
     private Long id;

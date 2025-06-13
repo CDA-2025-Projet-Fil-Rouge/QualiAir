@@ -16,5 +16,5 @@ public interface IValidator<T> {
         }
     }
 
-    void validate(T entity);
+    void validate(T entity) throws BusinessRuleException;
 }
