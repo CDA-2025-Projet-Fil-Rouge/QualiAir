@@ -15,4 +15,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(e.getMessage());
     }
 
+    @ExceptionHandler(Exception.class) //todo per exception
+    public ResponseEntity<String> handleFunctionnalException(FunctionnalException e) {
+        System.out.println(e.getMessage()); //todo temp for debug
+        return ResponseEntity.internalServerError().body(e.getMessage());
+    }
+
 }
