@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommuneValidator implements ICommuneValidator {
     @Override
-    public void validate(Commune entity) {
+    public boolean validate(Commune entity) {
         //todo impl
-
+        return true;
     }
 }

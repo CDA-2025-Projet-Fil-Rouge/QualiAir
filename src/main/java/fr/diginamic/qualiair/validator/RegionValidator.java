@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegionValidator implements IRegionValidator {
     @Override
-    public void validate(Region entity) {
+    public boolean validate(Region entity) {
         //todo impl
+        return true;
     }
 }
