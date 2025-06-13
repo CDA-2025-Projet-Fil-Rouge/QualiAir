@@ -5,29 +5,28 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "mesure_population")
-public class MesurePopulation extends Mesure
-{
+public class MesurePopulation extends Mesure {
     private int valeur;
-    
-    public MesurePopulation()
-    {
+
+
+    public MesurePopulation() {
     }
-    
+
     /**
      * Getter
+     *
      * @return valeur
      */
-    public int getValeur()
-    {
+    public int getValeur() {
         return valeur;
     }
-    
+
     /**
      * Setter
+     *
      * @param valeur sets value
      */
-    public void setValeur(int valeur)
-    {
+    public void setValeur(int valeur) {
         this.valeur = valeur;
     }
 }
