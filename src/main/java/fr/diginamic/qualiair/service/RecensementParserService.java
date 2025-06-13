@@ -86,7 +86,7 @@ public class RecensementParserService {
         lines.removeFirst(); // skip header
         return lines.stream()
                 .map(line -> line.split(";"))
-                .filter(tokens -> tokens.length >= 8)
+                .filter(tokens -> tokens.length >= 9)
                 .map(recensementCsvMapper::mapToCommuneHabitantDto)
                 .toList();
     }
