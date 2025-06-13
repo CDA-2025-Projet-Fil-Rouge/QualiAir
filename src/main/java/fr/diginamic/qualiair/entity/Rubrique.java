@@ -16,6 +16,7 @@ public class Rubrique
 
     @Column(nullable = false)
     private String nom;
+    @Column(nullable = false)
     private String description;
     @Column(name = "priorite_affichage_indice", nullable = false)
     private int prioriteAffichageIndice = 0;

@@ -17,4 +17,12 @@ public class RubriqueMapper {
         dto.setIdCreateur(rubrique.getCreateur().getId());
         return dto;
     }
+
+    public Rubrique toEntity(RubriqueDto dto) {
+        Rubrique entity = new Rubrique();
+        entity.setNom(dto.getNom());
+        entity.setDescription(dto.getDescription());
+        entity.setPrioriteAffichageIndice(dto.getPrioriteAffichageIndice());
+        return entity;
+    }
 }
