@@ -8,16 +8,34 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+/**
+ * Region service
+ */
 @Service
 public class RegionService {
 
+    /**
+     * cache service
+     */
     @Autowired
     private CacheService cacheService;
+    /**
+     * region repository
+     */
     @Autowired
     private RegionRepository regionRepository;
+    /**
+     * region validator
+     */
     @Autowired
     private RegionValidator regionValidator;
 
+    /**
+     * find or create a region from the cache and add it to the cache if new
+     *
+     * @param region region entity
+     * @return existing or new region
+     */
     public Region findOrCreate(Region region) {
         Map<String, Region> regionCache = cacheService.getRegionMap();
 
