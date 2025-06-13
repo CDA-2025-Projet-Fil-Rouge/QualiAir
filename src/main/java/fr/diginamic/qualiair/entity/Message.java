@@ -10,19 +10,32 @@ public class Message
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String contenu;
+    @Column(name="date_creation", nullable = false)
     private LocalDateTime dateCreation;
-    private int nbLike;
-    private int nbDislike;
-    private int nbSignalement;
+    @Column(name="date_modification")
+    private LocalDateTime dateModification;
+
+    @Column(name="nb_like", nullable = false)
+    private int nbLike = 0;
+    @Column(name="nb_dislike", nullable = false)
+    private int nbDislike = 0;
+    @Column(name="nb_signalement", nullable = false)
+    private int nbSignalement = 0;
     
-    @ManyToOne
-    @JoinColumn(name = "id_topic")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_topic", nullable = false)
     private Topic topic;
-    @ManyToOne
-    @JoinColumn(name = "id_createur")
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_createur", nullable = false)
     private Utilisateur createur;
+
+    @ManyToOne
+    @JoinColumn(name= "id_modificateur")
+    private Utilisateur modificateur;
     
     public Message()
     {
@@ -72,7 +85,23 @@ public class Message
     {
         this.dateCreation = dateCreation;
     }
-    
+
+    /**
+     * Getter
+     * @return dateModification
+     */
+    public LocalDateTime getDateModification() {
+        return dateModification;
+    }
+
+    /**
+     * Setter
+     * @param dateModification sets value
+     */
+    public void setDateModification(LocalDateTime dateModification) {
+        this.dateModification = dateModification;
+    }
+
     /**
      * Getter
      * @return nbLike
@@ -161,5 +190,21 @@ public class Message
     public void setCreateur(Utilisateur createur)
     {
         this.createur = createur;
+    }
+
+    /**
+     * Getter
+     * @return modificateur
+     */
+    public Utilisateur getModificateur() {
+        return modificateur;
+    }
+
+    /**
+     * Setter
+     * @param modificateur sets value
+     */
+    public void setModificateur(Utilisateur modificateur) {
+        this.modificateur = modificateur;
     }
 }
