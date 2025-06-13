@@ -12,14 +12,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Authentication controller
+ */
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
+    /**
+     * Utilisateur service
+     */
     @Autowired
     private UtilisateurService utilisateurService;
 
-
+    /**
+     * Login a user
+     *
+     * @param user user
+     * @return success message
+     * @throws Exception error logging in
+     */
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Utilisateur user) throws Exception {
         try {
@@ -32,6 +44,13 @@ public class AuthController {
         }
     }
 
+    /**
+     * Create new user
+     *
+     * @param user user in the body of the request
+     * @return success message
+     * @throws Exception error creating a new user
+     */
     @PostMapping("/create-user")
     public ResponseEntity<String> createUser(@RequestBody Utilisateur user) throws Exception {
         try {

@@ -1,0 +1,50 @@
+package fr.diginamic.qualiair.service;
+
+import fr.diginamic.qualiair.entity.Region;
+import fr.diginamic.qualiair.repository.RegionRepository;
+import fr.diginamic.qualiair.validator.RegionValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Map;
+
+/**
+ * Region service
+ */
+@Service
+public class RegionService {
+
+    /**
+     * cache service
+     */
+    @Autowired
+    private CacheService cacheService;
+    /**
+     * region repository
+     */
+    @Autowired
+    private RegionRepository regionRepository;
+    /**
+     * region validator
+     */
+    @Autowired
+    private RegionValidator regionValidator;
+
+    /**
+     * find or create a region from the cache and add it to the cache if new
+     *
+     * @param region region entity
+     * @return existing or new region
+     */
+    public Region findOrCreate(Region region) {
+        Map<String, Region> regionCache = cacheService.getRegionMap();
+
+        if (regionCache.get(region.getNom()) != null) {
+            return regionCache.get(region.getNom());
+        }
+        regionValidator.validate(region);
+        regionRepository.save(region);
+        regionCache.put(region.getNom(), region);
+        return region;
+    }
+}

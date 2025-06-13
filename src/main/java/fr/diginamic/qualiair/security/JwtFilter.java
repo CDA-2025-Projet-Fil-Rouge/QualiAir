@@ -19,6 +19,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Jwt Once per request implementation
+ */
 @Service
 public class JwtFilter extends OncePerRequestFilter {
 
