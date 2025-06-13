@@ -5,7 +5,7 @@ import fr.diginamic.qualiair.exception.ParsedDataException;
 
 public class MesureUtils {
 
-    public static int toInt(String string) {
+    public static int toInt(String string) throws ParsedDataException {
         if (string.trim().isEmpty()) {
             throw new ParsedDataException("Population must be a valid number");
         }
