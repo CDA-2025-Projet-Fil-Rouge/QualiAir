@@ -1,22 +1,20 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.entity.MesurePopulation;
-import fr.diginamic.qualiair.repository.MesurePopulationRepository;
+import fr.diginamic.qualiair.entity.Mesure;
+import fr.diginamic.qualiair.repository.MesureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.toKey;
 
-/**
- * MesurePopulation Service
- */
 @Service
-public class MesurePopulationService {
+public class MesureService {
+
     /**
      * MesurePopulation Repository
      */
     @Autowired
-    private MesurePopulationRepository mesurePopulationRepository;
+    private MesureRepository mesureRepository;
     /**
      * CacheService
      */
@@ -29,15 +27,20 @@ public class MesurePopulationService {
      * @param mesure commune entity
      * @return existing or created entity
      */
-    public MesurePopulation findOrCreate(MesurePopulation mesure) {
+    public Mesure save(Mesure mesure) {
+        mesureRepository.save(mesure);
+        return mesure;
+    }
+
+    public Mesure findOrCreate(Mesure mesure) {
 
         String key = toKey(mesure);
-        MesurePopulation existing = cacheService.findInMesurePopCache(key);
+        Mesure existing = cacheService.findInMesureCache(key);
         if (existing != null) {
             return existing;
         }
-        mesurePopulationRepository.save(mesure);
-        cacheService.putInMesurePopCache(key, mesure);
+        mesureRepository.save(mesure);
+        cacheService.putInMesureCache(key, mesure);
         return mesure;
     }
 }

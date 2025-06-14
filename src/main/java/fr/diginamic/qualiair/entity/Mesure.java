@@ -7,104 +7,102 @@ import java.time.LocalDateTime;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "mesure")
-public class Mesure
-{
+public class Mesure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    private String nom;
+
+    private TypeMesure typeMesure;
     @Column(name = "date_releve")
-    private LocalDateTime date;
+    private LocalDateTime dateReleve;
     @Column(name = "date_enregistrement")
     private LocalDateTime dateEnregistrement;
-    
+
     @ManyToOne
     @JoinColumn(name = "id_coordonnee")
     private Coordonnee coordonnee;
-    
-    public Mesure()
-    {
+
+    public Mesure() {
     }
-    
+
     /**
      * Getter
+     *
      * @return id
      */
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
-    
+
     /**
      * Getter
-     * @return nom
+     *
+     * @return typeMesure
      */
-    public String getNom()
-    {
-        return nom;
+    public TypeMesure getTypeMesure() {
+        return typeMesure;
     }
-    
+
     /**
      * Setter
-     * @param nom sets value
+     *
+     * @param typeMesure sets value
      */
-    public void setNom(String nom)
-    {
-        this.nom = nom;
+    public void setTypeMesure(TypeMesure typeMesure) {
+        this.typeMesure = typeMesure;
     }
-    
+
     /**
      * Getter
+     *
      * @return date
      */
-    public LocalDateTime getDate()
-    {
-        return date;
+    public LocalDateTime getDateReleve() {
+        return dateReleve;
     }
-    
+
     /**
      * Setter
+     *
      * @param date sets value
      */
-    public void setDate(LocalDateTime date)
-    {
-        this.date = date;
+    public void setDateReleve(LocalDateTime date) {
+        this.dateReleve = date;
     }
-    
+
     /**
      * Getter
+     *
      * @return dateEnregistrement
      */
-    public LocalDateTime getDateEnregistrement()
-    {
+    public LocalDateTime getDateEnregistrement() {
         return dateEnregistrement;
     }
-    
+
     /**
      * Setter
+     *
      * @param dateEnregistrement sets value
      */
-    public void setDateEnregistrement(LocalDateTime dateEnregistrement)
-    {
+    public void setDateEnregistrement(LocalDateTime dateEnregistrement) {
         this.dateEnregistrement = dateEnregistrement;
     }
-    
+
     /**
      * Getter
+     *
      * @return coordonnee
      */
-    public Coordonnee getCoordonnee()
-    {
+    public Coordonnee getCoordonnee() {
         return coordonnee;
     }
-    
+
     /**
      * Setter
+     *
      * @param coordonnee sets value
      */
-    public void setCoordonnee(Coordonnee coordonnee)
-    {
+    public void setCoordonnee(Coordonnee coordonnee) {
         this.coordonnee = coordonnee;
     }
 }

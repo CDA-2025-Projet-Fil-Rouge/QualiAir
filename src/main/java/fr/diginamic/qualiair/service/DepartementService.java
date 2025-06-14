@@ -6,8 +6,6 @@ import fr.diginamic.qualiair.validator.DepartementValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
  * DepartementService
  */
@@ -37,14 +35,16 @@ public class DepartementService {
      * @return existing or created entity
      */
     public Departement findOrCreate(Departement departement) {
-        Map<String, Departement> departementCache = cacheService.getDepartementMap();
 
-        if (departementCache.get(departement.getNom()) != null) {
-            return departementCache.get(departement.getNom());
+        String key = departement.getNom();
+        Departement existing = cacheService.findInDepartementCache(key);
+
+        if (existing != null) {
+            return existing;
         }
         departementValidator.validate(departement);
         departementRepository.save(departement);
-        departementCache.put(departement.getNom(), departement);
+        cacheService.putInDepartementCache(departement.getNom(), departement);
         return departement;
     }
 }

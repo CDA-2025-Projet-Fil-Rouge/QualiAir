@@ -6,8 +6,6 @@ import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
  * Commune service
  */
@@ -47,14 +45,15 @@ public class CommuneService {
      */
     public Commune findOrCreate(Commune commune) {
 
-        Map<String, Commune> communeCache = cacheService.getCommuneMap();
+        String key = commune.getNom();
+        Commune existing = cacheService.findInCommuneCache(key);
 
-        if (communeCache.get(commune.getNom()) != null) {
-            return communeCache.get(commune.getNom());
+        if (existing != null) {
+            return existing;
         }
         communeValidator.validate(commune);
         communeRepository.save(commune);
-        communeCache.put(commune.getNom(), commune);
+        cacheService.putInCommuneCache(commune.getNom(), commune);
         return commune;
     }
 
@@ -65,11 +64,7 @@ public class CommuneService {
      * @return existing commune
      */
     public Commune getFromCache(String communeName) {
-        Map<String, Commune> communeCache = cacheService.getCommuneMap();
-        Commune existing = communeCache.get(communeName);
-//        if (communeCache.get(communeName) == null) {
-//            throw new FunctionnalException("Commune doesn't exist for: " + communeName);
-//        }
-        return existing;
+
+        return cacheService.findInCommuneCache(communeName);
     }
 }

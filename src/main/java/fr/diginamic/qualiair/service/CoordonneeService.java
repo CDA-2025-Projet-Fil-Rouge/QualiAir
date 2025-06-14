@@ -5,8 +5,6 @@ import fr.diginamic.qualiair.repository.CoordonneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 import static fr.diginamic.qualiair.utils.CoordonneeUtils.toKey;
 
 /**
@@ -33,15 +31,15 @@ public class CoordonneeService {
      * @return existing or created entity
      */
     public Coordonnee findOrCreate(Coordonnee coordonnee) {
-        Map<String, Coordonnee> cache = cacheService.getCoordonneeMap();
 
         String key = toKey(coordonnee.getLatitude(), coordonnee.getLongitude());
 
-        if (cache.get(key) != null) {
-            return cache.get(key);
+        Coordonnee existing = cacheService.findInCoordoneeCache(key);
+        if (existing != null) {
+            return existing;
         }
 
-        cache.put(key, coordonnee);
+        cacheService.putInCoordonneeCache(key, coordonnee);
         coordonneRepository.save(coordonnee);
         return coordonnee;
     }

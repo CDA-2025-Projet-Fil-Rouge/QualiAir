@@ -7,7 +7,6 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
-import fr.diginamic.qualiair.repository.MesureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +53,7 @@ public class RecensementParserService {
     private MesureMapper mesureMapper;
     @Autowired
     private RecensementCsvMapper recensementCsvMapper;
-    @Autowired
-    private MesureRepository mesureRepository;
+
     /**
      * File path for file with cities + population
      */
@@ -66,6 +64,8 @@ public class RecensementParserService {
      */
     @Value("${recensement.fichier.communes-with-coord.path}")
     private String pathFichierCoord;
+    @Autowired
+    private MesureService mesureService;
 
     /**
      * Recensement Parser service orchestrator
@@ -184,11 +184,10 @@ public class RecensementParserService {
                 continue;
             }
 
-            MesurePopulation mesure = mesureMapper.toEntityFromCommuneCoordDto(dto);
+            MesurePopulation mesurePopulation = mesureMapper.toEntityFromCommuneCoordDto(dto);
+            mesurePopulation.setCoordonnee(commune.getCoordonnee());
 
-            mesure.setCoordonnee(commune.getCoordonnee());
-
-            mesurePopulationService.save(mesure);
+            mesurePopulationService.findOrCreate(mesurePopulation);
         }
     }
 }

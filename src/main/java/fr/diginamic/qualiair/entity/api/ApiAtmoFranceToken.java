@@ -8,14 +8,14 @@ public class ApiAtmoFranceToken extends ApiToken {
     /**
      * Time the token was acquired at
      */
-    private final LocalDateTime localDateTimeTokenObtention;
+    private final LocalDateTime obtentionDate;
 
     public ApiAtmoFranceToken() {
-        this.localDateTimeTokenObtention = LocalDateTime.now();
+        this.obtentionDate = LocalDateTime.now();
     }
 
-    public ApiAtmoFranceToken(ApiToken bearerToken, LocalDateTime localDateTimeTokenObtention) {
-        this.localDateTimeTokenObtention = LocalDateTime.now();
+    public ApiAtmoFranceToken(ApiToken bearerToken, LocalDateTime obtentionDate) {
+        this.obtentionDate = LocalDateTime.now();
     }
 
     /**
@@ -23,8 +23,8 @@ public class ApiAtmoFranceToken extends ApiToken {
      *
      * @return localDateTimeTokenObtention
      */
-    public LocalDateTime getLocalDateTimeTokenObtention() {
-        return localDateTimeTokenObtention;
+    public LocalDateTime getObtentionDate() {
+        return obtentionDate;
     }
 
 }

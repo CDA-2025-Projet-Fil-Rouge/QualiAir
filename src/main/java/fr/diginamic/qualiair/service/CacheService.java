@@ -20,23 +20,23 @@ public class CacheService {
     /**
      * Commune name - commune entity map
      */
-    private final Map<String, Commune> communeMap = new HashMap<>();
+    private final Map<String, Commune> communeCache = new HashMap<>();
     /**
      * Region name - region entity map
      */
-    private final Map<String, Region> regionMap = new HashMap<>();
+    private final Map<String, Region> regionCache = new HashMap<>();
     /**
      * Departement name - department entity map
      */
-    private final Map<String, Departement> departementMap = new HashMap<>();
+    private final Map<String, Departement> departementCache = new HashMap<>();
     /**
      * coordinates key - coordinates entity map
      */
-    private final Map<String, Coordonnee> coordonneeMap = new HashMap<>();
+    private final Map<String, Coordonnee> coordonneeCache = new HashMap<>();
     /**
      * Mesures key - mesure entity map
      */
-    private final Map<String, MesurePopulation> mesurePopulationMap = new HashMap<>();
+    private final Map<String, MesurePopulation> mesurePopCache = new HashMap<>();
 
     /**
      * commune repository
@@ -81,7 +81,7 @@ public class CacheService {
     public void loadExistingCommunes() {
         List<Commune> communeList = communeRepository.findAll();
         System.out.println("cache loaded");
-        communeList.forEach(commune -> communeMap.put(commune.getNom(), commune));
+        communeList.forEach(commune -> communeCache.put(commune.getNom(), commune));
 
     }
 
@@ -91,7 +91,7 @@ public class CacheService {
     public void loadExistingRegions() {
         List<Region> regionList = regionRepository.findAll();
         System.out.println("cache loaded");
-        regionList.forEach(region -> regionMap.put(region.getNom(), region));
+        regionList.forEach(region -> regionCache.put(region.getNom(), region));
     }
 
     /**
@@ -100,7 +100,7 @@ public class CacheService {
     public void loadExistingDepartements() {
         List<Departement> departementList = departementRepository.findAll();
         System.out.println("cache loaded");
-        departementList.forEach(departement -> departementMap.put(departement.getNom(), departement));
+        departementList.forEach(departement -> departementCache.put(departement.getNom(), departement));
     }
 
     /**
@@ -109,7 +109,7 @@ public class CacheService {
     public void loadExistingCoordonnees() {
         List<Coordonnee> coordonnees = coordonneRepository.findAll();
         coordonnees.forEach(c ->
-                coordonneeMap.put(toKey(c.getLatitude(), c.getLongitude()), c)
+                coordonneeCache.put(toKey(c.getLatitude(), c.getLongitude()), c)
         );
     }
 
@@ -118,7 +118,7 @@ public class CacheService {
      */
     public void loadExistingMesurePopulation() {
         List<MesurePopulation> mesuresPopulation = mesurePopulationRepository.findAll();
-        mesuresPopulation.forEach(m -> mesurePopulationMap.put(MesureUtils.toKey(m), m));
+        mesuresPopulation.forEach(m -> mesurePopCache.put(MesureUtils.toKey(m), m));
     }
 
     /**
@@ -126,8 +126,16 @@ public class CacheService {
      *
      * @return communeMap
      */
-    public Map<String, Commune> getCommuneMap() {
-        return communeMap;
+    public Map<String, Commune> getCommuneCache() {
+        return communeCache;
+    }
+
+    public Commune findInCommuneCache(String key) {
+        return communeCache.get(key);
+    }
+
+    public void putInCommuneCache(String key, Commune commune) {
+        communeCache.put(key, commune);
     }
 
     /**
@@ -135,8 +143,16 @@ public class CacheService {
      *
      * @return regionMap
      */
-    public Map<String, Region> getRegionMap() {
-        return regionMap;
+    public Map<String, Region> getRegionCache() {
+        return regionCache;
+    }
+
+    public Region findInRegionCache(String key) {
+        return regionCache.get(key);
+    }
+
+    public void putInRegionCache(String key, Region region) {
+        regionCache.put(key, region);
     }
 
     /**
@@ -144,8 +160,16 @@ public class CacheService {
      *
      * @return departementMap
      */
-    public Map<String, Departement> getDepartementMap() {
-        return departementMap;
+    public Map<String, Departement> getDepartementCache() {
+        return departementCache;
+    }
+
+    public Departement findInDepartementCache(String key) {
+        return departementCache.get(key);
+    }
+
+    public void putInDepartementCache(String key, Departement departement) {
+        departementCache.put(key, departement);
     }
 
     /**
@@ -153,8 +177,16 @@ public class CacheService {
      *
      * @return coordonneeMap
      */
-    public Map<String, Coordonnee> getCoordonneeMap() {
-        return coordonneeMap;
+    public Map<String, Coordonnee> getCoordonneeCache() {
+        return coordonneeCache;
+    }
+
+    public Coordonnee findInCoordoneeCache(String key) {
+        return coordonneeCache.get(key);
+    }
+
+    public void putInCoordonneeCache(String key, Coordonnee coordonnee) {
+        coordonneeCache.put(key, coordonnee);
     }
 
     /**
@@ -162,18 +194,34 @@ public class CacheService {
      *
      * @return mesurePopulationMap
      */
-    public Map<String, MesurePopulation> getMesurePopulationMap() {
-        return mesurePopulationMap;
+    public Map<String, MesurePopulation> getMesurePopCache() {
+        return mesurePopCache;
+    }
+
+    public MesurePopulation findInMesurePopCache(String key) {
+        return mesurePopCache.get(key);
+    }
+
+    public void putInMesurePopCache(String key, MesurePopulation mesurePop) {
+        mesurePopCache.put(key, mesurePop);
     }
 
     /**
      * cleans up cache
      */
     public void clearCaches() {
-        communeMap.clear();
-        regionMap.clear();
-        departementMap.clear();
-        mesurePopulationMap.clear();
-        coordonneeMap.clear();
+        communeCache.clear();
+        regionCache.clear();
+        departementCache.clear();
+        mesurePopCache.clear();
+        coordonneeCache.clear();
+    }
+
+    public Mesure findInMesureCache(String key) {
+        return null; //todo impl if needed
+    }
+
+    public void putInMesureCache(String key, Mesure mesure) {
+        //todo impl if needed
     }
 }

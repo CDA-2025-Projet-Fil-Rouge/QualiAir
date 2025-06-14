@@ -13,7 +13,7 @@ public class AtmoFranceTokenValidator implements IApiAtmoFranceTokenValidator {
 
     @Override
     public boolean validate(ApiAtmoFranceToken entity) throws TokenExpiredException, BusinessRuleException {
-        LocalDateTime timestamp = entity.getLocalDateTimeTokenObtention();
+        LocalDateTime timestamp = entity.getObtentionDate();
 
         Duration duration = Duration.between(timestamp, LocalDateTime.now());
 
