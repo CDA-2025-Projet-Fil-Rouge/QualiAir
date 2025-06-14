@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.mapper;
 
-import fr.diginamic.qualiair.dto.atmofrance.AirDataFeature;
-import fr.diginamic.qualiair.dto.atmofrance.AirDataProperties;
+import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
+import fr.diginamic.qualiair.dto.atmofrance.AirDataPropertiesDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.entity.MesurePopulation;
@@ -29,7 +29,7 @@ public class MesureMapper {
      * @param dto dto from csv
      * @return entity
      */
-    public MesurePopulation toEntityFromCommuneCoordDto(CommuneHabitantDto dto) throws ParsedDataException {
+    public MesurePopulation toEntity(CommuneHabitantDto dto) throws ParsedDataException {
         MesurePopulation mesure = new MesurePopulation();
         mesure.setTypeMesure(TypeMesure.RELEVE_POPULATION);
         mesure.setDateReleve(LocalDateTime.now());
@@ -38,9 +38,9 @@ public class MesureMapper {
         return mesure;
     }
 
-    public List<MesureAir> toEntityFromAirDataDto(AirDataFeature feature) {
+    public List<MesureAir> toEntityList(AirDataFeatureDto feature) {
         List<MesureAir> mesures = new ArrayList<>();
-        AirDataProperties props = feature.getProperties();
+        AirDataPropertiesDto props = feature.getProperties();
 
         LocalDateTime dateReleve = LocalDate.parse(props.getDateEch()).atStartOfDay();
         LocalDateTime dateMaj = LocalDateTime.now();

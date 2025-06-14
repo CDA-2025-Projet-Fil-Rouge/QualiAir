@@ -1,12 +1,14 @@
 package fr.diginamic.qualiair.dto.atmofrance;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class DailyAirDataDto {
     @JsonProperty("features")
-    private List<AirDataFeature> features;
+    private List<AirDataFeatureDto> features;
 
     public DailyAirDataDto() {
     }
@@ -16,7 +18,7 @@ public class DailyAirDataDto {
      *
      * @return features
      */
-    public List<AirDataFeature> getFeatures() {
+    public List<AirDataFeatureDto> getFeatures() {
         return features;
     }
 
@@ -25,7 +27,7 @@ public class DailyAirDataDto {
      *
      * @param features sets value
      */
-    public void setFeatures(List<AirDataFeature> features) {
+    public void setFeatures(List<AirDataFeatureDto> features) {
         this.features = features;
     }
 }

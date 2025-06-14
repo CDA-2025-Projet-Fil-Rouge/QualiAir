@@ -184,7 +184,7 @@ public class RecensementParserService {
                 continue;
             }
 
-            MesurePopulation mesurePopulation = mesureMapper.toEntityFromCommuneCoordDto(dto);
+            MesurePopulation mesurePopulation = mesureMapper.toEntity(dto);
             mesurePopulation.setCoordonnee(commune.getCoordonnee());
 
             mesurePopulationService.findOrCreate(mesurePopulation);

@@ -32,7 +32,7 @@ public class ApiAtmoFranceController {
      * @throws ExternalApiResponseException   if the API call fails
      * @throws UnnecessaryApiRequestException if data for the date already exists
      */
-    @PostMapping("/air-quality/national-data/date/{date}")
+    @PostMapping("/air-quality/national-data/date/{date}") // TODO restrict acces to super-admin
     public ResponseEntity<String> loadDailyFranceAirQualityData(@PathVariable String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
         apiAtmoFranceService.saveDailyFranceAirQualityData(date);
         return ResponseEntity.ok().body("Données chargées en base avec succès");

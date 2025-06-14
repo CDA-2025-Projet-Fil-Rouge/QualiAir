@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.dto.atmofrance.AirDataFeature;
+import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
 import fr.diginamic.qualiair.dto.atmofrance.DailyAirDataDto;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
@@ -12,6 +12,7 @@ import fr.diginamic.qualiair.exception.*;
 import fr.diginamic.qualiair.mapper.CoordonneeMapper;
 import fr.diginamic.qualiair.mapper.MesureMapper;
 import fr.diginamic.qualiair.validator.AtmoFranceTokenValidator;
+import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,8 @@ public class ApiAtmoFranceService {
     private MesureAirService mesureAirService;
     @Autowired
     private CoordonneeService coordonneeService;
+    @Autowired
+    private HttpResponseValidator responseValidator;
 
 
     /**
@@ -68,17 +71,9 @@ public class ApiAtmoFranceService {
 
         ResponseEntity<ApiToken> response = restTemplate.exchange(loginUri, HttpMethod.POST, requestEntity, ApiToken.class);
 
-        if (response.getStatusCode() != HttpStatus.OK) {
-            throw new ExternalApiResponseException("Error fetching new token for AtmoFrance Api, status: " + response.getStatusCode() + "\n" + response.getBody());
-        }
+        String token = responseValidator.validateAndReturnToken(response);
 
-        if (response.getBody() == null) {
-            throw new ExternalApiResponseException("Error fetching new token for AtmoFrance Api, response body is empty");
-        }
-
-        String token = response.getBody().getToken();
         api.setToken(token);
-
 
         return api;
     }
@@ -91,7 +86,7 @@ public class ApiAtmoFranceService {
         cacheService.loadExistingCoordonnees();
         DailyAirDataDto responseDto = fetchDailyAirDataFromApi(date);
 
-        for (AirDataFeature feature : responseDto.getFeatures()) {
+        for (AirDataFeatureDto feature : responseDto.getFeatures()) {
             Coordonnee coordonnee;
             try {
                 coordonnee = coordonneeMapper.toEntityFromAirDataTo(feature);
@@ -101,7 +96,7 @@ public class ApiAtmoFranceService {
             }
             Coordonnee savedCoordonnee = coordonneeService.findOrCreate(coordonnee);
 
-            List<MesureAir> mesureAir = mesureMapper.toEntityFromAirDataDto(feature);
+            List<MesureAir> mesureAir = mesureMapper.toEntityList(feature);
 
             mesureAir.forEach(mesure -> {
                 mesure.setCoordonnee(savedCoordonnee);

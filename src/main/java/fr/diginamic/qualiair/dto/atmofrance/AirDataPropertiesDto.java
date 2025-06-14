@@ -1,8 +1,10 @@
 package fr.diginamic.qualiair.dto.atmofrance;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class AirDataProperties {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class AirDataPropertiesDto {
     @JsonProperty("date_maj")
     private String dateMaj;
 
@@ -37,7 +39,7 @@ public class AirDataProperties {
     private String dateEch;
 
 
-    public AirDataProperties() {
+    public AirDataPropertiesDto() {
     }
 
     /**
