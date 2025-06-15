@@ -12,6 +12,7 @@ public class Mesure {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     private TypeMesure typeMesure;
     @Column(name = "date_releve")
     private LocalDateTime dateReleve;

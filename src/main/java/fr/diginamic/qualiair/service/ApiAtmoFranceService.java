@@ -136,7 +136,7 @@ public class ApiAtmoFranceService {
     private String getOrRefreshToken() throws ExternalApiResponseException {
         try {
             validator.validate(apiAtmoFrance.getToken());
-        } catch (TokenExpiredException | BusinessRuleException e) {
+        } catch (NullPointerException | TokenExpiredException | BusinessRuleException e) {
             apiAtmoFrance.setToken(requestToken());
         }
         return apiAtmoFrance.getToken().getToken();
