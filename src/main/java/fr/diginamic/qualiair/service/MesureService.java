@@ -5,7 +5,6 @@ import fr.diginamic.qualiair.repository.MesureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static fr.diginamic.qualiair.utils.MesureUtils.toKey;
 
 @Service
 public class MesureService {
@@ -32,15 +31,15 @@ public class MesureService {
         return mesure;
     }
 
-    public Mesure findOrCreate(Mesure mesure) {
-
-        String key = toKey(mesure);
-        Mesure existing = cacheService.findInMesureCache(key);
-        if (existing != null) {
-            return existing;
-        }
-        mesureRepository.save(mesure);
-        cacheService.putInMesureCache(key, mesure);
-        return mesure;
-    }
+//    public Mesure findOrCreate(Mesure mesure) {
+//
+//        String key = toKey(mesure);
+//        Mesure existing = cacheService.findInMesureCache(key);
+//        if (existing != null) {
+//            return existing;
+//        }
+//        mesureRepository.save(mesure);
+//        cacheService.putInMesureCache(key, mesure);
+//        return mesure;
+//    }
 }

@@ -29,44 +29,45 @@ public class MesureMapper {
      * @param dto dto from csv
      * @return entity
      */
-    public MesurePopulation toEntity(CommuneHabitantDto dto) throws ParsedDataException {
+    public MesurePopulation toEntity(CommuneHabitantDto dto, LocalDateTime date) throws ParsedDataException {
         MesurePopulation mesure = new MesurePopulation();
         mesure.setTypeMesure(TypeMesure.RELEVE_POPULATION);
-        mesure.setDateReleve(LocalDateTime.now());
+        mesure.setDateReleve(date);
         mesure.setDateEnregistrement(LocalDateTime.now());
         mesure.setValeur(toInt(dto.getPopulationMunicipale().trim().replace(" ", "")));
         return mesure;
     }
 
-    public List<MesureAir> toEntityList(AirDataFeatureDto feature) {
+    public List<MesureAir> toEntityList(AirDataFeatureDto feature, LocalDate dateReleve) {
         List<MesureAir> mesures = new ArrayList<>();
         AirDataPropertiesDto props = feature.getProperties();
 
-        LocalDateTime dateReleve = LocalDate.parse(props.getDateEch()).atStartOfDay();
+        LocalDateTime dateReleveTime = dateReleve.atStartOfDay();
         LocalDateTime dateMaj = LocalDateTime.now();
 
+
         if (props.getCodeNo2() != null) {
-            mesures.add(createMesureAir("NO2", props.getCodeNo2(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("NO2", props.getCodeNo2(), dateReleveTime, dateMaj));
         }
 
         if (props.getCodeO3() != null) {
-            mesures.add(createMesureAir("O3", props.getCodeO3(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("O3", props.getCodeO3(), dateReleveTime, dateMaj));
         }
 
         if (props.getCodePm10() != null) {
-            mesures.add(createMesureAir("PM10", props.getCodePm10(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("PM10", props.getCodePm10(), dateReleveTime, dateMaj));
         }
 
         if (props.getCodePm25() != null) {
-            mesures.add(createMesureAir("PM2.5", props.getCodePm25(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("PM2.5", props.getCodePm25(), dateReleveTime, dateMaj));
         }
 
         if (props.getCodeSo2() != null) {
-            mesures.add(createMesureAir("SO2", props.getCodeSo2(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("SO2", props.getCodeSo2(), dateReleveTime, dateMaj));
         }
 
         if (props.getCodeQual() != null) {
-            mesures.add(createMesureAir("ATMO", props.getCodeQual(), dateReleve, dateMaj));
+            mesures.add(createMesureAir("ATMO", props.getCodeQual(), dateReleveTime, dateMaj));
         }
 
         return mesures;

@@ -43,7 +43,7 @@ public class RegionService {
         }
         regionValidator.validate(region);
         regionRepository.save(region);
-        cacheService.putInRegionCache(region.getNom(), region);
+        cacheService.putInRegionCache(key, region);
         return region;
     }
 }

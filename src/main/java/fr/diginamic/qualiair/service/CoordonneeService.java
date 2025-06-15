@@ -1,11 +1,12 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dao.CoordoneeDao;
 import fr.diginamic.qualiair.entity.Coordonnee;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.repository.CoordonneRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static fr.diginamic.qualiair.utils.CoordonneeUtils.toKey;
 
 /**
  * Cordinates service
@@ -23,6 +24,8 @@ public class CoordonneeService {
      */
     @Autowired
     private CoordonneRepository coordonneRepository;
+    @Autowired
+    private CoordoneeDao dao;
 
     /**
      * Find from cache or create an entity and add it to the cache
@@ -30,17 +33,18 @@ public class CoordonneeService {
      * @param coordonnee commune entity
      * @return existing or created entity
      */
-    public Coordonnee findOrCreate(Coordonnee coordonnee) {
+    public Coordonnee findOrCreate(Coordonnee coordonnee) throws ParsedDataException {
 
-        String key = toKey(coordonnee.getLatitude(), coordonnee.getLongitude());
+
+        String key = coordonnee.getCommune().getNomPostal();
 
         Coordonnee existing = cacheService.findInCoordoneeCache(key);
         if (existing != null) {
             return existing;
         }
 
+        dao.save(coordonnee);
         cacheService.putInCoordonneeCache(key, coordonnee);
-        coordonneRepository.save(coordonnee);
         return coordonnee;
     }
 }

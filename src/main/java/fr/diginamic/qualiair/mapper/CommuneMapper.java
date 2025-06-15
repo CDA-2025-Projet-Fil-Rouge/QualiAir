@@ -23,7 +23,8 @@ public class CommuneMapper {
     public Commune toEntityFromCommuneCoordDto(CommuneCoordDto dto) throws ParsedDataException {
         Commune commune = new Commune();
 
-        commune.setNom(dto.getNomCommuneComplet());
+        commune.setNomPostal(dto.getNomCommunePostal());
+        commune.setNomComplet(dto.getNomCommuneComplet());
         commune.setCodeInsee(dto.getCodeCommuneINSEE());
         commune.setCodePostal(toInt(dto.getCodePostal()));
         return commune;
