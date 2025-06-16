@@ -6,4 +6,40 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Weather {
     private String main;
     private String description;
+
+    /**
+     * Getter
+     *
+     * @return description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Setter
+     *
+     * @param description sets value
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Getter
+     *
+     * @return main
+     */
+    public String getMain() {
+        return main;
+    }
+
+    /**
+     * Setter
+     *
+     * @param main sets value
+     */
+    public void setMain(String main) {
+        this.main = main;
+    }
 }

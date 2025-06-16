@@ -3,11 +3,10 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
-import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
-import fr.diginamic.qualiair.validator.MesurePrevisionValidator;
+import fr.diginamic.qualiair.validator.MesureValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class MesurePrevisionService {
     @Autowired
     private MesurePrevisionRepository repository;
     @Autowired
-    private MesurePrevisionValidator validator;
+    private MesureValidator validator;
 
 
     public List<MesurePrevision> saveMesurePrevision(List<MesurePrevision> mesures) {
@@ -42,7 +41,7 @@ public class MesurePrevisionService {
             try {
                 validator.validate(mesure);
                 repository.save(mesure);
-            } catch (BusinessRuleException | TokenExpiredException e) {
+            } catch (BusinessRuleException e) {
                 logger.error(e.getMessage());
                 iterator.remove();
             }

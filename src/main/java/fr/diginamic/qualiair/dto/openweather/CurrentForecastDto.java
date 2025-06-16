@@ -8,19 +8,38 @@ import java.util.List;
 public class CurrentForecastDto extends OpenWeatherForecastDto {
     private Coordinates coord;
     private List<Weather> weather;
-    private String base;
     private Temperature main;
-    private int visibility;
     private Wind wind;
-    private RainOneHour rain;
+    private Rain rain;
+    private Snow snow;
     private Clouds clouds;
-    private long dt;
-    private int timezone;
 
+    private String base;
+    private String visibility;
+    private String dt;
+    private String timezone;
     private String name;
-    private int cod;
+    private String cod;
 
     public CurrentForecastDto() {
+    }
+
+    /**
+     * Getter
+     *
+     * @return snow
+     */
+    public Snow getSnow() {
+        return snow;
+    }
+
+    /**
+     * Setter
+     *
+     * @param snow sets value
+     */
+    public void setSnow(Snow snow) {
+        this.snow = snow;
     }
 
     /**
@@ -100,7 +119,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @return visibility
      */
-    public int getVisibility() {
+    public String getVisibility() {
         return visibility;
     }
 
@@ -109,7 +128,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @param visibility sets value
      */
-    public void setVisibility(int visibility) {
+    public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
 
@@ -136,7 +155,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @return rain
      */
-    public RainOneHour getRain() {
+    public Rain getRain() {
         return rain;
     }
 
@@ -145,7 +164,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @param rain sets value
      */
-    public void setRain(RainOneHour rain) {
+    public void setRain(Rain rain) {
         this.rain = rain;
     }
 
@@ -172,7 +191,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @return dt
      */
-    public long getDt() {
+    public String getDt() {
         return dt;
     }
 
@@ -181,7 +200,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @param dt sets value
      */
-    public void setDt(long dt) {
+    public void setDt(String dt) {
         this.dt = dt;
     }
 
@@ -190,7 +209,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @return timezone
      */
-    public int getTimezone() {
+    public String getTimezone() {
         return timezone;
     }
 
@@ -199,7 +218,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @param timezone sets value
      */
-    public void setTimezone(int timezone) {
+    public void setTimezone(String timezone) {
         this.timezone = timezone;
     }
 
@@ -226,7 +245,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @return cod
      */
-    public int getCod() {
+    public String getCod() {
         return cod;
     }
 
@@ -235,7 +254,7 @@ public class CurrentForecastDto extends OpenWeatherForecastDto {
      *
      * @param cod sets value
      */
-    public void setCod(int cod) {
+    public void setCod(String cod) {
         this.cod = cod;
     }
 }

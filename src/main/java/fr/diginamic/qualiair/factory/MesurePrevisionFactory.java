@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.openweather.ForecastFiveDayDto;
 import fr.diginamic.qualiair.dto.openweather.ForecastSixteenDays;
 import fr.diginamic.qualiair.dto.openweather.OpenWeatherForecastDto;
 import fr.diginamic.qualiair.entity.MesurePrevision;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,9 @@ public class MesurePrevisionFactory {
     @Autowired
     private MesurePrevisionMapper mapper;
 
-    public List<MesurePrevision> getInstanceList(OpenWeatherForecastDto dto) {
+    public List<MesurePrevision> getInstanceList(OpenWeatherForecastDto dto) throws ParsedDataException {
         if (dto instanceof CurrentForecastDto currentForecastDto) {
-            return mapper.toEntityListFromCurrentForecast(currentForecastDto);
+            return mapper.toEntityListFromCurrentWeather(currentForecastDto);
         }
         if (dto instanceof ForecastFiveDayDto fiveDayDto) {
             return mapper.toEntityListFromFiveDaysForecast(fiveDayDto);

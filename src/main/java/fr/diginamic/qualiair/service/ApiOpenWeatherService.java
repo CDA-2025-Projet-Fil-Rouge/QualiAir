@@ -7,6 +7,7 @@ import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.entity.api.ApiOpenWeather;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
@@ -42,7 +43,7 @@ public class ApiOpenWeatherService {
     @Autowired
     private CommuneService communeService;
 
-    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType) throws ExternalApiResponseException {
+    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType) throws ExternalApiResponseException, ParsedDataException {
 
         ResponseEntity<T> response = restTemplate.getForEntity(uri, responseType);
         responseValidator.validate(response);
@@ -55,7 +56,7 @@ public class ApiOpenWeatherService {
         return mesures;
     }
 
-    public List<MesurePrevision> requestAndSaveCurrentForecast(String nomPostal) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException {
+    public List<MesurePrevision> requestAndSaveCurrentForecast(String nomPostal) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
 
@@ -75,12 +76,12 @@ public class ApiOpenWeatherService {
     }
 
 
-    public List<MesurePrevision> requestFiveDayForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException {
+    public List<MesurePrevision> requestFiveDayForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime endDate = startDate.plusDays(5);
+        LocalDateTime endDate = startDate.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
         boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_5J, nomPostal);
@@ -92,12 +93,12 @@ public class ApiOpenWeatherService {
         return fetchAndSaveForecast(fullUri, ForecastFiveDayDto.class);
     }
 
-    public List<MesurePrevision> requestSixteenDaysForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException {
+    public List<MesurePrevision> requestSixteenDaysForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime endDate = startDate.plusDays(16);
+        LocalDateTime endDate = startDate.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_16J;
         boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_16J, nomPostal);
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);

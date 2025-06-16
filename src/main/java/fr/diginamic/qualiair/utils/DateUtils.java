@@ -31,6 +31,10 @@ public class DateUtils {
         return Instant.ofEpochSecond(unix).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
+    public static LocalDateTime toLocalDateTime(String unix) {
+        return Instant.ofEpochSecond(Long.parseLong(unix)).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
     /**
      * Converts a LocalDate to string in yyyy-MM-dd format
      *
