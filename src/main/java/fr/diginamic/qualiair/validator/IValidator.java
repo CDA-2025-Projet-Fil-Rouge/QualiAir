@@ -17,5 +17,7 @@ public interface IValidator<T> {
         }
     }
 
+
     boolean validate(T entity) throws TokenExpiredException, BusinessRuleException;
+
 }

@@ -2,6 +2,9 @@ package fr.diginamic.qualiair.dto.forumDto;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO représentant un topic créé dans une rubrique du forum.
+ */
 public class TopicDto {
     private Long id;
     private String nom;

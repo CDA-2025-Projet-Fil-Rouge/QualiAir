@@ -4,9 +4,19 @@ import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.entity.Message;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper permettant de convertir réciproquement les entités Message et MessageDto.
+ * Utilisé pour isoler la logique de transformation dans la couche service.
+ */
 @Component
 public class MessageMapper{
 
+    /**
+     * Convertit une entité Message en MessageDto
+     *
+     * @param message l'entité à convertir
+     * @return le DTO correspondant
+     */
     public MessageDto toDto(Message message) {
         MessageDto messageDto = new MessageDto();
         messageDto.setId(message.getId());
