@@ -33,7 +33,7 @@ public class SecurityConfig {
                         "/forum/delete-topic/**").hasRole("ADMIN")
                         .requestMatchers("/forum/**").authenticated()
 
-                        .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files").permitAll()
+                        .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

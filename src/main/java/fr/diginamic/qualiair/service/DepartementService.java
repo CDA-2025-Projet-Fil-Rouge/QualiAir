@@ -1,12 +1,11 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dao.DepartementDao;
 import fr.diginamic.qualiair.entity.Departement;
 import fr.diginamic.qualiair.repository.DepartementRepository;
 import fr.diginamic.qualiair.validator.DepartementValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * DepartementService
@@ -29,6 +28,8 @@ public class DepartementService {
      */
     @Autowired
     private DepartementValidator departementValidator;
+    @Autowired
+    private DepartementDao departementDao;
 
     /**
      * Find from cache or create an entity and add it to the cache
@@ -37,14 +38,16 @@ public class DepartementService {
      * @return existing or created entity
      */
     public Departement findOrCreate(Departement departement) {
-        Map<String, Departement> departementCache = cacheService.getDepartementMap();
 
-        if (departementCache.get(departement.getNom()) != null) {
-            return departementCache.get(departement.getNom());
+        String key = departement.getNom();
+        Departement existing = cacheService.findInDepartementCache(key);
+
+        if (existing != null) {
+            return existing;
         }
         departementValidator.validate(departement);
-        departementRepository.save(departement);
-        departementCache.put(departement.getNom(), departement);
+        departementDao.save(departement);
+        cacheService.putInDepartementCache(key, departement);
         return departement;
     }
 }

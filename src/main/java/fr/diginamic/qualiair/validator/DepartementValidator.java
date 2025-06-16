@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class DepartementValidator implements IDepartementValidator {
     @Override
-    public void validate(Departement entity) {
+    public boolean validate(Departement entity) {
         //todo impl
+        return true;
     }
 }

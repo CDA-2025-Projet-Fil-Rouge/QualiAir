@@ -40,4 +40,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(e.getMessage());
     }
 
+    @ExceptionHandler(UnnecessaryApiRequestException.class)
+    public ResponseEntity<String> handleUnnecessaryApiRequestException(UnnecessaryApiRequestException e) {
+        logger.error(e.getMessage());
+        return ResponseEntity.internalServerError().body(e.getMessage());
+    }
 }

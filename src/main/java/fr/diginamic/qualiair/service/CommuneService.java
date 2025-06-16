@@ -1,12 +1,12 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dao.CommuneDao;
 import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 /**
  * Commune service
@@ -30,6 +30,9 @@ public class CommuneService {
     @Autowired
     private CommuneValidator communeValidator;
 
+    @Autowired
+    private CommuneDao dao;
+
     /**
      * Update a commune from its name
      *
@@ -45,16 +48,17 @@ public class CommuneService {
      * @param commune commune entity
      * @return existing or created entity
      */
-    public Commune findOrCreate(Commune commune) {
+    public Commune findOrCreate(Commune commune) throws ParsedDataException {
 
-        Map<String, Commune> communeCache = cacheService.getCommuneMap();
+        String key = commune.getNomPostal();
+        Commune existing = cacheService.findInCommuneCache(key);
 
-        if (communeCache.get(commune.getNom()) != null) {
-            return communeCache.get(commune.getNom());
+        if (existing != null) {
+            return existing;
         }
         communeValidator.validate(commune);
-        communeRepository.save(commune);
-        communeCache.put(commune.getNom(), commune);
+        dao.save(commune);
+        cacheService.putInCommuneCache(key, commune);
         return commune;
     }
 
@@ -65,11 +69,7 @@ public class CommuneService {
      * @return existing commune
      */
     public Commune getFromCache(String communeName) {
-        Map<String, Commune> communeCache = cacheService.getCommuneMap();
-        Commune existing = communeCache.get(communeName);
-//        if (communeCache.get(communeName) == null) {
-//            throw new FunctionnalException("Commune doesn't exist for: " + communeName);
-//        }
-        return existing;
+
+        return cacheService.findInCommuneCache(communeName);
     }
 }

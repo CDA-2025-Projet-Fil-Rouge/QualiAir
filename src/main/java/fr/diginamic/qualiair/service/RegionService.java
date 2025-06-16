@@ -6,8 +6,6 @@ import fr.diginamic.qualiair.validator.RegionValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 /**
  * Region service
  */
@@ -37,14 +35,15 @@ public class RegionService {
      * @return existing or new region
      */
     public Region findOrCreate(Region region) {
-        Map<String, Region> regionCache = cacheService.getRegionMap();
 
-        if (regionCache.get(region.getNom()) != null) {
-            return regionCache.get(region.getNom());
+        String key = region.getNom();
+        Region existing = cacheService.findInRegionCache(key);
+        if (existing != null) {
+            return existing;
         }
         regionValidator.validate(region);
         regionRepository.save(region);
-        regionCache.put(region.getNom(), region);
+        cacheService.putInRegionCache(key, region);
         return region;
     }
 }

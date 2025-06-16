@@ -9,9 +9,12 @@ import java.util.Set;
 public class Commune {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_commune")
     private Long id;
 
-    private String nom;
+    private String nomPostal;
+
+    private String nomComplet;
     @Column(name = "code_postal")
     private int codePostal;
     @Column(name = "code_insee")
@@ -21,7 +24,7 @@ public class Commune {
     @JoinColumn(name = "id_departement")
     private Departement departement;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_coordonnee")
     private Coordonnee coordonnee;
 
@@ -45,8 +48,8 @@ public class Commune {
      *
      * @return nom
      */
-    public String getNom() {
-        return nom;
+    public String getNomComplet() {
+        return nomComplet;
     }
 
     /**
@@ -54,8 +57,8 @@ public class Commune {
      *
      * @param nom sets value
      */
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setNomComplet(String nom) {
+        this.nomComplet = nom;
     }
 
     /**
@@ -146,5 +149,23 @@ public class Commune {
      */
     public void setAdresse(Set<Adresse> adresse) {
         this.adresse = adresse;
+    }
+
+    /**
+     * Getter
+     *
+     * @return libbelleAcheminenent
+     */
+    public String getNomPostal() {
+        return nomPostal;
+    }
+
+    /**
+     * Setter
+     *
+     * @param libbelleAcheminenent sets value
+     */
+    public void setNomPostal(String libbelleAcheminenent) {
+        this.nomPostal = libbelleAcheminenent;
     }
 }

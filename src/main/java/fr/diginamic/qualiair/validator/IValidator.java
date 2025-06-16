@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.validator;
 
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.TokenExpiredException;
 
 public interface IValidator<T> {
     /**
@@ -16,5 +17,7 @@ public interface IValidator<T> {
         }
     }
 
-    void validate(T entity) throws BusinessRuleException;
+
+    boolean validate(T entity) throws TokenExpiredException, BusinessRuleException;
+
 }

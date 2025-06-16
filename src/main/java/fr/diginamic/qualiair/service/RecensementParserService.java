@@ -4,9 +4,12 @@ import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
-import fr.diginamic.qualiair.repository.MesureRepository;
+import fr.diginamic.qualiair.repository.CommuneRepository;
+import fr.diginamic.qualiair.utils.CommuneUtils;
+import fr.diginamic.qualiair.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -53,8 +58,7 @@ public class RecensementParserService {
     private MesureMapper mesureMapper;
     @Autowired
     private RecensementCsvMapper recensementCsvMapper;
-    @Autowired
-    private MesureRepository mesureRepository;
+
     /**
      * File path for file with cities + population
      */
@@ -65,6 +69,10 @@ public class RecensementParserService {
      */
     @Value("${recensement.fichier.communes-with-coord.path}")
     private String pathFichierCoord;
+    @Autowired
+    private MesureService mesureService;
+    @Autowired
+    private CommuneRepository communeRepository;
 
     /**
      * Recensement Parser service orchestrator
@@ -73,21 +81,24 @@ public class RecensementParserService {
      * @throws FileNotFoundException error finding the file
      */
     @Transactional
-    public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
+    public void saveCommunesFromFichier() throws IOException, FileNotFoundException, ParsedDataException {
         validateFilePaths();
-        cacheService.loadAllCaches();
+        cacheService.loadExistingCommunesWithRelations();
 
         logger.debug("Starting insertion");
-        System.out.println("Starting insertion");
+
+
+        List<Commune> communes = communeRepository.findAll();
 
         List<CommuneCoordDto> coordDtos = parseCoordFile(pathFichierCoord);
         saveEntitiesFromCoordDtos(coordDtos);
 
         List<CommuneHabitantDto> popDtos = parsePopFile(pathFichierPop);
-        savePopulationFromDtos(popDtos);
+        String filename = Paths.get(pathFichierPop).getFileName().toString();
+        String fileDate = filename.split("_")[0];
+        savePopulationFromDtos(popDtos, fileDate);
 
         logger.debug("Completed insertion");
-        System.out.println("Completed insertion");
 
         cacheService.clearCaches();
     }
@@ -140,12 +151,14 @@ public class RecensementParserService {
                 .toList();
     }
 
+
     /**
      * This method iterates over the list of dtos, creates Region, Departement Coordonees and Commune entities while setting up their relationships and persists them
      *
      * @param dtos list of dtos
      */
-    private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) {
+
+    private void saveEntitiesFromCoordDtos(List<CommuneCoordDto> dtos) throws ParsedDataException {
         for (CommuneCoordDto dto : dtos) {
             Region region = regionService.findOrCreate(regionMapper.toEntityFromCommuneCoordDto(dto));
 
@@ -153,19 +166,23 @@ public class RecensementParserService {
             departement.setRegion(region);
             departement = departementService.findOrCreate(departement);
 
-            Coordonnee coordonnee = null;
-            try {
-                coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
-                coordonnee = coordonneeService.findOrCreate(coordonnee);
-            } catch (Exception e) {
-                continue;
-            }
-
             Commune commune = communeMapper.toEntityFromCommuneCoordDto(dto);
             commune.setDepartement(departement);
+
+            Coordonnee coordonnee;
+            try {
+                coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
+            } catch (ParsedDataException e) {
+                logger.debug("Skipping persistence of {} because coordinates are not parseable", commune.getNomComplet());
+                continue;
+            }
             commune.setCoordonnee(coordonnee);
+            coordonnee.setCommune(commune);
+
+            coordonneeService.findOrCreate(coordonnee);
             communeService.findOrCreate(commune);
         }
+
     }
 
     /**
@@ -173,21 +190,27 @@ public class RecensementParserService {
      *
      * @param dtos list of dtos
      */
-    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos) {
+    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos, String dateReleve) throws ParsedDataException {
+        LocalDate date = DateUtils.toLocalDate(dateReleve);
+        if (mesurePopulationService.existByDateReleve(date)) {
+            logger.debug("Population data for date {} already exists, skipping insertion", dateReleve);
+            return;
+        }
+
         for (CommuneHabitantDto dto : dtos) {
 
-            String name = dto.getNomCommune();
+            String name = CommuneUtils.toNomPostal(dto.getNomCommune());
 
             Commune commune = communeService.getFromCache(name);
             if (commune == null) {
                 continue;
             }
 
-            MesurePopulation mesure = mesureMapper.toEntityFromCommuneCoordDto(dto);
+            MesurePopulation mesurePopulation = mesureMapper.toEntity(dto, date.atStartOfDay());
+            mesurePopulation.setCoordonnee(commune.getCoordonnee());
 
-            mesure.setCoordonnee(commune.getCoordonnee());
-
-            mesurePopulationService.save(mesure);
+            mesurePopulationService.save(mesurePopulation);
         }
+
     }
 }
