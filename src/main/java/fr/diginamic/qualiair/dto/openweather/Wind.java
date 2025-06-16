@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.dto.openweather.current;
+package fr.diginamic.qualiair.dto.openweather;
 
 public class Wind {
     private String speed;

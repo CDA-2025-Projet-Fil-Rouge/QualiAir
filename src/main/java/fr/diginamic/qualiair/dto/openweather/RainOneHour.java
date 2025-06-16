@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.dto.openweather.current;
+package fr.diginamic.qualiair.dto.openweather;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

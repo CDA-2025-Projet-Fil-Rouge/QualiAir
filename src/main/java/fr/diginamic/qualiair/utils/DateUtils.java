@@ -1,12 +1,15 @@
 package fr.diginamic.qualiair.utils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 public class DateUtils {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm";
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
     private DateUtils() {
     }
@@ -30,6 +33,10 @@ public class DateUtils {
      */
     public static String toString(LocalDate date) {
         return date.format(DATE_FORMATTER);
+    }
+
+    public static String toString(LocalDateTime dateTime) {
+        return dateTime.format(DATE_TIME_FORMATTER);
     }
 
     /**
