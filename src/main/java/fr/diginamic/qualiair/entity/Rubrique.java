@@ -18,7 +18,7 @@ public class Rubrique
     private String nom;
     @Column(nullable = false)
     private String description;
-    @Column(name = "priorite_affichage_indice", nullable = false)
+    @Column(name = "priorite_affichage_indice", nullable = false, unique = true)
     private int prioriteAffichageIndice = 0;
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;

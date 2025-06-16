@@ -27,8 +27,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         .requestMatchers("/auth/**").permitAll()
-                        //  .requestMatchers("/forum/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/forum/create-rubrique").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
+                        .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
+                        "/forum/delete-topic/**").hasRole("ADMIN")
+                        .requestMatchers("/forum/**").authenticated()
 
                         .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files").permitAll()
 

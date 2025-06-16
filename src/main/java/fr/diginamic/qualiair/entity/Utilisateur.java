@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -33,13 +34,19 @@ public class Utilisateur {
     private Adresse adresse;
 
     @OneToMany(mappedBy = "createur")
-    private Set<Message> messages;
+    private Set<Message> messages = new HashSet<>();
     @OneToMany(mappedBy = "createur")
-    private Set<Topic> topics;
+    private Set<Topic> topics = new HashSet<>();
     @OneToMany(mappedBy = "createur")
-    private Set<Rubrique> rubriques;
+    private Set<Rubrique> rubriques = new HashSet<>();
 
-    
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Message> messagesModifies = new HashSet<>();
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Topic> topicsModifies = new HashSet<>();
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Rubrique> rubriquesModifiees = new HashSet<>();
+
 
     public Utilisateur()
     {
@@ -252,4 +259,51 @@ public class Utilisateur {
         this.rubriques = rubriques;
     }
 
+    /**
+     * Getter
+     * @return messagesModifies
+     */
+    public Set<Message> getMessagesModifies() {
+        return messagesModifies;
+    }
+
+    /**
+     * Setter
+     * @param messagesModifies sets value
+     */
+    public void setMessagesModifies(Set<Message> messagesModifies) {
+        this.messagesModifies = messagesModifies;
+    }
+
+    /**
+     * Getter
+     * @return topicsModifies
+     */
+    public Set<Topic> getTopicsModifies() {
+        return topicsModifies;
+    }
+
+    /**
+     * Setter
+     * @param topicsModifies sets value
+     */
+    public void setTopicsModifies(Set<Topic> topicsModifies) {
+        this.topicsModifies = topicsModifies;
+    }
+
+    /**
+     * Getter
+     * @return rubriquesModifiees
+     */
+    public Set<Rubrique> getRubriquesModifiees() {
+        return rubriquesModifiees;
+    }
+
+    /**
+     * Setter
+     * @param rubriquesModifiees sets value
+     */
+    public void setRubriquesModifiees(Set<Rubrique> rubriquesModifiees) {
+        this.rubriquesModifiees = rubriquesModifiees;
+    }
 }

@@ -10,12 +10,14 @@ import fr.diginamic.qualiair.service.forumService.TopicService;
 import fr.diginamic.qualiair.utils.api.HttpRequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Contrôleur REST pour la gestion du forum.
@@ -34,23 +36,17 @@ public class ForumController {
     @Autowired
     private HttpRequestUtils httpRequestUtils;
 
-    // Pour vérifier la création
-    @GetMapping
-    public Map<String, Object> forumSummary() {
-        Map<String, Object> summary = new HashMap<>();
-        summary.put("rubriques", rubriqueService.getAllRubriques().size());
-        summary.put("topics", topicService.getAllTopics().size());
-        summary.put("messages", messageService.getAllMessages().size());
-        return summary;
-    }
-
     /**
      * Récupère et affiche toutes les rubriques existantes
      * @return la liste des rubriques
      */
     @GetMapping("/rubrique/get-all")
-    public List<RubriqueDto> getAllRubriques() {
-        return rubriqueService.getAllRubriques();
+    public ResponseEntity<Page<RubriqueDto>> getAllRubriques(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "prioriteAffichageIndice"));
+        return ResponseEntity.ok(rubriqueService.getAllRubriques(pageable));
     }
 
     /**
@@ -58,8 +54,22 @@ public class ForumController {
      * @return la liste des topics
      */
     @GetMapping("/topic/get-all")
-    public List<TopicDto> getAllTopics() {
-        return topicService.getAllTopics();
+    public ResponseEntity<Page<TopicDto>> getAllTopics(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dateCreation").ascending());
+        return ResponseEntity.ok(topicService.getAllTopics(pageable));
+    }
+
+    /**
+     * Récupère et affiche tous les topics existants d'une rubrique
+     * @param idRubrique désigne l'id de la Rubrique parente
+     * @return la liste des topics associés à la rubrique indiquée
+     */
+    @GetMapping("/topic/by-rubrique/{idRubrique}")
+    public List<TopicDto> getTopicsByRubrique(@PathVariable Long idRubrique) {
+        return topicService.getTopicsByRubrique(idRubrique);
     }
 
     /**
@@ -67,8 +77,22 @@ public class ForumController {
      * @return la liste des messages
      */
     @GetMapping("message/get-all")
-    public List<MessageDto> getAllMessages() {
-        return messageService.getAllMessages();
+    public ResponseEntity<Page<MessageDto>> getAllMessages(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("dateCreation").ascending());
+        return ResponseEntity.ok(messageService.getAllMessages(pageable));
+    }
+
+    /**
+     * Récupère et affiche tous les messages existants d'un topic
+     * @param idTopic désigne l'id du topic parent
+     * @return la liste des messages associés au topic indiqué
+     */
+    @GetMapping("/message/by-topic/{idTopic}")
+    public List<MessageDto> getMessagesByTopic(@PathVariable Long idTopic) {
+        return messageService.getMessagesByTopic(idTopic);
     }
 
     /**
@@ -123,7 +147,7 @@ public class ForumController {
     }
 
     /**
-     * Met à jour un message existant, uniquement si l'utilisateur est son auteur ou un administrateur.
+     * Met à jour une rubrique existante, uniquement si l'utilisateur est admin.
      *
      * @param id       l'identifiant de la rubrique à mettre à jour
      * @param dto      les nouvelles données de la rubrique
@@ -179,6 +203,45 @@ public class ForumController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * Supprime une rubrique existante, uniquement si l'utilisateur est admin et si la rubrique ne contient pas de topic
+     * @param id désigne l'id de la rubrique à supprimer
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
+     * @return le message de confirmation si la suppression s'est bien passée
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @DeleteMapping("/delete-rubrique/{id}")
+    public ResponseEntity<String> deleteRubrique(
+            @PathVariable Long id,
+            HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        rubriqueService.deleteRubrique(id, user);
+        return ResponseEntity.ok("Rubrique supprimée");
+    }
+
+    /**
+     * Supprime un topic existant, uniquement si l'utilisateur est admin et si le topic ne contient pas de message
+     * @param id désigne l'id du topic à supprimer
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
+     * @return le message de confirmation si la suppression s'est bien passée
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @DeleteMapping("/delete-topic/{id}")
+    public ResponseEntity<String> deleteTopic(
+            @PathVariable Long id,
+            HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        topicService.deleteTopic(id, user);
+        return ResponseEntity.ok("Topic supprimé");
+    }
+
+    /**
+     * Supprime un message existant, uniquement si l'utilisateur est son auteur ou un administrateur.
+     * @param id désigne l'id du message à supprimer
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
+     * @return le message de confirmation si la suppression s'est bien passée
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
     @DeleteMapping("/delete-message/{id}")
     public ResponseEntity<?> deleteMessage(
             @PathVariable Long id,
@@ -188,6 +251,5 @@ public class ForumController {
         messageService.deleteMessage(id, user);
         return ResponseEntity.ok("Message supprimé");
     }
-
 }
 

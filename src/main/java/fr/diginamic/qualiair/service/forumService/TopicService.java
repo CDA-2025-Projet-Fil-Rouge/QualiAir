@@ -1,20 +1,22 @@
 package fr.diginamic.qualiair.service.forumService;
 
-import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
-import fr.diginamic.qualiair.entity.Message;
 import fr.diginamic.qualiair.entity.Rubrique;
 import fr.diginamic.qualiair.entity.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
+import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.TopicMapper;
+import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
 import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.TopicValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,8 @@ public class TopicService {
     @Autowired
     private RubriqueRepository rubriqueRepository;
     @Autowired
+    private MessageRepository messageRepository;
+    @Autowired
     private TopicValidator topicValidator;
 
     /**
@@ -42,9 +46,18 @@ public class TopicService {
      *
      * @return une liste de TopicDto représentant les topics du forum.
      */
-    public List<TopicDto> getAllTopics() {
-        return topicRepository.findAll().stream()
-                .map(topic -> topicMapper.toDto(topic))
+    public Page<TopicDto> getAllTopics(Pageable pageable) {
+        return topicRepository.findAll(pageable).map(topicMapper::toDto);
+    }
+
+    /**
+     * Récupère tous les topics existants d'une rubrique
+     * @param idRubrique désigne l'id de la rubrique parente
+     * @return la liste des topics associés à la rubrique indiquée
+     */
+    public List<TopicDto> getTopicsByRubrique(Long idRubrique) {
+        return topicRepository.findByRubriqueId(idRubrique).stream()
+                .map(topicMapper::toDto)
                 .toList();
     }
 
@@ -59,7 +72,7 @@ public class TopicService {
      * @throws FileNotFoundException si la rubrique associée n'est pas trouvée.
      */
     public TopicDto createTopic(TopicDto dto, Utilisateur createur)
-            throws BusinessRuleException, FileNotFoundException {
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
         Topic topic = topicMapper.toEntity(dto);
         topic.setCreateur(createur);
         topic.setDateCreation(LocalDateTime.now());
@@ -83,11 +96,11 @@ public class TopicService {
      * @throws BusinessRuleException si le topic modifié ne respecte pas les règles métier.
      */
     public TopicDto updateTopic(Long idTopic, TopicDto dto, Utilisateur modificateur)
-            throws BusinessRuleException, FileNotFoundException {
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
         ForumUtils.ensureMatchingIds(idTopic, dto.getId());
         Topic topic = ForumUtils.findTopicOrThrow(topicRepository, idTopic);
 
-        UtilisateurUtils.checkAuthorOrAdmin(modificateur, dto.getIdCreateur());
+        UtilisateurUtils.checkAuthorOrAdmin(modificateur, topic.getCreateur().getId());
         Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, dto.getIdRubrique());
 
         topic.setNom(dto.getNom());
@@ -97,5 +110,20 @@ public class TopicService {
         topicValidator.validate(topic);
         topicRepository.save(topic);
         return topicMapper.toDto(topic);
+    }
+
+    /**
+     * Supprime un topic existant, à la condition que l'utilisateur soit admin et que le topic ne contienne pas de message
+     * @param idTopic identifiant du topic à supprimer
+     * @param user l'utilisateur connecté tentant la suppression.
+     * @throws AccessDeniedException si l'utilisateur n'est pas admin.
+     * @throws FileNotFoundException si le topic est introuvable ou invalide
+     * @throws BusinessRuleException si la tentative de suppression ne respecte pas les règles métier.
+     */
+    public void deleteTopic(Long idTopic, Utilisateur user) throws FileNotFoundException, BusinessRuleException {
+        Topic topicASupprimer = ForumUtils.findTopicOrThrow(topicRepository, idTopic);
+        UtilisateurUtils.isAdmin(user);
+        ForumUtils.assertTopicIsEmpty(messageRepository, idTopic);
+        topicRepository.delete(topicASupprimer);
     }
 }

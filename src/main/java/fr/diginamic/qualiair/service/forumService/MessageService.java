@@ -6,6 +6,7 @@ import fr.diginamic.qualiair.entity.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
+import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.MessageMapper;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
@@ -13,6 +14,8 @@ import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.MessageValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -40,9 +43,18 @@ public class MessageService {
      * Récupère tous les messages présents en base.
      * @return liste de MessageDto représentant tous les messages.
      */
-    public List<MessageDto> getAllMessages() {
-        return messageRepository.findAll().stream()
-                .map(message -> messageMapper.toDto(message))
+    public Page<MessageDto> getAllMessages(Pageable pageable) {
+        return messageRepository.findAll(pageable).map(messageMapper::toDto);
+    }
+
+    /**
+     * Récupère la liste de tous les messages associés à un topic
+     * @param idTopic désigne l'id du topic parent
+     * @return la liste de tous les messages associés à ce topic
+     */
+    public List<MessageDto> getMessagesByTopic(Long idTopic) {
+        return messageRepository.findByTopicId(idTopic).stream()
+                .map(messageMapper::toDto)
                 .toList();
     }
 
@@ -57,8 +69,8 @@ public class MessageService {
      * @throws FileNotFoundException si le topic associé n'est pas trouvé
      */
     public MessageDto createMessage(MessageDto dto, Utilisateur createur)
-            throws BusinessRuleException, FileNotFoundException {
-        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getId());
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
+        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());
 
         Message message = messageMapper.toEntity(dto);
         message.setCreateur(createur);
@@ -82,11 +94,11 @@ public class MessageService {
      * @throws FileNotFoundException si le message n'est pas trouvé
      */
     public MessageDto updateMessage(Long idMessage, MessageDto dto, Utilisateur modificateur)
-            throws BusinessRuleException, FileNotFoundException {
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
 
         ForumUtils.ensureMatchingIds(idMessage, dto.getId());
         Message message = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
-        UtilisateurUtils.checkAuthorOrAdmin(modificateur, dto.getIdCreateur());
+        UtilisateurUtils.checkAuthorOrAdmin(modificateur,message.getCreateur().getId());
         Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());
 
         message.setContenu(dto.getContenu());

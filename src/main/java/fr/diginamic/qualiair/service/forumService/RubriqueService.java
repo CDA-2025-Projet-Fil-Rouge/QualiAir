@@ -5,12 +5,16 @@ import fr.diginamic.qualiair.entity.Rubrique;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
+import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapper;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
+import fr.diginamic.qualiair.repository.TopicRepository;
 import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.RubriqueValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -31,16 +35,16 @@ public class RubriqueService {
     private RubriqueMapper rubriqueMapper;
     @Autowired
     private RubriqueValidator rubriqueValidator;
+    @Autowired
+    private TopicRepository topicRepository;
 
     /**
      * Récupère toutes les rubriques existantes en base.
      *
      * @return une liste de RubriqueDto représentant les rubriques disponibles.
      */
-    public List<RubriqueDto> getAllRubriques() {
-        return rubriqueRepository.findAll().stream()
-                .map(rubrique -> rubriqueMapper.toDto(rubrique))
-                .toList();
+    public Page<RubriqueDto> getAllRubriques(Pageable pageable) {
+        return rubriqueRepository.findAll(pageable).map(rubriqueMapper::toDto);
     }
 
     /**
@@ -52,7 +56,8 @@ public class RubriqueService {
      * @throws AccessDeniedException si l'utilisateur n'est pas ADMIN.
      * @throws BusinessRuleException si la rubrique ne respecte pas les règles de validation métier.
      */
-    public RubriqueDto createRubrique(RubriqueDto dto, Utilisateur createur) throws BusinessRuleException {
+    public RubriqueDto createRubrique(RubriqueDto dto, Utilisateur createur)
+            throws BusinessRuleException, TokenExpiredException {
         UtilisateurUtils.isAdmin(createur);
 
         Rubrique rubrique = rubriqueMapper.toEntity(dto);
@@ -75,7 +80,7 @@ public class RubriqueService {
      * @throws BusinessRuleException si la rubrique modifiée ne respecte pas les règles métier.
      */
     public RubriqueDto updateRubrique(Long idRubrique, RubriqueDto dto, Utilisateur modificateur)
-        throws BusinessRuleException, FileNotFoundException {
+        throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
 
         ForumUtils.ensureMatchingIds(idRubrique, dto.getId());
         Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, idRubrique);
@@ -87,5 +92,21 @@ public class RubriqueService {
         rubriqueValidator.validate(rubrique);
         rubriqueRepository.save(rubrique);
         return rubriqueMapper.toDto(rubrique);
+    }
+
+    /**
+     * Supprime une rubrique existante, à la condition que l'utilisateur soit admin et que la rubrique ne contienne pas de topic.
+     * @param idRubrique identifiant de la rubrique à supprimer.
+     * @param user l'utilisateur connecté tentant la suppression.
+     * @throws AccessDeniedException si l'utilisateur n'est pas admin.
+     * @throws FileNotFoundException si la rubrique est introuvable ou invalide.
+     * @throws BusinessRuleException si la tentative de suppression ne respecte pas les règles métier.
+     */
+    public void deleteRubrique(Long idRubrique, Utilisateur user)
+            throws FileNotFoundException, BusinessRuleException {
+        Rubrique rubriqueASupprimer = ForumUtils.findRubriqueOrThrow(rubriqueRepository, idRubrique);
+        UtilisateurUtils.isAdmin(user);
+        ForumUtils.assertRubriqueIsEmpty(topicRepository, idRubrique);
+        rubriqueRepository.delete(rubriqueASupprimer);
     }
 }
