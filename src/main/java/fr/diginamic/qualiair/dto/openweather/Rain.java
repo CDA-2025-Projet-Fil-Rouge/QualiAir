@@ -3,6 +3,9 @@ package fr.diginamic.qualiair.dto.openweather;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * DTO réponse Open Weather
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Rain {
     @JsonProperty("1h")

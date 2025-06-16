@@ -28,6 +28,7 @@ public class CoordonneeMapper {
         return coordonnee;
     }
 
+
     public Coordonnee toEntityFromAirDataTo(AirDataFeatureDto feature) throws ParsedDataException {
         Coordonnee coordonnee = new Coordonnee();
         coordonnee.setLatitude(toDouble(feature.getProperties().getyWgs84()));

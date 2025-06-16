@@ -4,7 +4,6 @@ import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
-import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
 import fr.diginamic.qualiair.validator.MesureValidator;
 import org.slf4j.Logger;
@@ -23,10 +22,6 @@ public class MesurePrevisionService {
      */
     private static final Logger logger = LoggerFactory.getLogger(MesurePrevisionService.class);
 
-    @Autowired
-    private ApiOpenWeatherService openWeatherService;
-    @Autowired
-    private MesurePrevisionMapper mapper;
     @Autowired
     private MesurePrevisionRepository repository;
     @Autowired

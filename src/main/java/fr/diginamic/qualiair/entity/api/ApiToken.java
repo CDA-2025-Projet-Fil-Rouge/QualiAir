@@ -1,5 +1,8 @@
 package fr.diginamic.qualiair.entity.api;
 
+/**
+ * Contenu de token api
+ */
 public class ApiToken {
 
     private String token;

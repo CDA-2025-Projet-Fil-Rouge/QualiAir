@@ -12,11 +12,21 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Factory pour les Mesures Prévision
+ */
 @Component
 public class MesurePrevisionFactory {
     @Autowired
     private MesurePrevisionMapper mapper;
 
+    /**
+     * Map le dto réponse en une liste de Mesure prévision datées à l'enregistremenet et à la date de relevé
+     *
+     * @param dto dto réponse OpenWeather
+     * @return Liste de mesures prevision
+     * @throws ParsedDataException erreur de conversion de donnée
+     */
     public List<MesurePrevision> getInstanceList(OpenWeatherForecastDto dto) throws ParsedDataException {
         if (dto instanceof CurrentForecastDto currentForecastDto) {
             return mapper.toEntityListFromCurrentWeather(currentForecastDto);

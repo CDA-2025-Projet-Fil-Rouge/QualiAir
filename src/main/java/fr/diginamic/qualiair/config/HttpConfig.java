@@ -5,9 +5,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+
 @Configuration
 public class HttpConfig {
 
+    /**
+     * RestTemplate instanciateur
+     *
+     * @param builder builder
+     * @return resttemplate
+     */
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();

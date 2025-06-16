@@ -3,6 +3,9 @@ package fr.diginamic.qualiair.entity.api;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Utilisateur Api Atmo-France, les identifiations sont récupérés dans le fichier atmo.config
+ */
 @Component
 public class UtilisateurAtmoFrance {
 

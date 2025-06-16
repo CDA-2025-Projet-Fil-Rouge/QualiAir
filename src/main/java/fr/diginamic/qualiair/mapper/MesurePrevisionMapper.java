@@ -17,6 +17,14 @@ import static fr.diginamic.qualiair.utils.MesureUtils.addIfNotNull;
 @Component
 public class MesurePrevisionMapper {
 
+    /**
+     * Cette méthode est utilisée par plusieurs Objets de réponse meteo issus de l'api Open Weather. Ajoute une mesure meteo pour chaque fields non vide;
+     *
+     * @param dto        réponse api
+     * @param typeReleve type de relevé généré par la methode
+     * @return liste de relevé
+     * @throws ParsedDataException erreur de conversion de données
+     */
     public List<MesurePrevision> toEntityList(CurrentForecastDto dto, TypeReleve typeReleve) throws ParsedDataException {
         List<MesurePrevision> mesures = new ArrayList<>();
 
@@ -62,10 +70,24 @@ public class MesurePrevisionMapper {
         return mesures;
     }
 
+    /**
+     * Conversion pour les reuqetes de meteo instantannées
+     *
+     * @param dto objet reponse api
+     * @return list de mesures
+     * @throws ParsedDataException erreurs de parsing
+     */
     public List<MesurePrevision> toEntityListFromCurrentWeather(CurrentForecastDto dto) throws ParsedDataException {
         return toEntityList(dto, TypeReleve.ACTUEL);
     }
 
+    /**
+     * Conversion pour les reuqetes de prévision meteo 5j
+     *
+     * @param dto objet reponse api
+     * @return list de mesures
+     * @throws ParsedDataException erreurs de parsing
+     */
     public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto) throws ParsedDataException {
         List<MesurePrevision> mesures = new ArrayList<>();
         for (CurrentForecastDto dailyForecast : dto.getCurrentForecastDtos()) {
@@ -74,6 +96,13 @@ public class MesurePrevisionMapper {
         return mesures;
     }
 
+    /**
+     * Conversion pour les reuqetes de prévision meteo 16j
+     *
+     * @param dto objet reponse api
+     * @return list de mesures
+     * //     * @throws ParsedDataException erreurs de parsing
+     */
     public List<MesurePrevision> toEntityListFromSixteenDaysForecast(ForecastSixteenDays dto) {
         return List.of(); // todo impl
     }

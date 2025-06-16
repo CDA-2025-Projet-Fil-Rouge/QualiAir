@@ -1,5 +1,8 @@
 package fr.diginamic.qualiair.dto.openweather;
 
+/**
+ * DTO réponse Open Weather
+ */
 public class Wind {
     private String speed;
     private String deg;

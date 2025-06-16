@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 
+/**
+ * DTO réponse Open Weather
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ForecastFiveDayDto extends OpenWeatherForecastDto {
     List<CurrentForecastDto> currentForecastDtos;

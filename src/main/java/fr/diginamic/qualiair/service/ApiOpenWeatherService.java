@@ -43,6 +43,16 @@ public class ApiOpenWeatherService {
     @Autowired
     private CommuneService communeService;
 
+    /**
+     * Methode générique pour les appels vers l'api OpenWeather
+     *
+     * @param uri          uri complet de la requete
+     * @param responseType DTO cible de la réponse serveur
+     * @param <T>          La classe mère des dtos
+     * @return une liste de mesures sauvegargées en base
+     * @throws ExternalApiResponseException La connexion vers l'api a échouée
+     * @throws ParsedDataException          erreur de conversion de données
+     */
     private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType) throws ExternalApiResponseException, ParsedDataException {
 
         ResponseEntity<T> response = restTemplate.getForEntity(uri, responseType);
@@ -56,6 +66,16 @@ public class ApiOpenWeatherService {
         return mesures;
     }
 
+    /**
+     * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
+     *
+     * @param nomPostal nom de la ville cible pour la requete externe
+     * @return liste de mesures
+     * @throws ExternalApiResponseException   api injoignable
+     * @throws UnnecessaryApiRequestException requete inutile
+     * @throws FunctionnalException           ville absente en base
+     * @throws ParsedDataException            erreur de conversion
+     */
     public List<MesurePrevision> requestAndSaveCurrentForecast(String nomPostal) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
@@ -75,7 +95,16 @@ public class ApiOpenWeatherService {
         return fetchAndSaveForecast(uri, CurrentForecastDto.class);
     }
 
-
+    /**
+     * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
+     *
+     * @param nomPostal nom de la ville cible pour la requete externe
+     * @return liste de mesures
+     * @throws ExternalApiResponseException   api injoignable
+     * @throws UnnecessaryApiRequestException requete inutile
+     * @throws FunctionnalException           ville absente en base
+     * @throws ParsedDataException            erreur de conversion
+     */
     public List<MesurePrevision> requestFiveDayForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
@@ -93,6 +122,16 @@ public class ApiOpenWeatherService {
         return fetchAndSaveForecast(fullUri, ForecastFiveDayDto.class);
     }
 
+    /**
+     * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
+     *
+     * @param nomPostal nom de la ville cible pour la requete externe
+     * @return liste de mesures
+     * @throws ExternalApiResponseException   api injoignable
+     * @throws UnnecessaryApiRequestException requete inutile
+     * @throws FunctionnalException           ville absente en base
+     * @throws ParsedDataException            erreur de conversion
+     */
     public List<MesurePrevision> requestSixteenDaysForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
 
         Commune commune = communeService.findByNomPostal(nomPostal);
@@ -110,13 +149,22 @@ public class ApiOpenWeatherService {
         return fetchAndSaveForecast(fullUri, ForecastSixteenDays.class);
     }
 
-    public LocalAirQualityDto requestLocalAirQuality(double latitude, double longitude) throws ExternalApiResponseException {
+
+    public LocalAirQualityDto requestLocalAirQuality(double latitude, double longitude) throws ExternalApiResponseException { //todo a voir si on implemente
         URI fullUri = getFullUri(api.getUriLocalAirData(), latitude, longitude);
         ResponseEntity<LocalAirQualityDto> response = restTemplate.getForEntity(fullUri, LocalAirQualityDto.class);
         responseValidator.validate(response);
         return response.getBody();
     }
 
+    /**
+     * Construit l'uri de la requete api
+     *
+     * @param sourceUri uri de base définit dans le fichier config
+     * @param latitude  latitude
+     * @param longitude longitude
+     * @return uri complet
+     */
     private URI getFullUri(URI sourceUri, double latitude, double longitude) {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("lat", String.valueOf(latitude));

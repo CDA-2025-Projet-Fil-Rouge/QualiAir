@@ -38,6 +38,11 @@ public class MesureMapper {
         return mesure;
     }
 
+    /**
+     * @param feature    objet réponse de l'api Atmo-France
+     * @param dateReleve date du relevé (précisée pour la requete)
+     * @return Liste de mesures Air
+     */
     public List<MesureAir> toEntityList(AirDataFeatureDto feature, LocalDate dateReleve) {
         List<MesureAir> mesures = new ArrayList<>();
         AirDataPropertiesDto props = feature.getProperties();
@@ -73,6 +78,15 @@ public class MesureMapper {
         return mesures;
     }
 
+    /**
+     * Crée une mesure air
+     *
+     * @param codeElement code de l'élément récupéré par la requete
+     * @param indice      valeur indexée de la mesure (convention //todo trouvé la convention euro d'indexation
+     * @param dateReleve  date du relevé
+     * @param dateMaj     date d'insertion
+     * @return mesure créée
+     */
     private MesureAir createMesureAir(String codeElement, String indice,
                                       LocalDateTime dateReleve, LocalDateTime dateMaj) {
         MesureAir mesure = new MesureAir();
