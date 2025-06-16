@@ -30,7 +30,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/forum/create-rubrique").hasRole("ADMIN")
 
-                        .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files").permitAll()
+                        .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

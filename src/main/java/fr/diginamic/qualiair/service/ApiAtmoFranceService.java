@@ -1,30 +1,35 @@
 package fr.diginamic.qualiair.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.diginamic.qualiair.dto.insertion.DailyAirDataDto;
+import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
+import fr.diginamic.qualiair.dto.atmofrance.DailyAirDataDto;
+import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.entity.Coordonnee;
+import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.entity.api.ApiAtmoFrance;
 import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.ApiToken;
 import fr.diginamic.qualiair.entity.api.UtilisateurAtmoFrance;
-import fr.diginamic.qualiair.exception.BusinessRuleException;
-import fr.diginamic.qualiair.exception.ExternalApiResponseException;
-import fr.diginamic.qualiair.exception.TokenExpiredException;
+import fr.diginamic.qualiair.exception.*;
+import fr.diginamic.qualiair.mapper.CoordonneeMapper;
+import fr.diginamic.qualiair.mapper.MesureMapper;
 import fr.diginamic.qualiair.validator.AtmoFranceTokenValidator;
+import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.List;
+
+import static fr.diginamic.qualiair.utils.CommuneUtils.toNomPostal;
+import static fr.diginamic.qualiair.utils.DateUtils.toLocalDate;
 
 @Service
 public class ApiAtmoFranceService {
@@ -39,88 +44,117 @@ public class ApiAtmoFranceService {
     private RestTemplate restTemplate;
     @Autowired
     private AtmoFranceTokenValidator validator;
-    @Value("${local.temp.directory}")
-    private Path tempDir;
+    @Autowired
+    private CacheService cacheService;
+    @Autowired
+    private MesureMapper mesureMapper;
+    @Autowired
+    private CoordonneeMapper coordonneeMapper;
+    @Autowired
+    private MesureAirService mesureAirService;
+    @Autowired
+    private CoordonneeService coordonneeService;
+    @Autowired
+    private HttpResponseValidator responseValidator;
+    @Autowired
+    private CommuneService communeService;
 
 
+    /**
+     * Sends a post request to AtmoFranceApi for a new bearer token
+     *
+     * @return new token timestamped at obtention
+     * @throws ExternalApiResponseException the request failed
+     */
     public ApiAtmoFranceToken requestToken() throws ExternalApiResponseException {
         ApiAtmoFranceToken api = new ApiAtmoFranceToken();
 
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            UtilisateurAtmoFrance user = apiAtmoFrance.getUtilisateur();
-            URI loginUri = apiAtmoFrance.getUriLogin();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        UtilisateurAtmoFrance user = apiAtmoFrance.getUtilisateur();
+        URI loginUri = apiAtmoFrance.getUriLogin();
 
-            HttpEntity<UtilisateurAtmoFrance> requestEntity = new HttpEntity<>(user, headers);
+        HttpEntity<UtilisateurAtmoFrance> requestEntity = new HttpEntity<>(user, headers);
 
-            ResponseEntity<ApiToken> response = restTemplate.exchange(
-                    loginUri,
-                    HttpMethod.POST,
-                    requestEntity,
-                    ApiToken.class
-            );
-            if (response.getStatusCode() == HttpStatus.OK) {
+        ResponseEntity<ApiToken> response = restTemplate.exchange(loginUri, HttpMethod.POST, requestEntity, ApiToken.class);
 
-                if (response.getBody() == null) {
-                    throw new ExternalApiResponseException("Response body is empty");
-                }
-                String token = response.getBody().getToken();
-                api.setToken(token);
+        String token = responseValidator.validateAndReturnToken(response);
 
-            } else {
-                throw new ExternalApiResponseException("Status: " + response.getStatusCode() + "\n" + response.getBody());
-            }
-        } catch (RestClientException ex) {
-            throw new ExternalApiResponseException("API error: " + ex.getMessage());
-        }
+        api.setToken(token);
+
         return api;
     }
 
-
-    public void loadDailyFranceAirQualityData(String date) throws ExternalApiResponseException {
-        try {
-            Files.createDirectories(tempDir);
-        } catch (IOException e) {
-            throw new ExternalApiResponseException("Failed to create temp directory");
+    @Transactional
+    public void saveDailyFranceAirQualityData(String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
+        LocalDate dateReleve = toLocalDate(date);
+        if (mesureAirService.existsByDateReleve(dateReleve)) {
+            throw new UnnecessaryApiRequestException(String.format("Measurements for date %s already exist, skipping", date));
         }
-        Path filePath = tempDir.resolve("atmo-" + date + ".json");
+        cacheService.loadExistingCommunesWithRelations();
+        DailyAirDataDto responseDto = fetchDailyAirDataFromApi(date);
 
-        if (Files.exists(filePath)) {
-            return;
-        }
-        ObjectMapper objectMapper = new ObjectMapper();
-        DailyAirDataDto rawJson = fetchDailyAirDataFromApi(date);
+        for (AirDataFeatureDto feature : responseDto.getFeatures()) {
 
-        try {
-            objectMapper.writeValue(new File(filePath.toString()), rawJson);
-        } catch (IOException e) {
-            throw new ExternalApiResponseException("Failed to write response to file");
+            try {
+
+                String zoneName = toNomPostal(feature.getProperties().getLibZone());
+//                logger.debug("Looking up commune from cache using zone name: {}", zoneName);
+                Commune commune = communeService.getFromCache(zoneName);
+
+                if (commune == null) {
+                    continue;
+                }
+                Coordonnee savedCoordonnee = commune.getCoordonnee();
+
+                List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, dateReleve);
+
+                mesureAir.forEach(mesure -> {
+                    mesure.setCoordonnee(savedCoordonnee);
+                    mesureAirService.save(mesure);
+                });
+            } catch (ParsedDataException e) {
+                logger.warn("Skipping Air quality registering for {} because : {}", feature.getProperties().getLibZone(), e.getMessage());
+            }
         }
-        //todo DTO parsing impl from file
+
+        cacheService.clearCaches();
     }
 
     private DailyAirDataDto fetchDailyAirDataFromApi(String date) throws ExternalApiResponseException {
-        if (!isTokenValid()) {
-            throw new ExternalApiResponseException("Error refreshing token");
+        String token = getOrRefreshToken();
+
+        try {
+
+            URI fullUri = UriComponentsBuilder.fromUri(apiAtmoFrance.getUriAirQuality()).queryParam("date", date).build().toUri();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+            ResponseEntity<DailyAirDataDto> response = restTemplate.exchange(fullUri, HttpMethod.GET, requestEntity, DailyAirDataDto.class);
+
+            if (response.getStatusCode() != HttpStatus.OK) {
+                throw new ExternalApiResponseException("Status: " + response.getStatusCode() + "\n" + response.getBody());
+            }
+
+            if (response.getBody() == null) {
+                throw new ExternalApiResponseException("Response body is empty");
+            }
+            return response.getBody();
+        } catch (RestClientException ex) {
+            throw new ExternalApiResponseException("API error: " + ex.getMessage());
         }
-        URI fullUri = UriComponentsBuilder.fromUri(apiAtmoFrance.getUriAirQuality()).queryParam("date", date).build().toUri();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(apiAtmoFrance.getToken().getToken());
-        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<DailyAirDataDto> response = restTemplate.exchange(fullUri, HttpMethod.GET, requestEntity, DailyAirDataDto.class);
-
-        return response.getBody();
     }
 
 
-    private boolean isTokenValid() throws ExternalApiResponseException {
+    private String getOrRefreshToken() throws ExternalApiResponseException {
         try {
             validator.validate(apiAtmoFrance.getToken());
-        } catch (TokenExpiredException | BusinessRuleException e) {
+        } catch (NullPointerException | TokenExpiredException | BusinessRuleException e) {
             apiAtmoFrance.setToken(requestToken());
         }
-        return true;
+        return apiAtmoFrance.getToken().getToken();
     }
+
+
 }

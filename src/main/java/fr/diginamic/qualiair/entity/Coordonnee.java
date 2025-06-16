@@ -9,6 +9,7 @@ import java.util.Set;
 public class Coordonnee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_coordonnee")
     private Long id;
 
     /**
@@ -22,8 +23,8 @@ public class Coordonnee {
      */
     private double longitude;
 
-    @OneToMany(mappedBy = "coordonnee")
-    private Set<Commune> communes;
+    @OneToOne(mappedBy = "coordonnee")
+    private Commune commune;
 
     @OneToMany(mappedBy = "coordonnee")
     private Set<Mesure> mesures;
@@ -79,19 +80,19 @@ public class Coordonnee {
     /**
      * Getter
      *
-     * @return communes
+     * @return commune
      */
-    public Set<Commune> getCommunes() {
-        return communes;
+    public Commune getCommune() {
+        return commune;
     }
 
     /**
      * Setter
      *
-     * @param communes sets value
+     * @param commune sets value
      */
-    public void setCommunes(Set<Commune> communes) {
-        this.communes = communes;
+    public void setCommune(Commune commune) {
+        this.commune = commune;
     }
 
     /**
