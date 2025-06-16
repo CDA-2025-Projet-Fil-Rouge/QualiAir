@@ -5,6 +5,8 @@ package fr.diginamic.qualiair.entity;
  */
 public enum RoleUtilisateur
 {
+    INACTIF,
     UTILISATEUR,
-    ADMIN
+    ADMIN,
+    SUPERADMIN
 }

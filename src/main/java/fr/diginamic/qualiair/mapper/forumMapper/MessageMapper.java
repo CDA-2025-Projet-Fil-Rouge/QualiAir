@@ -31,6 +31,13 @@ public class MessageMapper{
         return messageDto;
     }
 
+    /**
+     * Convertit un MessageDto en entité Message.
+     * Ne renseigne que les champs transmis depuis le client.
+     *
+     * @param dto le DTO source
+     * @return l'entité partiellement construite
+     */
     public Message toEntity(MessageDto dto) {
         Message entity = new Message();
         entity.setContenu(dto.getContenu());
