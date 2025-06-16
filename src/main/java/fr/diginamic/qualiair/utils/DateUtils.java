@@ -1,7 +1,9 @@
 package fr.diginamic.qualiair.utils;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -23,6 +25,10 @@ public class DateUtils {
      */
     public static LocalDate toLocalDate(String dateStr) {
         return LocalDate.parse(dateStr, DATE_FORMATTER);
+    }
+
+    public static LocalDateTime toLocalDateTime(long unix) {
+        return Instant.ofEpochSecond(unix).atZone(ZoneId.systemDefault()).toLocalDateTime();
     }
 
     /**
