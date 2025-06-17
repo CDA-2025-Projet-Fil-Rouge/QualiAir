@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,19 +29,16 @@ public class MesurePrevisionService {
 
 
     public List<MesurePrevision> saveMesurePrevision(List<MesurePrevision> mesures) {
-
-        Iterator<MesurePrevision> iterator = mesures.iterator();
-        while (iterator.hasNext()) {
-            MesurePrevision mesure = iterator.next();
+        List<MesurePrevision> saved = new ArrayList<>();
+        for (MesurePrevision mesure : mesures) {
             try {
                 validator.validate(mesure);
-                repository.save(mesure);
+                saved.add(repository.save(mesure));
             } catch (BusinessRuleException e) {
                 logger.error(e.getMessage());
-                iterator.remove();
             }
         }
-        return mesures;
+        return saved;
     }
 
     public boolean existsByHourAndNomPostal(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String nomPostal) throws UnnecessaryApiRequestException {

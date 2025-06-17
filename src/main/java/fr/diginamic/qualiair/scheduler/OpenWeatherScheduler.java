@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,14 +37,14 @@ public class OpenWeatherScheduler {
     @Scheduled(cron = "${ow.schedule.cron.meteo}")
     public void fetchLocalWeatherForTopCitiesEveryHour() {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
-
+        logger.info("Found {} communes with >= {} habitants", communes.size(), HAB);
+        logger.info("Scheduled task running at {}", LocalDateTime.now());
         for (Commune commune : communes) {
             try {
-                String nomPostal = commune.getNomPostal();
-                service.requestAndSaveCurrentForecast(nomPostal);
+                service.requestAndSaveCurrentForecast(commune);
             } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException |
                      ParsedDataException e) {
-                logger.error("Failed to get weather data for {}, with error : {}", commune.getNomComplet(), e.getMessage());
+//                logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomComplet(), e.getMessage());
             }
         }
     }

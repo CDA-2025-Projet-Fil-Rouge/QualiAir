@@ -27,8 +27,7 @@ public class MesureService {
      * @return existing or created entity
      */
     public Mesure save(Mesure mesure) {
-        mesureRepository.save(mesure);
-        return mesure;
+        return mesureRepository.save(mesure);
     }
 
 }

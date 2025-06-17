@@ -36,6 +36,18 @@ public class CommuneMapper {
     }
 
     public InfoCarteCommune toDto(Commune commune) {
+        InfoCarteCommune dto = new InfoCarteCommune();
+//
+//        dto.setNomVille(commune.getNomComplet());
+//        dto.setLatitude();
+//        dto.setLongitude();
+//        dto.setDetailMeteo();
+//        dto.setIndiceQualiteAir();
+//        dto.setDetailQualiteAir();
+//
+//        String descriptionMeteo = MesurePrevisionUtils.assumeWeatherQuality()
+//        dto.setDescriptionMeteo();
+
         return new InfoCarteCommune();
     }
 }

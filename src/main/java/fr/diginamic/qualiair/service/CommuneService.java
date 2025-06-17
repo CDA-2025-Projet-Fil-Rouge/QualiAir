@@ -64,9 +64,9 @@ public class CommuneService {
             return existing;
         }
         communeValidator.validate(commune);
-        dao.save(commune);
-        cacheService.putInCommuneCache(key, commune);
-        return commune;
+        Commune saved = dao.save(commune);
+        cacheService.putInCommuneCache(key, saved);
+        return saved;
     }
 
     /**
@@ -88,10 +88,14 @@ public class CommuneService {
         return commune;
     }
 
-    public List<InfoCarteCommune> getListCommunesByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findCommunesByLatestMesurePopulation();
+    public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
+        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecast(nbHabitant);
         List<InfoCarteCommune> dto = new ArrayList<>();
         communes.forEach(commune -> dto.add(mapper.toDto(commune)));
         return dto;
+    }
+
+    public List<Commune> getListTopCommunesByPopulation(int nbHabitant) {
+        return communeRepository.findTopByLastestMesurePopulation(nbHabitant);
     }
 }

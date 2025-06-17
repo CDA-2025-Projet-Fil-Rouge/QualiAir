@@ -43,8 +43,8 @@ public class CoordonneeService {
             return existing;
         }
 
-        dao.save(coordonnee);
-        cacheService.putInCoordonneeCache(key, coordonnee);
-        return coordonnee;
+        Coordonnee saved = dao.save(coordonnee);
+        cacheService.putInCoordonneeCache(key, saved);
+        return saved;
     }
 }

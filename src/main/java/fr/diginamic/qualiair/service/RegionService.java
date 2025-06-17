@@ -42,8 +42,8 @@ public class RegionService {
             return existing;
         }
         regionValidator.validate(region);
-        regionRepository.save(region);
+        Region saved = regionRepository.save(region);
         cacheService.putInRegionCache(key, region);
-        return region;
+        return saved;
     }
 }

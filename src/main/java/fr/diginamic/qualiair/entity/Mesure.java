@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class Mesure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mesure")
     private Long id;
 
     @Enumerated(EnumType.STRING)

@@ -25,7 +25,7 @@ public class Commune {
     private Departement departement;
 
     @OneToOne
-    @JoinColumn(name = "id_coordonnee")
+    @JoinColumn(name = "id_coordonnee_principale")
     private Coordonnee coordonnee;
 
     @OneToMany(mappedBy = "commune")
@@ -131,6 +131,7 @@ public class Commune {
      */
     public void setCoordonnee(Coordonnee coordonnee) {
         this.coordonnee = coordonnee;
+
     }
 
     /**

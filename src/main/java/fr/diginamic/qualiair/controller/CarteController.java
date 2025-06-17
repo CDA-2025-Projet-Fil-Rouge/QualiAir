@@ -1,7 +1,6 @@
 package fr.diginamic.qualiair.controller;
 
 import fr.diginamic.qualiair.dto.InfoCarteCommune;
-import fr.diginamic.qualiair.exception.DatabaseResponseException;
 import fr.diginamic.qualiair.service.CommuneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ public class CarteController {
     private CommuneService communeService;
 
     @GetMapping("/commune/get-thumbnail-data")
-    public ResponseEntity<List<InfoCarteCommune>> getThumbnailData(@RequestParam int nbHabitant) throws DatabaseResponseException {
-        return ResponseEntity.ok().body(communeService.getListCommunesByPopulation(nbHabitant));
+    public ResponseEntity<List<InfoCarteCommune>> getThumbnailData(@RequestParam int nbHabitant) {
+        return ResponseEntity.ok().body(communeService.getListCommunesDtoByPopulation(nbHabitant));
     }
 }

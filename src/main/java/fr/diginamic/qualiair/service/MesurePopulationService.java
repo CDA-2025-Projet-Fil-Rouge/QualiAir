@@ -21,8 +21,8 @@ public class MesurePopulationService {
     @Autowired
     private MesurePopulationRepository mesurePopulationRepository;
 
-    public void save(MesurePopulation mesurePopulation) {
-        mesurePopulationRepository.save(mesurePopulation);
+    public MesurePopulation save(MesurePopulation mesurePopulation) {
+        return mesurePopulationRepository.save(mesurePopulation);
     }
 
     public void saveAll(List<MesurePopulation> mesures) {

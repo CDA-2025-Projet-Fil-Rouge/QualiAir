@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.openweather.*;
 import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.entity.api.ApiOpenWeather;
@@ -11,6 +12,8 @@ import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +31,7 @@ import static fr.diginamic.qualiair.utils.MesureUtils.ThrowExceptionIfTrue;
 
 @Service
 public class ApiOpenWeatherService {
-
+    private static final Logger logger = LoggerFactory.getLogger(ApiOpenWeatherService.class);
     @Autowired
     private ApiOpenWeather api;
     @Autowired
@@ -52,14 +55,14 @@ public class ApiOpenWeatherService {
      * @throws ExternalApiResponseException La connexion vers l'api a échouée
      * @throws ParsedDataException          erreur de conversion de données
      */
-    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType) throws ExternalApiResponseException, ParsedDataException {
-
+    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType, Coordonnee coordonnee) throws ExternalApiResponseException, ParsedDataException {
         ResponseEntity<T> response = restTemplate.getForEntity(uri, responseType);
         responseValidator.validate(response);
 
         T dto = response.getBody();
 
         List<MesurePrevision> mesures = factory.getInstanceList(dto);
+        mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
         service.saveMesurePrevision(mesures);
 
         return mesures;
@@ -68,16 +71,16 @@ public class ApiOpenWeatherService {
     /**
      * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
      *
-     * @param nomPostal nom de la ville cible pour la requete externe
+     * @param commune nom de la ville cible pour la requete externe
      * @return liste de mesures
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
      * @throws FunctionnalException           ville absente en base
      * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestAndSaveCurrentForecast(String nomPostal) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
+    public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
 
-        Commune commune = communeService.findByNomPostal(nomPostal);
+        String nomPostal = commune.getNomPostal();
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDate = now.truncatedTo(ChronoUnit.HOURS);
@@ -85,28 +88,27 @@ public class ApiOpenWeatherService {
         TypeReleve typeReleve = TypeReleve.ACTUEL;
 
         boolean exists = service.existsByHourAndNomPostal(startDate, endDate, typeReleve, nomPostal);
+
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
+        Coordonnee coordonnee = commune.getCoordonnee();
 
-        double latitude = commune.getCoordonnee().getLatitude();
-        double longitude = commune.getCoordonnee().getLongitude();
-        URI uri = getFullUri(api.getUriCurrentWeather(), latitude, longitude);
+        URI uri = getFullUri(api.getUriCurrentWeather(), coordonnee.getLatitude(), coordonnee.getLongitude());
 
-        return fetchAndSaveForecast(uri, CurrentForecastDto.class);
+        return fetchAndSaveForecast(uri, CurrentForecastDto.class, coordonnee);
     }
 
     /**
      * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
      *
-     * @param nomPostal nom de la ville cible pour la requete externe
+     * @param commune nom de la ville cible pour la requete externe
      * @return liste de mesures
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
-     * @throws FunctionnalException           ville absente en base
      * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestFiveDayForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
+    public List<MesurePrevision> requestFiveDayForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
 
-        Commune commune = communeService.findByNomPostal(nomPostal);
+        String nomPostal = commune.getNomPostal();
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime endDate = startDate.plusDays(1);
@@ -115,25 +117,25 @@ public class ApiOpenWeatherService {
         boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_5J, nomPostal);
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
 
-        double latitude = commune.getCoordonnee().getLatitude();
-        double longitude = commune.getCoordonnee().getLongitude();
-        URI fullUri = getFullUri(api.getUriWeather5Days(), latitude, longitude);
-        return fetchAndSaveForecast(fullUri, ForecastFiveDayDto.class);
+        Coordonnee coordonnee = commune.getCoordonnee();
+
+        URI uri = getFullUri(api.getUriWeather5Days(), coordonnee.getLatitude(), coordonnee.getLongitude());
+
+        return fetchAndSaveForecast(uri, ForecastFiveDayDto.class, coordonnee);
     }
 
     /**
      * Récupère les coordonnées de la ville ciblée afin de construire l'uri de la requete, effectuée ensuite un appel pour executer la requete
      *
-     * @param nomPostal nom de la ville cible pour la requete externe
+     * @param commune nom de la ville cible pour la requete externe
      * @return liste de mesures
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
-     * @throws FunctionnalException           ville absente en base
      * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestSixteenDaysForecast(String nomPostal) throws ExternalApiResponseException, FunctionnalException, UnnecessaryApiRequestException, ParsedDataException {
+    public List<MesurePrevision> requestSixteenDaysForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
 
-        Commune commune = communeService.findByNomPostal(nomPostal);
+        String nomPostal = commune.getNomPostal();
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime endDate = startDate.plusDays(1);
@@ -141,11 +143,11 @@ public class ApiOpenWeatherService {
         boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_16J, nomPostal);
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
 
-        double latitude = commune.getCoordonnee().getLatitude();
-        double longitude = commune.getCoordonnee().getLongitude();
+        Coordonnee coordonnee = commune.getCoordonnee();
 
-        URI fullUri = getFullUri(api.getUriWeather5Days(), latitude, longitude);
-        return fetchAndSaveForecast(fullUri, ForecastSixteenDays.class);
+        URI uri = getFullUri(api.getUriWeather16Days(), coordonnee.getLatitude(), coordonnee.getLongitude());
+
+        return fetchAndSaveForecast(uri, ForecastSixteenDays.class, coordonnee);
     }
 
 
@@ -168,12 +170,14 @@ public class ApiOpenWeatherService {
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
         queryParams.add("lat", String.valueOf(latitude));
         queryParams.add("lon", String.valueOf(longitude));
+        queryParams.add("units", "metric");
+        queryParams.add("lang", "fr");
         queryParams.add(api.getTokenParam(), api.getToken());
 
         return UriComponentsBuilder.fromUri(sourceUri).queryParams(queryParams).build().toUri();
     }
 
     public List<Commune> getCommunesByNbHab(int hab) {
-        return null;
+        return communeService.getListTopCommunesByPopulation(hab);
     }
 }

@@ -5,26 +5,26 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class Message
-{
+public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_message")
     private Long id;
 
     @Column(nullable = false)
     private String contenu;
-    @Column(name="date_creation", nullable = false)
+    @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
-    @Column(name="date_modification")
+    @Column(name = "date_modification")
     private LocalDateTime dateModification;
 
-    @Column(name="nb_like", nullable = false)
+    @Column(name = "nb_like", nullable = false)
     private int nbLike = 0;
-    @Column(name="nb_dislike", nullable = false)
+    @Column(name = "nb_dislike", nullable = false)
     private int nbDislike = 0;
-    @Column(name="nb_signalement", nullable = false)
+    @Column(name = "nb_signalement", nullable = false)
     private int nbSignalement = 0;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_topic", nullable = false)
     private Topic topic;
@@ -34,60 +34,60 @@ public class Message
     private Utilisateur createur;
 
     @ManyToOne
-    @JoinColumn(name= "id_modificateur")
+    @JoinColumn(name = "id_modificateur")
     private Utilisateur modificateur;
-    
-    public Message()
-    {
+
+    public Message() {
     }
-    
+
     /**
      * Getter
+     *
      * @return id
      */
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
-    
+
     /**
      * Getter
+     *
      * @return contenu
      */
-    public String getContenu()
-    {
+    public String getContenu() {
         return contenu;
     }
-    
+
     /**
      * Setter
+     *
      * @param contenu sets value
      */
-    public void setContenu(String contenu)
-    {
+    public void setContenu(String contenu) {
         this.contenu = contenu;
     }
-    
+
     /**
      * Getter
+     *
      * @return dateCreation
      */
-    public LocalDateTime getDateCreation()
-    {
+    public LocalDateTime getDateCreation() {
         return dateCreation;
     }
-    
+
     /**
      * Setter
+     *
      * @param dateCreation sets value
      */
-    public void setDateCreation(LocalDateTime dateCreation)
-    {
+    public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
     }
 
     /**
      * Getter
+     *
      * @return dateModification
      */
     public LocalDateTime getDateModification() {
@@ -96,6 +96,7 @@ public class Message
 
     /**
      * Setter
+     *
      * @param dateModification sets value
      */
     public void setDateModification(LocalDateTime dateModification) {
@@ -104,96 +105,97 @@ public class Message
 
     /**
      * Getter
+     *
      * @return nbLike
      */
-    public int getNbLike()
-    {
+    public int getNbLike() {
         return nbLike;
     }
-    
+
     /**
      * Setter
+     *
      * @param nbLike sets value
      */
-    public void setNbLike(int nbLike)
-    {
+    public void setNbLike(int nbLike) {
         this.nbLike = nbLike;
     }
-    
+
     /**
      * Getter
+     *
      * @return nbDislike
      */
-    public int getNbDislike()
-    {
+    public int getNbDislike() {
         return nbDislike;
     }
-    
+
     /**
      * Setter
+     *
      * @param nbDislike sets value
      */
-    public void setNbDislike(int nbDislike)
-    {
+    public void setNbDislike(int nbDislike) {
         this.nbDislike = nbDislike;
     }
-    
+
     /**
      * Getter
+     *
      * @return nbSignalement
      */
-    public int getNbSignalement()
-    {
+    public int getNbSignalement() {
         return nbSignalement;
     }
-    
+
     /**
      * Setter
+     *
      * @param nbSignalement sets value
      */
-    public void setNbSignalement(int nbSignalement)
-    {
+    public void setNbSignalement(int nbSignalement) {
         this.nbSignalement = nbSignalement;
     }
-    
+
     /**
      * Getter
+     *
      * @return topic
      */
-    public Topic getTopic()
-    {
+    public Topic getTopic() {
         return topic;
     }
-    
+
     /**
      * Setter
+     *
      * @param topic sets value
      */
-    public void setTopic(Topic topic)
-    {
+    public void setTopic(Topic topic) {
         this.topic = topic;
     }
-    
+
     /**
      * Getter
+     *
      * @return createur
      */
-    public Utilisateur getCreateur()
-    {
+    public Utilisateur getCreateur() {
         return createur;
     }
-    
+
     /**
      * Setter
+     *
      * @param createur sets value
      */
-    public void setCreateur(Utilisateur createur)
-    {
+    public void setCreateur(Utilisateur createur) {
         this.createur = createur;
     }
 
     /**
      * Getter
+     *
      * @return modificateur
      */
     public Utilisateur getModificateur() {
@@ -202,6 +204,7 @@ public class Message
 
     /**
      * Setter
+     *
      * @param modificateur sets value
      */
     public void setModificateur(Utilisateur modificateur) {
