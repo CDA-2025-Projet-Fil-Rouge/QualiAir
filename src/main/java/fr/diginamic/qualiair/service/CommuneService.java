@@ -1,13 +1,18 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dao.CommuneDao;
+import fr.diginamic.qualiair.dto.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
+import fr.diginamic.qualiair.mapper.CommuneMapper;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Commune service
@@ -30,9 +35,10 @@ public class CommuneService {
      */
     @Autowired
     private CommuneValidator communeValidator;
-
     @Autowired
     private CommuneDao dao;
+    @Autowired
+    private CommuneMapper mapper;
 
     /**
      * Update a commune from its name
@@ -80,5 +86,12 @@ public class CommuneService {
             throw new FunctionnalException("Commune not found for nomPostal: " + nomPostal);
         }
         return commune;
+    }
+
+    public List<InfoCarteCommune> getListCommunesByPopulation(int nbHabitant) {
+        List<Commune> communes = communeRepository.findCommunesByLatestMesurePopulation();
+        List<InfoCarteCommune> dto = new ArrayList<>();
+        communes.forEach(commune -> dto.add(mapper.toDto(commune)));
+        return dto;
     }
 }

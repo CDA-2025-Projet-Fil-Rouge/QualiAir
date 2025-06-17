@@ -25,4 +25,6 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Commune getCommuneByCoordonnee_LatitudeAndCoordonneeLongitude(double coordonneeLatitude, double coordonneeLongitude);
 
     Commune findCommuneByNomPostal(String nomPostal);
+
+    List<Commune> findCommunesByLatestMesurePopulation();
 }

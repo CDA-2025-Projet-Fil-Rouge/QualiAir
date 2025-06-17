@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.mapper;
 
+import fr.diginamic.qualiair.dto.InfoCarteCommune;
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.Commune;
@@ -32,5 +33,9 @@ public class CommuneMapper {
 
     public Commune toEntityFromCommuneHabitantDto(CommuneHabitantDto dto) {
         return null; // todo if needed
+    }
+
+    public InfoCarteCommune toDto(Commune commune) {
+        return new InfoCarteCommune();
     }
 }
