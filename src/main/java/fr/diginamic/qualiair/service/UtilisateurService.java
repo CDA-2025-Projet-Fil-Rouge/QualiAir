@@ -13,6 +13,9 @@ import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -28,10 +31,12 @@ public class UtilisateurService {
     private UtilisateurValidator utilisateurValidator;
     @Autowired
     private AdresseRepository adresseRepository;
+    @Autowired
+    RoleManagementService roleManagementService;
 
 
     /**
-     * Récupère un utilisateur à partir de son email.
+     * Récupérer un utilisateur à partir de son email.
      *
      * @param email Email de l'utilisateur recherché
      * @return l'utilisateur correspondant
@@ -43,13 +48,28 @@ public class UtilisateurService {
     }
 
     /**
-     * Crée un nouvel admin après validation des règles métier.
+     * Récupérer la liste paginée de tous les utilisateurs inscrits.
+     * Accessible uniquement aux administrateurs et super-administrateurs.
+     *
+     * @param pageable objet de pagination contenant le numéro de page, la taille de page, et éventuellement le tri
+     * @param demandeur utilisateur authentifié à l'origine de la requête
+     * @return une page de UtilisateurDto représentant les utilisateurs
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
+     */
+    public Page<UtilisateurDto> getAllUsers(Pageable pageable, Utilisateur demandeur) {
+        UtilisateurUtils.isAdmin(demandeur);
+        return utilisateurRepository.findAll(pageable).map(utilisateurMapper::toDto);
+    }
+
+    /**
+     * Créer un nouvel admin après validation des règles métier.
      * Cette démarche n'est possible que pour un superadmin.
      *
      * @param userDto Admin à créer (non encore persisté)
      * @param role Rôle à affecter au nouvel utilisateur
      * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
      * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
      */
     public void createAdmin(UtilisateurDto userDto, Utilisateur demandeur, RoleUtilisateur role)
             throws FileNotFoundException, BusinessRuleException, TokenExpiredException {
@@ -62,32 +82,41 @@ public class UtilisateurService {
     }
 
     /**
-     * Modifie le rôle d'un utilisateur (si actif = désactivé et vice versa)
+     * Active ou désactive un utilisateur (inversion selon son rôle actuel)
      * Accessible uniquement pour les admins et super admins
      * @param idCible identifiant de l'utilisateur à activer/désactiver
      * @param demandeur utilisateur à l'origine de la requête
      * @return le message de confirmation du changement de rôle
      * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
      * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
      */
-    public String toggleRole(Long idCible, Utilisateur demandeur)
+    public String toggleActivationUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
-        UtilisateurUtils.isAdmin(demandeur);
-        Utilisateur cible = utilisateurRepository.findById(idCible)
-                .orElseThrow(() -> new FileNotFoundException("Utilisateur introuvable"));
+        return roleManagementService.toggleUserRole(
+                demandeur, idCible,
+                RoleUtilisateur.INACTIF, RoleUtilisateur.UTILISATEUR,
+                "Utilisateur désactivé", "Utilisateur réactivé"
+        );
+    }
 
-        if (UtilisateurUtils.isAdmin(cible)) {
-            throw new BusinessRuleException("Impossible de désactiver un admin.");
-        }
-        // Vérifie le rôle de l'utilisateur ciblé afin de procéder au bon changement
-        if (cible.getRole() == RoleUtilisateur.INACTIF) {
-            cible.setRole(RoleUtilisateur.UTILISATEUR);
-            utilisateurRepository.save(cible);
-            return "Utilisateur réactivé";
-        } else {
-            cible.setRole(RoleUtilisateur.INACTIF);
-            utilisateurRepository.save(cible);
-            return "Utilisateur désactivé";
-        }
+    /**
+     * Banni ou débanni un utilisateur (inversion selon son rôle actuel)
+     * Accessible uniquement pour les admins et super admins
+     * @param idCible identifiant de l'utilisateur à bannir/débannir
+     * @param demandeur utilisateur à l'origine de la requête
+     * @return le message de confirmation du changement de rôle
+     * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
+     * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
+     */
+    public String toggleBanUser(Long idCible, Utilisateur demandeur)
+            throws FileNotFoundException, BusinessRuleException {
+        return roleManagementService.toggleUserRole(
+                demandeur, idCible,
+                RoleUtilisateur.BANNI, RoleUtilisateur.UTILISATEUR,
+                "Utilisateur banni", "Utilisateur débanni"
+        );
     }
 }
+
