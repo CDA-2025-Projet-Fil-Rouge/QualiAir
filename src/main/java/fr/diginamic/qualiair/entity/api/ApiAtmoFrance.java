@@ -6,12 +6,21 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 
+/**
+ * Classe rassemblant les données utiles à l'utilsation de l'api Atmo-France
+ */
 @Component
 public class ApiAtmoFrance {
 
-    @Value("${external.api.atmo.uri.login}")
+    /**
+     * URI de login
+     */
+    @Value("${atmo.uri.login}")
     private URI uriLogin;
-    @Value("${external.api.atmo.uri.air-quality}")
+    /**
+     * URI pour les requetes AirQualité, plus d'information dans la documentation officielles : "//todo"
+     */
+    @Value("${atmo.uri.air-quality}")
     private URI uriAirQuality;
 
     @Autowired

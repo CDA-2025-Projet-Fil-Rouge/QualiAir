@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller des requetes à destination de l'api Atmo-France
+ * path "/external/api/atmo-france"
+ */
 @RestController
 @RequestMapping({"/external/api/atmo-france"})
 public class ApiAtmoFranceController {

@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dao.CommuneDao;
 import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
@@ -71,5 +72,13 @@ public class CommuneService {
     public Commune getFromCache(String communeName) {
 
         return cacheService.findInCommuneCache(communeName);
+    }
+
+    public Commune findByNomPostal(String nomPostal) throws FunctionnalException {
+        Commune commune = communeRepository.findCommuneByNomPostal(nomPostal);
+        if (commune == null) {
+            throw new FunctionnalException("Commune not found for nomPostal: " + nomPostal);
+        }
+        return commune;
     }
 }

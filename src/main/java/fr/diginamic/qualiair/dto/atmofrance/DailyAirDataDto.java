@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * DTO réponse atmo-france
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class DailyAirDataDto {
     @JsonProperty("features")

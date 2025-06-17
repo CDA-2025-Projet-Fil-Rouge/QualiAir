@@ -10,8 +10,7 @@ import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.ApiToken;
 import fr.diginamic.qualiair.entity.api.UtilisateurAtmoFrance;
 import fr.diginamic.qualiair.exception.*;
-import fr.diginamic.qualiair.mapper.CoordonneeMapper;
-import fr.diginamic.qualiair.mapper.MesureMapper;
+import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.validator.AtmoFranceTokenValidator;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
@@ -47,13 +46,9 @@ public class ApiAtmoFranceService {
     @Autowired
     private CacheService cacheService;
     @Autowired
-    private MesureMapper mesureMapper;
-    @Autowired
-    private CoordonneeMapper coordonneeMapper;
+    private MesureAirMapper mesureMapper;
     @Autowired
     private MesureAirService mesureAirService;
-    @Autowired
-    private CoordonneeService coordonneeService;
     @Autowired
     private HttpResponseValidator responseValidator;
     @Autowired
@@ -85,6 +80,15 @@ public class ApiAtmoFranceService {
         return api;
     }
 
+    /**
+     * Sauvegarde les données de qualité de l'air pour la France à une date donnée.
+     * Un check préalable est effectué afin de s'assurer que la requete n'a pas déjà éte executée pour cette date.
+     * Sinon, un appel est fait pour recuperer les données et celles-ci sont mappées et persistées.
+     *
+     * @param date target date pour la requete
+     * @throws ExternalApiResponseException   La connexion vers l'api a échoué
+     * @throws UnnecessaryApiRequestException La requete à déjà été executée pour cette date
+     */
     @Transactional
     public void saveDailyFranceAirQualityData(String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
         LocalDate dateReleve = toLocalDate(date);
@@ -121,6 +125,13 @@ public class ApiAtmoFranceService {
         cacheService.clearCaches();
     }
 
+    /**
+     * Recupère les données air qualité pour la France depuis l'api Atmo-France. Le token d'authentification est placé de le header de la requete. Si le retour est status 200 l'objet réponse est retransmit.
+     *
+     * @param date date cible
+     * @return dto réponse
+     * @throws ExternalApiResponseException La connexion vers l'api a échoué
+     */
     private DailyAirDataDto fetchDailyAirDataFromApi(String date) throws ExternalApiResponseException {
         String token = getOrRefreshToken();
 
@@ -146,7 +157,12 @@ public class ApiAtmoFranceService {
         }
     }
 
-
+    /**
+     * Vérifie la validité du token d'identification et le renouvelle s'il est invalide (durée > 1h)
+     *
+     * @return le token valide
+     * @throws ExternalApiResponseException La connexion vers l'api a échoué
+     */
     private String getOrRefreshToken() throws ExternalApiResponseException {
         try {
             validator.validate(apiAtmoFrance.getToken());
