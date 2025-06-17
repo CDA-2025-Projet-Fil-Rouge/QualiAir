@@ -10,16 +10,16 @@ import java.net.URI;
  */
 @Component
 public class ApiOpenWeather {
-    @Value("${external.api.ow.uri.meteo-current}")
+    @Value("${ow.uri.meteo-current}")
     private URI uriCurrentWeather;
-    @Value("${external.api.ow.uri.meteo-5d}")
+    @Value("${ow.uri.meteo-5d}")
     private URI uriWeather5Days;
-    @Value("${external.api.ow.uri.air}")
+    @Value("${ow.uri.air}")
     private URI uriLocalAirData;
 
-    @Value("${external.api.ow.token}")
+    @Value("${ow.token}")
     private String token;
-    @Value("${external.api.ow.param-name}")
+    @Value("${ow.param-name}")
     private String tokenParam;
 
     /**

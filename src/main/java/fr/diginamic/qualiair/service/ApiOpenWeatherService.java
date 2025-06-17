@@ -172,4 +172,8 @@ public class ApiOpenWeatherService {
 
         return UriComponentsBuilder.fromUri(sourceUri).queryParams(queryParams).build().toUri();
     }
+
+    public List<Commune> getCommunesByNbHab(int hab) {
+        return null;
+    }
 }
