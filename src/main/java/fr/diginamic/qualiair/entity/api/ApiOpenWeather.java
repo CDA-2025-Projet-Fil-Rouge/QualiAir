@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 
+/**
+ * Classe rassemblant les données utiles à l'utilsation de l'api Open-Weather
+ */
 @Component
 public class ApiOpenWeather {
     @Value("${external.api.ow.uri.meteo-current}")

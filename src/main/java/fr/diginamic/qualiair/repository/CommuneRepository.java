@@ -21,4 +21,8 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
                 JOIN FETCH d.region
             """)
     List<Commune> findAll();
+
+    Commune getCommuneByCoordonnee_LatitudeAndCoordonneeLongitude(double coordonneeLatitude, double coordonneeLongitude);
+
+    Commune findCommuneByNomPostal(String nomPostal);
 }

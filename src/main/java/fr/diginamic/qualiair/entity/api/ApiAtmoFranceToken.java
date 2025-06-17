@@ -2,6 +2,9 @@ package fr.diginamic.qualiair.entity.api;
 
 import java.time.LocalDateTime;
 
+/**
+ * Token de l'api Atmo France, étant valide 1h ce token doit toujours être confirmé avant utilisation
+ */
 public class ApiAtmoFranceToken extends ApiToken {
 
 

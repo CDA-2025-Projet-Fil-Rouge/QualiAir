@@ -2,11 +2,8 @@ package fr.diginamic.qualiair.mapper;
 
 import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
 import fr.diginamic.qualiair.dto.atmofrance.AirDataPropertiesDto;
-import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.MesureAir;
-import fr.diginamic.qualiair.entity.MesurePopulation;
 import fr.diginamic.qualiair.entity.TypeMesure;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -15,29 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.cleanUpElementCode;
-import static fr.diginamic.qualiair.utils.MesureUtils.toInt;
 
 /**
- * Mesure Mapper
+ * Mapper pour les mesures qualité de l'air
  */
 @Component
-public class MesureMapper {
-
+public class MesureAirMapper {
     /**
-     * Map a dto from csv to entity
-     *
-     * @param dto dto from csv
-     * @return entity
+     * @param feature    objet réponse de l'api Atmo-France
+     * @param dateReleve date du relevé (précisée pour la requete)
+     * @return Liste de mesures Air
      */
-    public MesurePopulation toEntity(CommuneHabitantDto dto, LocalDateTime date) throws ParsedDataException {
-        MesurePopulation mesure = new MesurePopulation();
-        mesure.setTypeMesure(TypeMesure.RELEVE_POPULATION);
-        mesure.setDateReleve(date);
-        mesure.setDateEnregistrement(LocalDateTime.now());
-        mesure.setValeur(toInt(dto.getPopulationMunicipale().trim().replace(" ", "")));
-        return mesure;
-    }
-
     public List<MesureAir> toEntityList(AirDataFeatureDto feature, LocalDate dateReleve) {
         List<MesureAir> mesures = new ArrayList<>();
         AirDataPropertiesDto props = feature.getProperties();
@@ -73,6 +58,15 @@ public class MesureMapper {
         return mesures;
     }
 
+    /**
+     * Crée une mesure air
+     *
+     * @param codeElement code de l'élément récupéré par la requete
+     * @param indice      valeur indexée de la mesure (convention //todo trouver la convention euro d'indexation
+     * @param dateReleve  date du relevé
+     * @param dateMaj     date d'insertion
+     * @return mesure créée
+     */
     private MesureAir createMesureAir(String codeElement, String indice,
                                       LocalDateTime dateReleve, LocalDateTime dateMaj) {
         MesureAir mesure = new MesureAir();

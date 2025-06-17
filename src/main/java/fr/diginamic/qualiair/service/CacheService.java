@@ -63,6 +63,12 @@ public class CacheService {
 
     }
 
+    /**
+     * Recherche dans le cache communes
+     *
+     * @param key nom postal de la commune
+     * @return commune ou null
+     */
     public Commune findInCommuneCache(String key) {
         return communeCache.get(key);
     }
@@ -71,7 +77,12 @@ public class CacheService {
         communeCache.put(key, commune);
     }
 
-
+    /**
+     * Recherche dans le cache regions
+     *
+     * @param key nom  de la region
+     * @return region ou null
+     */
     public Region findInRegionCache(String key) {
         return regionCache.get(key);
     }
@@ -80,7 +91,12 @@ public class CacheService {
         regionCache.put(key, region);
     }
 
-
+    /**
+     * Recherche dans le cache departement
+     *
+     * @param key nom  de la region
+     * @return region ou null
+     */
     public Departement findInDepartementCache(String key) {
         return departementCache.get(key);
     }
@@ -89,7 +105,12 @@ public class CacheService {
         departementCache.put(key, departement);
     }
 
-
+    /**
+     * Recherche dans le cache coordonnées
+     *
+     * @param key nom postal de la commune rattachée
+     * @return coordonnées ou null
+     */
     public Coordonnee findInCoordoneeCache(String key) {
         return coordonneeCache.get(key);
     }
