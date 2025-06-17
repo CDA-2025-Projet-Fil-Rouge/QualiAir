@@ -26,7 +26,7 @@ public class AtmoFranceScheduler {
      * La reussite ou l'echec de la méthode est loggé dans un fichier .log
      * La tache est configurée pour s'executer toutes les nuits à 02h00.
      */
-    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(cron = "${atmo.schedule.cron.meteo}")
     public void fetchAirQualityDataAndPersist() {
         String targetDate = LocalDate.now().minusDays(1).toString();
         try {

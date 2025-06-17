@@ -9,9 +9,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class UtilisateurAtmoFrance {
 
-    @Value("${external.api.atmo.identifiant}")
+    @Value("${atmo.identifiant}")
     private String username;
-    @Value("${external.api.atmo.mot-de-passe}")
+    @Value("${atmo.mot-de-passe}")
     private String password;
 
 
