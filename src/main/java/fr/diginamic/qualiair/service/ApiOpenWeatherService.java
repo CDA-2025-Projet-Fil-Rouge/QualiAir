@@ -29,7 +29,6 @@ import static fr.diginamic.qualiair.utils.MesureUtils.ThrowExceptionIfTrue;
 @Service
 public class ApiOpenWeatherService {
 
-    private final MultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
     @Autowired
     private ApiOpenWeather api;
     @Autowired

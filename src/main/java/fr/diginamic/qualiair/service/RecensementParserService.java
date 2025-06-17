@@ -55,7 +55,7 @@ public class RecensementParserService {
     @Autowired
     private MesurePopulationService mesurePopulationService;
     @Autowired
-    private MesureMapper mesureMapper;
+    private MesurePopulationMapper mesurePopulationMapper;
     @Autowired
     private RecensementCsvMapper recensementCsvMapper;
 
@@ -206,7 +206,7 @@ public class RecensementParserService {
                 continue;
             }
 
-            MesurePopulation mesurePopulation = mesureMapper.toEntity(dto, date.atStartOfDay());
+            MesurePopulation mesurePopulation = mesurePopulationMapper.toEntity(dto, date.atStartOfDay());
             mesurePopulation.setCoordonnee(commune.getCoordonnee());
 
             mesurePopulationService.save(mesurePopulation);

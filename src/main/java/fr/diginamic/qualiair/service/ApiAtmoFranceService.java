@@ -10,8 +10,7 @@ import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.ApiToken;
 import fr.diginamic.qualiair.entity.api.UtilisateurAtmoFrance;
 import fr.diginamic.qualiair.exception.*;
-import fr.diginamic.qualiair.mapper.CoordonneeMapper;
-import fr.diginamic.qualiair.mapper.MesureMapper;
+import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.validator.AtmoFranceTokenValidator;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
@@ -47,13 +46,9 @@ public class ApiAtmoFranceService {
     @Autowired
     private CacheService cacheService;
     @Autowired
-    private MesureMapper mesureMapper;
-    @Autowired
-    private CoordonneeMapper coordonneeMapper;
+    private MesureAirMapper mesureMapper;
     @Autowired
     private MesureAirService mesureAirService;
-    @Autowired
-    private CoordonneeService coordonneeService;
     @Autowired
     private HttpResponseValidator responseValidator;
     @Autowired

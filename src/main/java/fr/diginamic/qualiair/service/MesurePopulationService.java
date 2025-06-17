@@ -20,29 +20,6 @@ public class MesurePopulationService {
      */
     @Autowired
     private MesurePopulationRepository mesurePopulationRepository;
-    /**
-     * CacheService
-     */
-    @Autowired
-    private CacheService cacheService;
-
-//    /**
-//     * Find from cache or create an entity and add it to the cache
-//     *
-//     * @param mesure commune entity
-//     * @return existing or created entity
-//     */
-//    public MesurePopulation findOrCreate(MesurePopulation mesure) {
-//
-//        String key = mesure.getCoordonnee().getCommune().getNomComplet();
-//        MesurePopulation existing = cacheService.findInMesurePopCache(key);
-//        if (existing != null) {
-//            return existing;
-//        }
-//        mesurePopulationRepository.save(mesure);
-//        cacheService.putInMesurePopCache(key, mesure);
-//        return mesure;
-//    }
 
     public void save(MesurePopulation mesurePopulation) {
         mesurePopulationRepository.save(mesurePopulation);
@@ -60,6 +37,12 @@ public class MesurePopulationService {
         return mesurePopulationRepository.existsByDate(startOfDay, startOfNextDay);
     }
 
+    /**
+     * Recherche si un relevé existe déjà à cette date afin d'éviter une requete externe inutile. Retourne true si un relevé existe déjà
+     *
+     * @param dateReleve date cible du relevé
+     * @return boolean
+     */
     public boolean existByDateReleve(LocalDate dateReleve) {
         return mesurePopulationRepository.existsMesurePopulationByDateReleve(dateReleve.atStartOfDay());
     }
