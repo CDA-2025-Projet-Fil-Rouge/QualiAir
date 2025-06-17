@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.mapper.forumMapper;
 
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
-import fr.diginamic.qualiair.entity.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
 import org.springframework.stereotype.Component;
 
 /**

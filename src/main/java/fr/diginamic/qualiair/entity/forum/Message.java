@@ -1,8 +1,11 @@
-package fr.diginamic.qualiair.entity;
+package fr.diginamic.qualiair.entity.forum;
 
+import fr.diginamic.qualiair.entity.Utilisateur;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Message
@@ -36,7 +39,10 @@ public class Message
     @ManyToOne
     @JoinColumn(name= "id_modificateur")
     private Utilisateur modificateur;
-    
+
+    @OneToMany(mappedBy = "message")
+    private Set<ReactionMessage> reactions = new HashSet<>();
+
     public Message()
     {
     }
@@ -206,5 +212,21 @@ public class Message
      */
     public void setModificateur(Utilisateur modificateur) {
         this.modificateur = modificateur;
+    }
+
+    /**
+     * Getter
+     * @return reactions
+     */
+    public Set<ReactionMessage> getReactions() {
+        return reactions;
+    }
+
+    /**
+     * Setter
+     * @param reactions sets value
+     */
+    public void setReactions(Set<ReactionMessage> reactions) {
+        this.reactions = reactions;
     }
 }

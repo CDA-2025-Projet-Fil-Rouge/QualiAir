@@ -30,8 +30,10 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
                         .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
-                        "/forum/delete-topic/**").hasRole("ADMIN")
-                        .requestMatchers("/forum/**").authenticated()
+                        "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/forum/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+
+                        .requestMatchers("/user/**").hasAnyRole("ADMIN", "SUPERADMIN")
 
                         .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 

@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.validator.forumValidator;
 
-import fr.diginamic.qualiair.entity.Topic;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
 import org.springframework.stereotype.Component;

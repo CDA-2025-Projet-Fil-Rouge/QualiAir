@@ -1,8 +1,9 @@
 package fr.diginamic.qualiair.service.forumService;
 
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
-import fr.diginamic.qualiair.entity.Message;
-import fr.diginamic.qualiair.entity.Topic;
+import fr.diginamic.qualiair.entity.forum.Message;
+import fr.diginamic.qualiair.entity.forum.ReactionType;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +40,8 @@ public class MessageService {
     private TopicRepository topicRepository;
     @Autowired
     private MessageValidator messageValidator;
+    @Autowired
+    private ReactionMessageService reactionService;
 
     /**
      * Récupère tous les messages présents en base.
@@ -122,5 +126,61 @@ public class MessageService {
         UtilisateurUtils.checkAuthorOrAdmin(user, messageASupprimer.getCreateur().getId());
 
         messageRepository.delete(messageASupprimer);
+    }
+
+    /**
+     * Incrémente l'attribut de Message concerné par la réaction associée au message
+     * @param messageId identifiant du message à l'origine de la réaction
+     * @param user utilisateur qui réagit au message
+     * @param type type de réaction (like, dislike ou report)
+     * @return la confirmation contenant le message à l'origine de la réaction
+     * @throws BusinessRuleException si ce type de réaction à ce message a déjà été fait par cet utilisateur
+     * @throws FileNotFoundException si le message n'est pas trouvé
+     */
+    @Transactional
+    public MessageDto reactToMessage(Long messageId, Utilisateur user, ReactionType type)
+            throws FileNotFoundException, BusinessRuleException {
+
+        Message message = ForumUtils.findMessageOrThrow(messageRepository, messageId);
+        reactionService.createReaction(user, message, type);
+
+        updateReactionCounter(message, type, +1);
+        messageRepository.save(message);
+        return messageMapper.toDto(message);
+    }
+
+    /**
+     * Décrémente l'attribut de Message concerné par la réaction associée au message
+     * @param messageId identifiant du message à l'origine de la réaction
+     * @param user utilisateur qui annule une précédente réaction au message
+     * @param type type de réaction à annuler (like, dislike ou report)
+     * @return la confirmation contenant le message duquel la réaction a été annulée
+     * @throws BusinessRuleException si ce type de réaction à ce message n'a pas été fait par cet utilisateur
+     * @throws FileNotFoundException si le message n'est pas trouvé
+     */
+    @Transactional
+    public MessageDto removeReaction(Long messageId, Utilisateur user, ReactionType type)
+    throws FileNotFoundException, BusinessRuleException {
+        Message message = ForumUtils.findMessageOrThrow(messageRepository, messageId);
+        reactionService.removeReaction(user, message, type);
+
+        updateReactionCounter(message, type, -1);
+        messageRepository.save(message);
+        return  messageMapper.toDto(message);
+    }
+
+    /**
+     * Met à jour le compteur correspondant à une réaction (like, dislike ou signalement) sur un message
+     *
+     * @param message message dont le compteur doit être mis à jour.
+     * @param type type de réaction à appliquer (LIKE, DISLIKE ou REPORT).
+     * @param i décalage à appliquer au compteur (+1 pour ajout, -1 pour suppression).
+     */
+    private void updateReactionCounter(Message message, ReactionType type, int i) {
+        switch (type) {
+            case LIKE -> message.setNbLike(Math.max(0, message.getNbLike() + i));
+            case DISLIKE -> message.setNbDislike(Math.max(0, message.getNbDislike() + i));
+            case REPORT -> message.setNbSignalement(Math.max(0, message.getNbSignalement() + i));
+        }
     }
 }

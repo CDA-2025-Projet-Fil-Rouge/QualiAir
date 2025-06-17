@@ -1,5 +1,9 @@
 package fr.diginamic.qualiair.entity;
 
+import fr.diginamic.qualiair.entity.forum.Message;
+import fr.diginamic.qualiair.entity.forum.ReactionMessage;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -46,6 +50,8 @@ public class Utilisateur {
     private Set<Topic> topicsModifies = new HashSet<>();
     @OneToMany(mappedBy = "modificateur")
     private Set<Rubrique> rubriquesModifiees = new HashSet<>();
+    @OneToMany(mappedBy = "utilisateur")
+    private Set<ReactionMessage> reactions = new HashSet<>();
 
 
     public Utilisateur()
@@ -305,5 +311,21 @@ public class Utilisateur {
      */
     public void setRubriquesModifiees(Set<Rubrique> rubriquesModifiees) {
         this.rubriquesModifiees = rubriquesModifiees;
+    }
+
+    /**
+     * Getter
+     * @return reactions
+     */
+    public Set<ReactionMessage> getReactions() {
+        return reactions;
+    }
+
+    /**
+     * Setter
+     * @param reactions sets value
+     */
+    public void setReactions(Set<ReactionMessage> reactions) {
+        this.reactions = reactions;
     }
 }

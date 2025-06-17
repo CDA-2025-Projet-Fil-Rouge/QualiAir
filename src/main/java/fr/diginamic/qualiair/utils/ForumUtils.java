@@ -1,8 +1,8 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.entity.Message;
-import fr.diginamic.qualiair.entity.Rubrique;
-import fr.diginamic.qualiair.entity.Topic;
+import fr.diginamic.qualiair.entity.forum.Message;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.repository.MessageRepository;

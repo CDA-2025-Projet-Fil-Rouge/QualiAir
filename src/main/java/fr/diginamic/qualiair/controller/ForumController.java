@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.forumDto.MessageDto;
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
 import fr.diginamic.qualiair.entity.Utilisateur;
+import fr.diginamic.qualiair.entity.forum.ReactionType;
 import fr.diginamic.qualiair.service.forumService.MessageService;
 import fr.diginamic.qualiair.service.forumService.RubriqueService;
 import fr.diginamic.qualiair.service.forumService.TopicService;
@@ -36,9 +37,11 @@ public class ForumController {
     @Autowired
     private HttpRequestUtils httpRequestUtils;
 
-    /**
-     * Récupère et affiche toutes les rubriques existantes
-     * @return la liste des rubriques
+     /**
+     * Retourne la liste paginée de toutes les rubriques existantes
+     * @param page numéro de la page (défaut : 0)
+     * @param size taille de la page (défaut : 5)
+     * @return page de RubriqueDto
      */
     @GetMapping("/rubrique/get-all")
     public ResponseEntity<Page<RubriqueDto>> getAllRubriques(
@@ -50,8 +53,10 @@ public class ForumController {
     }
 
     /**
-     * Récupère et affiche tous les topics existants
-     * @return la liste des topics
+     * Retourne la liste paginée de tous les topics existants
+     * @param page numéro de la page (défaut : 0)
+     * @param size taille de la page (défaut : 5)
+     * @return page de TopicDto
      */
     @GetMapping("/topic/get-all")
     public ResponseEntity<Page<TopicDto>> getAllTopics(
@@ -73,10 +78,12 @@ public class ForumController {
     }
 
     /**
-     * Récupère et affiche tous les messages existants
-     * @return la liste des messages
+     * Retourne la liste paginée de tous les messages existants
+     * @param page numéro de la page (défaut : 0)
+     * @param size taille de la page (défaut : 10)
+     * @return page de MessageDto
      */
-    @GetMapping("message/get-all")
+    @GetMapping("/message/get-all")
     public ResponseEntity<Page<MessageDto>> getAllMessages(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -132,7 +139,7 @@ public class ForumController {
     /**
      * Crée un nouveau message à partir des données fournies dans le corps de la requête.
      *
-     * @param dto     les données du message à créer
+     * @param dto les données du message à créer
      * @param request la requête HTTP contenant le cookie JWT pour authentification
      * @return le message créé
      * @throws Exception si l'utilisateur est introuvable ou non autorisé
@@ -147,15 +154,31 @@ public class ForumController {
     }
 
     /**
+     * Incrémente l'attribut de message correspondant à la réaction effectuée par un utilisateur
+     * @param id identifiant du message
+     * @param request la requête HTTP contenant le cookie JWT pour authentification
+     * @return la confirmation contenant le message auquel l'utilisateur a réagi
+     * @throws Exception si une erreur est rencontrée
+     */
+     @PostMapping("/message/{id}/react")
+    public ResponseEntity<MessageDto> react(
+            @PathVariable Long id,
+            @RequestParam ReactionType type,
+            HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        return ResponseEntity.ok(messageService.reactToMessage(id, user, type));
+    }
+
+    /**
      * Met à jour une rubrique existante, uniquement si l'utilisateur est admin.
      *
-     * @param id       l'identifiant de la rubrique à mettre à jour
-     * @param dto      les nouvelles données de la rubrique
-     * @param request  la requête HTTP contenant l'identité de l'utilisateur
+     * @param id l'identifiant de la rubrique à mettre à jour
+     * @param dto les nouvelles données de la rubrique
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
      * @return la rubrique mise à jour
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
-    @PutMapping("/update-rubrique/{id}")
+     @PutMapping("/update-rubrique/{id}")
     public ResponseEntity<RubriqueDto> updateRubrique(
             @PathVariable Long id,
             @RequestBody RubriqueDto dto,
@@ -167,9 +190,9 @@ public class ForumController {
 
     /**
      * Met à jour un topic existant, uniquement si l'utilisateur est son auteur ou un administrateur.
-     * @param id       l'identifiant du topic à mettre à jour
-     * @param dto      les nouvelles données du topic
-     * @param request  la requête HTTP contenant l'identité de l'utilisateur
+     * @param id l'identifiant du topic à mettre à jour
+     * @param dto les nouvelles données du topic
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
      * @return le topic mis à jour
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
@@ -187,9 +210,9 @@ public class ForumController {
     /**
      * Met à jour un message existant, uniquement si l'utilisateur est son auteur ou un administrateur.
      *
-     * @param id       l'identifiant du message à mettre à jour
-     * @param dto      les nouvelles données du message
-     * @param request  la requête HTTP contenant l'identité de l'utilisateur
+     * @param id l'identifiant du message à mettre à jour
+     * @param dto les nouvelles données du message
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
      * @return le message mis à jour
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
@@ -251,5 +274,21 @@ public class ForumController {
         messageService.deleteMessage(id, user);
         return ResponseEntity.ok("Message supprimé");
     }
-}
 
+    /**
+     * Retire une réaction préalablement effectuée à un message du forum
+     * @param id identifiant du message à l'origine de la réaction
+     * @param type type de réaction à retirer (like, dislike, report)
+     * @param request la requête HTTP contenant l'identité de l'utilisateur
+     * @return la confirmation contenant le message duquel la réaction a été annulée
+     * @throws Exception si une erreur est rencontrée
+     */
+    @DeleteMapping("/message/{id}/unreact")
+    public ResponseEntity<MessageDto> removeReaction(
+            @PathVariable Long id,
+            @RequestParam ReactionType type,
+            HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        return ResponseEntity.ok(messageService.removeReaction(id, user, type));
+    }
+}
