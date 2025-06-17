@@ -39,7 +39,7 @@ public class DepartementService {
      */
     public Departement findOrCreate(Departement departement) {
 
-        String key = departement.getNom();
+        String key = departement.getCode();
         Departement existing = cacheService.findInDepartementCache(key);
 
         if (existing != null) {

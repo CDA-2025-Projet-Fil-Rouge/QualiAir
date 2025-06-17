@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
-import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
 import fr.diginamic.qualiair.validator.MesureValidator;
 import org.slf4j.Logger;
@@ -41,9 +40,7 @@ public class MesurePrevisionService {
         return saved;
     }
 
-    public boolean existsByHourAndNomPostal(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String nomPostal) throws UnnecessaryApiRequestException {
-        return repository.existsByNomPostalAndTypeMesureAndDateReleveBetween(
-                nomPostal, typeReleve, startDate, endDate);
+    public boolean existsByHourAndCodeInsee(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String codeInsee) {
+        return repository.existsByCodeInseeAndTypeMesureAndDateReleveBetween(codeInsee, typeReleve, startDate, endDate);
     }
-
 }

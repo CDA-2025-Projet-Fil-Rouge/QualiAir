@@ -44,7 +44,7 @@ public class OpenWeatherScheduler {
                 service.requestAndSaveCurrentForecast(commune);
             } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException |
                      ParsedDataException e) {
-//                logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomComplet(), e.getMessage());
+                logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
     }

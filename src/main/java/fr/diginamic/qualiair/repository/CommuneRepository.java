@@ -16,11 +16,11 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
 
 
     @Query("SELECT c FROM Commune c JOIN FETCH c.coordonnee JOIN FETCH c.departement d JOIN FETCH d.region")
-    List<Commune> findAll();
+    List<Commune> findAllWithRelations();
 
 
-    @Query("SELECT DISTINCT c FROM Commune  c JOIN FETCH Coordonnee cd ON cd.commune = c WHERE c.nomPostal = :nomPostal")
-    Commune findCommuneByNomPostal(@Param("nomPostal") String nomPostal);
+//    @Query("SELECT DISTINCT c FROM Commune  c JOIN FETCH Coordonnee cd ON cd.commune = c WHERE c.nomPostal = :nomPostal")
+//    Commune findCommuneByNomPostal(@Param("nomPostal") String nomPostal);
 
 
     @Query(value = """
@@ -28,11 +28,7 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             JOIN FETCH c.coordonnee cd
             JOIN FETCH MesurePopulation mpop ON mpop.coordonnee = cd
             WHERE mpop.valeur >= :nbHab
-              AND mpop.dateReleve = (
-                  SELECT MAX(m2.dateReleve)
-                  FROM MesurePopulation m2
-                  WHERE m2.coordonnee = cd
-              )
+              AND mpop.dateReleve = (SELECT m2.dateReleve FROM MesurePopulation m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
             """)
     List<Commune> findTopByLastestMesurePopulation(@Param("nbHab") int nbHab);
 
@@ -45,22 +41,31 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             JOIN FETCH MesureAir mair ON mair.coordonnee = cd
             
             WHERE mpop.valeur >= :nbHab
-              AND mpop.dateReleve = (
-                  SELECT MAX(m2.dateReleve)
-                  FROM MesurePopulation m2
-                  WHERE m2.coordonnee = cd
-              )
-              AND mprev.dateReleve = (
-                  SELECT MAX(m2.dateReleve)
-                  FROM MesurePrevision m2
-                  WHERE m2.coordonnee = cd
-              )
-              AND mair.dateReleve = (
-                  SELECT MAX(m2.dateReleve)
-                  FROM MesureAir m2
-                  WHERE m2.coordonnee = cd
-              )
+              AND mpop.dateReleve = (SELECT m2.dateReleve FROM MesurePopulation m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+              AND mprev.dateReleve = (SELECT m2.dateReleve FROM MesurePrevision m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+              AND mair.dateReleve = (SELECT m2.dateReleve FROM MesureAir m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
             """)
     List<Commune> findTopByMesurePopulationWithCurrentForecast(@Param("nbHab") int nbHab);
 
+    @Query(value = """
+            SELECT mp.coordonnee.id FROM MesurePopulation mp
+            WHERE mp.valeur >= :nbHab
+              AND mp.dateReleve = (
+                  SELECT MAX(m2.dateReleve)
+                  FROM MesurePopulation m2
+                  WHERE m2.coordonnee = mp.coordonnee
+              )
+            """)
+    List<Long> findCoordonneesWithLatestPopulation(@Param("nbHab") int nbHab);
+
+    @Query(value = """
+            SELECT DISTINCT c FROM Commune c
+            JOIN FETCH c.coordonnee cd
+            WHERE cd.id IN :coordonneeIds
+            """)
+    List<Commune> findCommunesByCoordonneeIds(@Param("coordonneeIds") List<Long> coordonneeIds);
+
+
+    @Query("SELECT c FROM Commune c JOIN FETCH c.coordonnee")
+    List<Commune> findAllWithCoordinates();
 }

@@ -19,19 +19,19 @@ import java.util.Map;
 @Service
 public class CacheService {
     /**
-     * Commune name - commune entity map
+     * Commune code Insee - commune entity map
      */
     private final Map<String, Commune> communeCache = new HashMap<>();
     /**
-     * Region name - region entity map
+     * Region code - region entity map
      */
-    private final Map<String, Region> regionCache = new HashMap<>();
+    private final Map<Integer, Region> regionCache = new HashMap<>();
     /**
-     * Departement name - department entity map
+     * Departement code - department entity map
      */
     private final Map<String, Departement> departementCache = new HashMap<>();
     /**
-     * NomCommune - coordinates entity map
+     * Code Insee commune - coordinates entity map
      */
     private final Map<String, Coordonnee> coordonneeCache = new HashMap<>();
 
@@ -48,17 +48,17 @@ public class CacheService {
      */
     @Transactional(readOnly = true)
     public void loadExistingCommunesWithRelations() {
-        List<Commune> communeList = communeRepository.findAll();
+        List<Commune> communeList = communeRepository.findAllWithRelations();
         System.out.println("cache loaded");
         communeList.forEach(commune -> {
             Coordonnee coordonnee = commune.getCoordonnee();
             Departement departement = commune.getDepartement();
             Region region = commune.getDepartement().getRegion();
 
-            communeCache.put(commune.getNomPostal(), commune);
-            regionCache.put(region.getNom(), region);
-            departementCache.put(departement.getNom(), departement);
-            coordonneeCache.put(commune.getNomPostal(), coordonnee);
+            communeCache.put(commune.getCodeInsee(), commune);
+            regionCache.put(region.getCode(), region);
+            departementCache.put(departement.getCode(), departement);
+            coordonneeCache.put(commune.getCodeInsee(), coordonnee);
         });
 
     }
@@ -66,11 +66,11 @@ public class CacheService {
     /**
      * Recherche dans le cache communes
      *
-     * @param key nom postal de la commune
+     * @param codeInsee code insee de la commune
      * @return commune ou null
      */
-    public Commune findInCommuneCache(String key) {
-        return communeCache.get(key);
+    public Commune findInCommuneCache(String codeInsee) {
+        return communeCache.get(codeInsee);
     }
 
     public void putInCommuneCache(String key, Commune commune) {
@@ -83,11 +83,11 @@ public class CacheService {
      * @param key nom  de la region
      * @return region ou null
      */
-    public Region findInRegionCache(String key) {
+    public Region findInRegionCache(int key) {
         return regionCache.get(key);
     }
 
-    public void putInRegionCache(String key, Region region) {
+    public void putInRegionCache(int key, Region region) {
         regionCache.put(key, region);
     }
 
@@ -108,7 +108,7 @@ public class CacheService {
     /**
      * Recherche dans le cache coordonnées
      *
-     * @param key nom postal de la commune rattachée
+     * @param key codeInsee  de la commune rattachée
      * @return coordonnées ou null
      */
     public Coordonnee findInCoordoneeCache(String key) {

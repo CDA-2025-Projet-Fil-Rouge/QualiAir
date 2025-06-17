@@ -3,8 +3,6 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.dao.CommuneDao;
 import fr.diginamic.qualiair.dto.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
-import fr.diginamic.qualiair.exception.FunctionnalException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.CommuneMapper;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
@@ -55,9 +53,9 @@ public class CommuneService {
      * @param commune commune entity
      * @return existing or created entity
      */
-    public Commune findOrCreate(Commune commune) throws ParsedDataException {
+    public Commune findOrCreate(Commune commune) {
 
-        String key = commune.getNomPostal();
+        String key = commune.getCodeInsee();
         Commune existing = cacheService.findInCommuneCache(key);
 
         if (existing != null) {
@@ -80,13 +78,13 @@ public class CommuneService {
         return cacheService.findInCommuneCache(communeName);
     }
 
-    public Commune findByNomPostal(String nomPostal) throws FunctionnalException {
-        Commune commune = communeRepository.findCommuneByNomPostal(nomPostal);
-        if (commune == null) {
-            throw new FunctionnalException("Commune not found for nomPostal: " + nomPostal);
-        }
-        return commune;
-    }
+//    public Commune findByNomPostal(String nomPostal) throws FunctionnalException {
+//        Commune commune = communeRepository.findCommuneByNomPostal(nomPostal);
+//        if (commune == null) {
+//            throw new FunctionnalException("Commune not found for nomPostal: " + nomPostal);
+//        }
+//        return commune;
+//    }
 
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
         List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecast(nbHabitant);
@@ -97,5 +95,9 @@ public class CommuneService {
 
     public List<Commune> getListTopCommunesByPopulation(int nbHabitant) {
         return communeRepository.findTopByLastestMesurePopulation(nbHabitant);
+    }
+
+    public List<Commune> getAllCommunesWithCoordinates() {
+        return communeRepository.findAllWithCoordinates();
     }
 }

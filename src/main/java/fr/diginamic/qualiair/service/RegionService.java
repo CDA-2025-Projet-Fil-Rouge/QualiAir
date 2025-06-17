@@ -36,7 +36,7 @@ public class RegionService {
      */
     public Region findOrCreate(Region region) {
 
-        String key = region.getNom();
+        int key = region.getCode();
         Region existing = cacheService.findInRegionCache(key);
         if (existing != null) {
             return existing;

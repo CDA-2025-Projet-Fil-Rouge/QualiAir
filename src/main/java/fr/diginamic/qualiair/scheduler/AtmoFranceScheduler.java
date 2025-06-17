@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Scheduler pour l'api externe atmo-france
@@ -29,6 +30,7 @@ public class AtmoFranceScheduler {
     @Scheduled(cron = "${atmo.schedule.cron.meteo}")
     public void fetchAirQualityDataAndPersist() {
         String targetDate = LocalDate.now().minusDays(1).toString();
+        logger.info("Scheduled task running at {}", LocalDateTime.now());
         try {
             service.saveDailyFranceAirQualityData(targetDate);
             logger.info("Executed automated persistence task for air quality data for date {}.", targetDate);

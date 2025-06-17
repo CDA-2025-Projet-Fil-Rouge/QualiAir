@@ -80,14 +80,14 @@ public class ApiOpenWeatherService {
      */
     public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
 
-        String nomPostal = commune.getNomPostal();
+        String codeInsee = commune.getCodeInsee();
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startDate = now.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime endDate = startDate.plusHours(1).minusNanos(1);
         TypeReleve typeReleve = TypeReleve.ACTUEL;
 
-        boolean exists = service.existsByHourAndNomPostal(startDate, endDate, typeReleve, nomPostal);
+        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, typeReleve, codeInsee);
 
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
         Coordonnee coordonnee = commune.getCoordonnee();
@@ -108,13 +108,13 @@ public class ApiOpenWeatherService {
      */
     public List<MesurePrevision> requestFiveDayForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
 
-        String nomPostal = commune.getNomPostal();
+        String codeInsee = commune.getCodeInsee();
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime endDate = startDate.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
-        boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_5J, nomPostal);
+        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, TypeReleve.PREVISION_5J, codeInsee);
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
@@ -135,12 +135,12 @@ public class ApiOpenWeatherService {
      */
     public List<MesurePrevision> requestSixteenDaysForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
 
-        String nomPostal = commune.getNomPostal();
+        String codeInsee = commune.getCodeInsee();
 
         LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
         LocalDateTime endDate = startDate.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_16J;
-        boolean exists = service.existsByHourAndNomPostal(startDate, endDate, TypeReleve.PREVISION_16J, nomPostal);
+        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, TypeReleve.PREVISION_16J, codeInsee);
         ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();

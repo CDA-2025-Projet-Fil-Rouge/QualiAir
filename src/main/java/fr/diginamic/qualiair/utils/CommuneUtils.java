@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.exception.ParsedDataException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
 
@@ -38,5 +39,22 @@ public class CommuneUtils {
                 .trim();
 
         return normalized.toUpperCase();
+    }
+
+    public static String withoutArrondissement(String name) throws ParsedDataException {
+        if (name == null) {
+            throw new ParsedDataException("Commune name can't be null");
+        }
+        return name.replaceAll("\\b\\d{1,2}(E|ER)? ARRONDISSEMENT\\b", "").trim();
+    }
+
+    public static String normalizeInseeCode(String insee) {
+        if (insee == null || insee.trim().isEmpty()) return null;
+
+        if (StringUtils.length(insee) == 5) {
+            return insee;
+        } else {
+            return StringUtils.leftPad(insee, 5, "0");
+        }
     }
 }
