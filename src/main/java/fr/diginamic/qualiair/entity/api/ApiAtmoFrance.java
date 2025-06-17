@@ -15,12 +15,12 @@ public class ApiAtmoFrance {
     /**
      * URI de login
      */
-    @Value("${external.api.atmo.uri.login}")
+    @Value("${atmo.uri.login}")
     private URI uriLogin;
     /**
      * URI pour les requetes AirQualité, plus d'information dans la documentation officielles : "//todo"
      */
-    @Value("${external.api.atmo.uri.air-quality}")
+    @Value("${atmo.uri.air-quality}")
     private URI uriAirQuality;
 
     @Autowired
