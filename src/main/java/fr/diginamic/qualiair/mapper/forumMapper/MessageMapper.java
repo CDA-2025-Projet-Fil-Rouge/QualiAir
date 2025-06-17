@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.mapper.forumMapper;
 
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
-import fr.diginamic.qualiair.entity.Message;
+import fr.diginamic.qualiair.entity.forum.Message;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,6 +24,9 @@ public class MessageMapper{
         messageDto.setDateCreation(message.getDateCreation());
         messageDto.setIdCreateur(message.getCreateur().getId());
         messageDto.setIdTopic(message.getTopic().getId());
+        messageDto.setNbLike(message.getNbLike());
+        messageDto.setNbDislike(message.getNbDislike());
+        messageDto.setNbSignalement(message.getNbSignalement());
         if(message.getModificateur() != null) {
             messageDto.setIdModificateur(message.getModificateur().getId());
             messageDto.setDateModification(message.getDateModification());

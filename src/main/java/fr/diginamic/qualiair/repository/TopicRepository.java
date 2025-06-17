@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.repository;
 
-import fr.diginamic.qualiair.entity.Topic;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

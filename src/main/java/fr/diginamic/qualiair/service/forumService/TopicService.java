@@ -1,8 +1,8 @@
 package fr.diginamic.qualiair.service.forumService;
 
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
-import fr.diginamic.qualiair.entity.Rubrique;
-import fr.diginamic.qualiair.entity.Topic;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
