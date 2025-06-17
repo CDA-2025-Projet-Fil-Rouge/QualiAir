@@ -1,21 +1,23 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
+import fr.diginamic.qualiair.entity.Adresse;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
+import fr.diginamic.qualiair.mapper.UtilisateurMapper;
+import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
-import fr.diginamic.qualiair.security.IJwtAuthentificationService;
+import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
 
 
 @Service
@@ -24,15 +26,17 @@ public class UtilisateurService {
     @Autowired
     UtilisateurRepository utilisateurRepository;
     @Autowired
-    BCryptPasswordEncoder bcrypt;
-    @Autowired
-    IJwtAuthentificationService IJwtAuthentificationService;
+    UtilisateurMapper utilisateurMapper;
     @Autowired
     private UtilisateurValidator utilisateurValidator;
+    @Autowired
+    private AdresseRepository adresseRepository;
+    @Autowired
+    RoleManagementService roleManagementService;
 
 
     /**
-     * Récupère un utilisateur à partir de son email.
+     * Récupérer un utilisateur à partir de son email.
      *
      * @param email Email de l'utilisateur recherché
      * @return l'utilisateur correspondant
@@ -44,41 +48,75 @@ public class UtilisateurService {
     }
 
     /**
-     * Authentifie un utilisateur en comparant le mot de passe, puis génère un token JWT.
+     * Récupérer la liste paginée de tous les utilisateurs inscrits.
+     * Accessible uniquement aux administrateurs et super-administrateurs.
      *
-     * @param user L'utilisateur à authentifier
-     * @return un cookie contenant le token JWT
-     * @throws Exception si les identifiants sont invalides
+     * @param pageable objet de pagination contenant le numéro de page, la taille de page, et éventuellement le tri
+     * @param demandeur utilisateur authentifié à l'origine de la requête
+     * @return une page de UtilisateurDto représentant les utilisateurs
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
      */
-    public ResponseCookie logUser(Utilisateur user) throws Exception {
-        Utilisateur utilisateur = getUser(user.getEmail());
-        if (bcrypt.matches(user.getMotDePasse(), utilisateur.getMotDePasse())) {
-            return IJwtAuthentificationService.generateToken(utilisateur);
-        }
-        throw new BadCredentialsException("Email ou mot de passe incorrect");
+    public Page<UtilisateurDto> getAllUsers(Pageable pageable, Utilisateur demandeur) {
+        UtilisateurUtils.isAdmin(demandeur);
+        return utilisateurRepository.findAll(pageable).map(utilisateurMapper::toDto);
     }
 
     /**
-     * Crée un nouvel utilisateur après validation des règles métier.
+     * Créer un nouvel admin après validation des règles métier.
+     * Cette démarche n'est possible que pour un superadmin.
      *
-     * @param user Utilisateur à créer (non encore persisté)
+     * @param userDto Admin à créer (non encore persisté)
      * @param role Rôle à affecter au nouvel utilisateur
+     * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
      * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
      */
-    public void createUser(Utilisateur user, RoleUtilisateur role)
-            throws BusinessRuleException, TokenExpiredException {
-        utilisateurValidator.validate(user);
+    public void createAdmin(UtilisateurDto userDto, Utilisateur demandeur, RoleUtilisateur role)
+            throws FileNotFoundException, BusinessRuleException, TokenExpiredException {
 
-        Utilisateur userToSave = new Utilisateur();
-        userToSave.setEmail(user.getEmail());
-        userToSave.setMotDePasse(bcrypt.encode(user.getMotDePasse()));
-        userToSave.setPrenom(user.getPrenom());
-        userToSave.setNom(user.getNom());
-        Optional.ofNullable(user.getDateNaissance()).ifPresent(userToSave::setDateNaissance);
-        userToSave.setAdresse(user.getAdresse());
-        userToSave.setDateInscription(LocalDateTime.now());
-        userToSave.setRole(role);
-
+        UtilisateurUtils.isSuperadmin(demandeur);
+        Adresse adresse = UtilisateurUtils.findAdresseOrThrow(adresseRepository, userDto.getIdAdresse());
+        Utilisateur userToSave = utilisateurMapper.fromDto(userDto, adresse, role);
+        utilisateurValidator.validate(userToSave);
         utilisateurRepository.save(userToSave);
     }
+
+    /**
+     * Active ou désactive un utilisateur (inversion selon son rôle actuel)
+     * Accessible uniquement pour les admins et super admins
+     * @param idCible identifiant de l'utilisateur à activer/désactiver
+     * @param demandeur utilisateur à l'origine de la requête
+     * @return le message de confirmation du changement de rôle
+     * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
+     * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
+     */
+    public String toggleActivationUser(Long idCible, Utilisateur demandeur)
+            throws FileNotFoundException, BusinessRuleException {
+        return roleManagementService.toggleUserRole(
+                demandeur, idCible,
+                RoleUtilisateur.INACTIF, RoleUtilisateur.UTILISATEUR,
+                "Utilisateur désactivé", "Utilisateur réactivé"
+        );
+    }
+
+    /**
+     * Banni ou débanni un utilisateur (inversion selon son rôle actuel)
+     * Accessible uniquement pour les admins et super admins
+     * @param idCible identifiant de l'utilisateur à bannir/débannir
+     * @param demandeur utilisateur à l'origine de la requête
+     * @return le message de confirmation du changement de rôle
+     * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
+     * @throws BusinessRuleException si les règles métier ne sont pas respectées
+     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
+     */
+    public String toggleBanUser(Long idCible, Utilisateur demandeur)
+            throws FileNotFoundException, BusinessRuleException {
+        return roleManagementService.toggleUserRole(
+                demandeur, idCible,
+                RoleUtilisateur.BANNI, RoleUtilisateur.UTILISATEUR,
+                "Utilisateur banni", "Utilisateur débanni"
+        );
+    }
 }
+

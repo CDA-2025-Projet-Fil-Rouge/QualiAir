@@ -1,15 +1,15 @@
-package fr.diginamic.qualiair.entity;
+package fr.diginamic.qualiair.entity.forum;
 
+import fr.diginamic.qualiair.entity.Utilisateur;
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "topic")
-public class Topic
+@Table(name = "rubrique")
+public class Rubrique
 {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,29 +17,26 @@ public class Topic
 
     @Column(nullable = false)
     private String nom;
-
+    @Column(nullable = false)
+    private String description;
+    @Column(name = "priorite_affichage_indice", nullable = false, unique = true)
+    private int prioriteAffichageIndice = 0;
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
-
-    @Column(name = "date_modification")
+    @Column(name="date_modification")
     private LocalDateTime dateModification;
     
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_createur", nullable = false)
     private Utilisateur createur;
-
     @ManyToOne
-    @JoinColumn(name= "id_modificateur")
+    @JoinColumn(name = "id_modificateur")
     private Utilisateur modificateur;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "id_rubrique", nullable = false)
-    private Rubrique rubrique;
+    @OneToMany(mappedBy = "rubrique")
+    private Set<Topic> topics = new HashSet<>();
     
-    @OneToMany(mappedBy = "topic")
-    private Set<Message> messages = new HashSet<>();
-
-    public Topic()
+    public Rubrique()
     {
     }
     
@@ -72,6 +69,42 @@ public class Topic
     
     /**
      * Getter
+     * @return description
+     */
+    public String getDescription()
+    {
+        return description;
+    }
+    
+    /**
+     * Setter
+     * @param description sets value
+     */
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+    
+    /**
+     * Getter
+     * @return prioriteAffichageIndice
+     */
+    public int getPrioriteAffichageIndice()
+    {
+        return prioriteAffichageIndice;
+    }
+    
+    /**
+     * Setter
+     * @param prioriteAffichageIndice sets value
+     */
+    public void setPrioriteAffichageIndice(int prioriteAffichageIndice)
+    {
+        this.prioriteAffichageIndice = prioriteAffichageIndice;
+    }
+    
+    /**
+     * Getter
      * @return dateCreation
      */
     public LocalDateTime getDateCreation()
@@ -98,7 +131,6 @@ public class Topic
 
     /**
      * Setter
-     *
      * @param dateModification sets value
      */
     public void setDateModification(LocalDateTime dateModification) {
@@ -133,7 +165,6 @@ public class Topic
 
     /**
      * Setter
-     *
      * @param modificateur sets value
      */
     public void setModificateur(Utilisateur modificateur) {
@@ -142,39 +173,17 @@ public class Topic
 
     /**
      * Getter
-     * @return rubrique
+     * @return topics
      */
-    public Rubrique getRubrique()
-    {
-        return rubrique;
-    }
-    
-    /**
-     * Setter
-     * @param rubrique sets value
-     */
-    public void setRubrique(Rubrique rubrique)
-    {
-        this.rubrique = rubrique;
-    }
-    
-    /**
-     * Getter
-     * @return messages
-     */
-    public Set<Message> getMessages()
-    {
-        return messages;
-    }
-    
-    /**
-     * Setter
-     * @param messages sets value
-     */
-    public void setMessages(Set<Message> messages)
-    {
-        this.messages = messages;
+    public Set<Topic> getTopics() {
+        return topics;
     }
 
-
+    /**
+     * Setter
+     * @param topics sets value
+     */
+    public void setTopics(Set<Topic> topics) {
+        this.topics = topics;
+    }
 }

@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.service.forumService;
 
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
-import fr.diginamic.qualiair.entity.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
@@ -19,7 +19,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Service de gestion des rubriques du forum.
