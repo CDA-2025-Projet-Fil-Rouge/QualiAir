@@ -10,9 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AirDataPropertiesDto {
     @JsonProperty("date_maj")
     private String dateMaj;
-
+    @JsonProperty("code_zone")
+    private String codeZone;
     @JsonProperty("code_no2")
     private String codeNo2;
+    @JsonProperty("type_zone")
+    private String typeZone;
 
     @JsonProperty("code_o3")
     private String codeO3;
@@ -41,8 +44,43 @@ public class AirDataPropertiesDto {
     @JsonProperty("date_ech")
     private String dateEch;
 
-
     public AirDataPropertiesDto() {
+    }
+
+    /**
+     * Getter
+     *
+     * @return typeZone
+     */
+    public String getTypeZone() {
+        return typeZone;
+    }
+
+    /**
+     * Setter
+     *
+     * @param typeZone sets value
+     */
+    public void setTypeZone(String typeZone) {
+        this.typeZone = typeZone;
+    }
+
+    /**
+     * Getter
+     *
+     * @return codeZone
+     */
+    public String getCodeZone() {
+        return codeZone;
+    }
+
+    /**
+     * Setter
+     *
+     * @param codeZone sets value
+     */
+    public void setCodeZone(String codeZone) {
+        this.codeZone = codeZone;
     }
 
     /**

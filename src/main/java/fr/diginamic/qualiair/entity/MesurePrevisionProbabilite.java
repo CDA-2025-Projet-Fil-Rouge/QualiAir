@@ -5,29 +5,28 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "mesure_prevision_probabilite")
-public class MesurePrevisionProbabilite extends MesurePrevision
-{
+@Deprecated
+public class MesurePrevisionProbabilite extends MesurePrevision {
     private double probabilite;
-    
-    public MesurePrevisionProbabilite()
-    {
+
+    public MesurePrevisionProbabilite() {
     }
-    
+
     /**
      * Getter
+     *
      * @return probabilite
      */
-    public double getProbabilite()
-    {
+    public double getProbabilite() {
         return probabilite;
     }
-    
+
     /**
      * Setter
+     *
      * @param probabilite sets value
      */
-    public void setProbabilite(double probabilite)
-    {
+    public void setProbabilite(double probabilite) {
         this.probabilite = probabilite;
     }
 }

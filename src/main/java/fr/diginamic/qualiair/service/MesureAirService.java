@@ -15,8 +15,7 @@ public class MesureAirService {
     private CacheService cacheService;
 
     public MesureAir save(MesureAir mesure) {
-        repository.save(mesure);
-        return mesure;
+        return repository.save(mesure);
     }
 
     public boolean existsByDateReleve(LocalDate date) {

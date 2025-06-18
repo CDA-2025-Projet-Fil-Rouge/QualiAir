@@ -27,7 +27,7 @@ public class MesurePopulationMapper {
         mesure.setTypeMesure(TypeMesure.RELEVE_POPULATION);
         mesure.setDateReleve(date);
         mesure.setDateEnregistrement(LocalDateTime.now());
-        mesure.setValeur(toInt(dto.getPopulationMunicipale().trim().replace(" ", "")));
+        mesure.setValeur(toInt(dto.getPopulationMunicipale().trim()));
         return mesure;
     }
 

@@ -5,9 +5,9 @@ package fr.diginamic.qualiair.dto.insertion;
  */
 public class CommuneHabitantDto implements DtoFromCsv {
 
-    private String nomCommune;
+    private String codeInsee;
     private String populationMunicipale;
-    private String populationTotale;
+
 
     public CommuneHabitantDto() {
     }
@@ -15,37 +15,19 @@ public class CommuneHabitantDto implements DtoFromCsv {
     /**
      * Getter
      *
-     * @return nomCommune
+     * @return codeInsee
      */
-    public String getNomCommune() {
-        return nomCommune;
+    public String getCodeInsee() {
+        return codeInsee;
     }
 
     /**
      * Setter
      *
-     * @param nomCommune sets value
+     * @param codeInsee sets value
      */
-    public void setNomCommune(String nomCommune) {
-        this.nomCommune = nomCommune;
-    }
-
-    /**
-     * Getter
-     *
-     * @return populationTotale
-     */
-    public String getPopulationTotale() {
-        return populationTotale;
-    }
-
-    /**
-     * Setter
-     *
-     * @param populationTotale sets value
-     */
-    public void setPopulationTotale(String populationTotale) {
-        this.populationTotale = populationTotale;
+    public void setCodeInsee(String codeInsee) {
+        this.codeInsee = codeInsee;
     }
 
     /**

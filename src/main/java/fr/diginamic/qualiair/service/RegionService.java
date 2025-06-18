@@ -36,14 +36,14 @@ public class RegionService {
      */
     public Region findOrCreate(Region region) {
 
-        String key = region.getNom();
+        int key = region.getCode();
         Region existing = cacheService.findInRegionCache(key);
         if (existing != null) {
             return existing;
         }
         regionValidator.validate(region);
-        regionRepository.save(region);
+        Region saved = regionRepository.save(region);
         cacheService.putInRegionCache(key, region);
-        return region;
+        return saved;
     }
 }

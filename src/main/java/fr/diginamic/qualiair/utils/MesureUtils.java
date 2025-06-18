@@ -6,11 +6,14 @@ import fr.diginamic.qualiair.entity.TypeMesure;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class MesureUtils {
+    private static final Logger logger = LoggerFactory.getLogger(MesureUtils.class);
 
     private MesureUtils() {
     }
@@ -40,9 +43,14 @@ public class MesureUtils {
         }
     }
 
-    public static void addIfNotNull(List<MesurePrevision> mesures, String valeur, TypeReleve type, LocalDateTime releve, LocalDateTime maj, NatureMesurePrevision nature) throws ParsedDataException {
-        if (valeur != null) {
-            mesures.add(createMesurePrevision(type, releve, maj, valeur, nature));
+    public static void addIfNotNull(List<MesurePrevision> mesures, String valeur, TypeReleve type, LocalDateTime releve, LocalDateTime maj, NatureMesurePrevision nature) {
+
+        try {
+            if (valeur != null) {
+                mesures.add(createMesurePrevision(type, releve, maj, valeur, nature));
+            }
+        } catch (ParsedDataException e) {
+            logger.debug("Couldn't convert value to double for {}, at {}", type, maj);
         }
     }
 

@@ -9,8 +9,12 @@ import fr.diginamic.qualiair.entity.api.ApiAtmoFrance;
 import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.ApiToken;
 import fr.diginamic.qualiair.entity.api.UtilisateurAtmoFrance;
-import fr.diginamic.qualiair.exception.*;
+import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.ExternalApiResponseException;
+import fr.diginamic.qualiair.exception.TokenExpiredException;
+import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
+import fr.diginamic.qualiair.utils.CommuneUtils;
 import fr.diginamic.qualiair.validator.AtmoFranceTokenValidator;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
@@ -25,9 +29,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
-import static fr.diginamic.qualiair.utils.CommuneUtils.toNomPostal;
 import static fr.diginamic.qualiair.utils.DateUtils.toLocalDate;
 
 @Service
@@ -95,34 +99,30 @@ public class ApiAtmoFranceService {
         if (mesureAirService.existsByDateReleve(dateReleve)) {
             throw new UnnecessaryApiRequestException(String.format("Measurements for date %s already exist, skipping", date));
         }
-        cacheService.loadExistingCommunesWithRelations();
+
+        List<Commune> communes = communeService.getAllCommunesWithCoordinates();
+        HashMap<String, Commune> map = new HashMap<>();
+        communes.forEach(c -> map.put(c.getCodeInsee(), c));
         DailyAirDataDto responseDto = fetchDailyAirDataFromApi(date);
+        List<AirDataFeatureDto> dataList = responseDto.getFeatures().stream().filter(f -> f.getProperties().getTypeZone().equalsIgnoreCase("commune")).toList();
 
-        for (AirDataFeatureDto feature : responseDto.getFeatures()) {
+        for (AirDataFeatureDto feature : dataList) {
+            String featureCodeInsee = CommuneUtils.normalizeInseeCode(feature.getProperties().getCodeZone().trim());
 
-            try {
-
-                String zoneName = toNomPostal(feature.getProperties().getLibZone());
-//                logger.debug("Looking up commune from cache using zone name: {}", zoneName);
-                Commune commune = communeService.getFromCache(zoneName);
-
-                if (commune == null) {
-                    continue;
-                }
-                Coordonnee savedCoordonnee = commune.getCoordonnee();
-
-                List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, dateReleve);
-
-                mesureAir.forEach(mesure -> {
-                    mesure.setCoordonnee(savedCoordonnee);
-                    mesureAirService.save(mesure);
-                });
-            } catch (ParsedDataException e) {
-                logger.warn("Skipping Air quality registering for {} because : {}", feature.getProperties().getLibZone(), e.getMessage());
+            Commune commune = map.get(featureCodeInsee);
+            if (commune == null) {
+                logger.debug("Commune not found for {}", feature.getProperties().getLibZone());
+                continue;
             }
-        }
+            Coordonnee savedCoordonnee = commune.getCoordonnee();
 
-        cacheService.clearCaches();
+            List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, dateReleve);
+
+            mesureAir.forEach(mesure -> {
+                mesure.setCoordonnee(savedCoordonnee);
+                mesureAirService.save(mesure);
+            });
+        }
     }
 
     /**
