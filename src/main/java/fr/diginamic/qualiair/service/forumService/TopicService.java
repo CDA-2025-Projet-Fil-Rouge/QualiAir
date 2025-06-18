@@ -11,6 +11,7 @@ import fr.diginamic.qualiair.mapper.forumMapper.TopicMapper;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
+import fr.diginamic.qualiair.utils.CheckUtils;
 import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.TopicValidator;
@@ -97,7 +98,7 @@ public class TopicService {
      */
     public TopicDto updateTopic(Long idTopic, TopicDto dto, Utilisateur modificateur)
             throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
-        ForumUtils.ensureMatchingIds(idTopic, dto.getId());
+        CheckUtils.ensureMatchingIds(idTopic, dto.getId());
         Topic topic = ForumUtils.findTopicOrThrow(topicRepository, idTopic);
 
         UtilisateurUtils.checkAuthorOrAdmin(modificateur, topic.getCreateur().getId());

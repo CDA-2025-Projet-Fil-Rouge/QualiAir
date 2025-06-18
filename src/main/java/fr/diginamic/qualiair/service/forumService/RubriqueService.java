@@ -9,6 +9,7 @@ import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapper;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
+import fr.diginamic.qualiair.utils.CheckUtils;
 import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.RubriqueValidator;
@@ -81,7 +82,7 @@ public class RubriqueService {
     public RubriqueDto updateRubrique(Long idRubrique, RubriqueDto dto, Utilisateur modificateur)
         throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
 
-        ForumUtils.ensureMatchingIds(idRubrique, dto.getId());
+        CheckUtils.ensureMatchingIds(idRubrique, dto.getId());
         Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, idRubrique);
         UtilisateurUtils.isAdmin(modificateur);
 

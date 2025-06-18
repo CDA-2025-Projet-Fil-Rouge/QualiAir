@@ -11,6 +11,7 @@ import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.MessageMapper;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
+import fr.diginamic.qualiair.utils.CheckUtils;
 import fr.diginamic.qualiair.utils.ForumUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.MessageValidator;
@@ -100,7 +101,7 @@ public class MessageService {
     public MessageDto updateMessage(Long idMessage, MessageDto dto, Utilisateur modificateur)
             throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
 
-        ForumUtils.ensureMatchingIds(idMessage, dto.getId());
+        CheckUtils.ensureMatchingIds(idMessage, dto.getId());
         Message message = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
         UtilisateurUtils.checkAuthorOrAdmin(modificateur,message.getCreateur().getId());
         Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());

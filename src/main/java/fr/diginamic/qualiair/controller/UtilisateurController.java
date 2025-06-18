@@ -1,6 +1,8 @@
 package fr.diginamic.qualiair.controller;
 
+import fr.diginamic.qualiair.dto.entitesDto.AdresseDto;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
+import fr.diginamic.qualiair.dto.entitesDto.UtilisateurUpdateDto;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.service.UtilisateurService;
@@ -22,6 +24,20 @@ public class UtilisateurController {
     UtilisateurService utilisateurService;
     @Autowired
     HttpRequestUtils httpRequestUtils;
+
+    /**
+     * Récupère les informations personnelles de l'utilisateur connecté.
+     *
+     * @param request la requête HTTP contenant le token JWT
+     * @return les données personnelles de l'utilisateur connecté
+     * @throws Exception si l'utilisateur n'est pas authentifié
+     */
+    @GetMapping("/get-personal-data")
+    public ResponseEntity<UtilisateurDto> getPersonalData(HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        UtilisateurDto dto = utilisateurService.getPersonalData(user.getId());
+        return ResponseEntity.ok(dto);
+    }
 
     /**
      * Retourne la liste paginée de tous les utilisateurs inscrits,
@@ -59,6 +75,38 @@ public class UtilisateurController {
         Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
         utilisateurService.createAdmin(userDto, demandeur, RoleUtilisateur.ADMIN);
         return ResponseEntity.ok("Admin créé");
+    }
+
+    /**
+     * Permet à un utilisateur connecté de modifier ses informations personnelles
+     * @param dto données utilisateur à modifier dans le corps de la requête
+     * @param request la requête HTTP contenant le token JWT
+     * @return les données personnelles de l'utilisateur connecté
+     * @throws Exception si l'utilisateur n'est pas authentifié
+     */
+    @PutMapping("/update-personal-data")
+    public ResponseEntity<UtilisateurUpdateDto> updatePersonalData(
+            @RequestBody UtilisateurUpdateDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur utilisateur = httpRequestUtils.getUtilisateurFromRequest(request);
+        UtilisateurUpdateDto updated = utilisateurService.updatePersonalData(utilisateur, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Permet à un utilisateur connecté de modifier son adresse personnelle
+     * @param dto instance de AdresseDto correspondant à la nouvelle adresse
+     * @param request la requête HTTP contenant le token JWT
+     * @return la dto correspondant à l'utilisateur modifié
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @PutMapping("/update-adresse")
+    public ResponseEntity<AdresseDto> updateAdresse(
+            @RequestBody AdresseDto dto,
+            HttpServletRequest request) throws Exception {
+        Utilisateur utilisateur = httpRequestUtils.getUtilisateurFromRequest(request);
+        AdresseDto updated = utilisateurService.updateUserAdresse(utilisateur, dto);
+        return ResponseEntity.ok(updated);
     }
 
     /**
