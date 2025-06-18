@@ -9,8 +9,6 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.*;
 import fr.diginamic.qualiair.parser.CsvParser;
-import fr.diginamic.qualiair.repository.CommuneRepository;
-import fr.diginamic.qualiair.repository.DepartementRepository;
 import fr.diginamic.qualiair.utils.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +33,6 @@ public class RecensementParserService {
     private static final Logger logger = LoggerFactory.getLogger(RecensementParserService.class);
 
     @Autowired
-    private CsvParser parser;
-    @Autowired
     private CacheService cacheService;
     @Autowired
     private CoordonneeService coordonneeService;
@@ -60,10 +56,6 @@ public class RecensementParserService {
     private MesurePopulationMapper mesurePopulationMapper;
     @Autowired
     private RecensementCsvMapper recensementCsvMapper;
-    @Autowired
-    private MesureService mesureService;
-    @Autowired
-    private CommuneRepository communeRepository;
 
     @Value("${recensement.fichier.communes-with-pop.path}")
     private String pathFichierPop;
@@ -73,11 +65,9 @@ public class RecensementParserService {
     private String pathFichierDepartement;
     @Value("${recensement.fichier.region.path}")
     private String pathFichierRegion;
-    @Autowired
-    private DepartementRepository departementRepository;
 
     @Transactional
-    public void saveCommunesFromFichier() throws IOException, FileNotFoundException, ParsedDataException {
+    public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
         validateFilePaths();
         cacheService.loadExistingCommunesWithRelations();
 
@@ -100,59 +90,20 @@ public class RecensementParserService {
     }
 
     private List<RegionDto> parseRegionFile(String path) throws IOException {
-        List<String> lines = parser.parseFile(path);
-        lines.removeFirst();
-        return lines.stream()
-                .map(line -> {
-                    String[] tokens = line.split(",");
-                    for (int i = 0; i < tokens.length; i++) {
-                        tokens[i] = tokens[i].substring(1, tokens[i].length() - 1).trim();
-                    }
-                    return tokens;
-                })
-                .map(recensementCsvMapper::mapToRegionDto).toList();
+        return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToRegionDto);
     }
 
     private List<DepartementDto> parseDepartementFile(String path) throws IOException {
-        List<String> lines = parser.parseFile(path);
-        lines.removeFirst();
-        return lines.stream().map(line -> {
-            String[] tokens = line.split(",");
-            for (int i = 0; i < tokens.length; i++) {
-                tokens[i] = tokens[i].substring(1, tokens[i].length() - 1).trim();
-            }
-            return tokens;
-        }).map(recensementCsvMapper::mapToDepartementdto).toList();
+
+        return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToDepartementdto);
     }
 
     private List<CommuneCoordDto> parseCoordFile(String path) throws IOException {
-        List<String> lines = parser.parseFile(path);
-        lines.removeFirst();
-        return lines.stream()
-                .map(line -> {
-                    String[] tokens = line.split(",");
-                    for (int i = 0; i < tokens.length; i++) {
-                        tokens[i] = tokens[i].substring(1, tokens[i].length() - 1).trim();
-                    }
-                    return tokens;
-                })
-                .map(recensementCsvMapper::mapToCommuneCoordDto)
-                .toList();
+        return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToCommuneCoordDto);
     }
 
     private List<CommuneHabitantDto> parsePopFile(String path) throws IOException {
-        List<String> lines = parser.parseFile(path);
-        lines.removeFirst();
-        return lines.stream()
-                .map(line -> {
-                    String[] tokens = line.split(",");
-                    for (int i = 0; i < tokens.length; i++) {
-                        tokens[i] = tokens[i].trim();
-                    }
-                    return tokens;
-                })
-                .map(recensementCsvMapper::mapToCommuneHabitantDto)
-                .toList();
+        return CsvParser.parseRecensementCsv(path, false, ",", recensementCsvMapper::mapToCommuneHabitantDto);
     }
 
     private void validateFilePaths() throws FileNotFoundException {
@@ -162,13 +113,19 @@ public class RecensementParserService {
         if (pathFichierDepartement == null) throw new FileNotFoundException("Missing departement file");
     }
 
-    private void saveCommunesAndCoords(List<CommuneCoordDto> communeDtos) throws ParsedDataException {
+    private void saveCommunesAndCoords(List<CommuneCoordDto> communeDtos) {
         for (CommuneCoordDto dto : communeDtos) {
             Commune commune = communeMapper.toEntityFromCommuneCoordDto(dto);
 
             Departement dept = cacheService.findInDepartementCache(dto.getCodeDepartement());
             commune.setDepartement(dept);
-            Coordonnee coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
+            Coordonnee coordonnee;
+            try {
+                coordonnee = coordonneeMapper.toEntityFromCommuneCoordDto(dto);
+            } catch (ParsedDataException e) {
+                logger.debug("Skipping {}, couldn't parse coordinates {} / {} \n {}", commune.getNomSimple(), dto.getLatitude(), dto.getLongitude(), e.getMessage());
+                continue;
+            }
 
             commune.setCoordonnee(coordonnee);
             coordonnee.setCommune(commune);
@@ -194,7 +151,7 @@ public class RecensementParserService {
         }
     }
 
-    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos, String dateReleve) throws ParsedDataException {
+    private void savePopulationFromDtos(List<CommuneHabitantDto> dtos, String dateReleve) {
         LocalDate date = DateUtils.toLocalDate(dateReleve);
         if (mesurePopulationService.existByDateReleve(date)) {
             logger.debug("Population data for date {} already exists, skipping insertion", dateReleve);
@@ -205,11 +162,16 @@ public class RecensementParserService {
             String codeInsee = dto.getCodeInsee();
             Commune commune = communeService.getFromCache(codeInsee);
             if (commune == null) {
-//                logger.debug("Error for codeInsee {}", codeInsee);
+//                logger.debug("Commune not present for code {}", codeInsee);
                 continue;
             }
-
-            MesurePopulation mesurePopulation = mesurePopulationMapper.toEntity(dto, date.atStartOfDay());
+            MesurePopulation mesurePopulation;
+            try {
+                mesurePopulation = mesurePopulationMapper.toEntity(dto, date.atStartOfDay());
+            } catch (ParsedDataException e) {
+                logger.debug("Skipping mesure for {}, couldn't parse value {} \n{}", commune.getNomSimple(), dto.getPopulationMunicipale(), e.getMessage());
+                continue;
+            }
             mesurePopulation.setCoordonnee(commune.getCoordonnee());
 
             mesurePopulationService.save(mesurePopulation);
