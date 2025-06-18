@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
+import static fr.diginamic.qualiair.utils.DateUtils.getTimeStamp;
+
 /**
  * Controller des requetes à destination de l'api Atmo-France
  * path "/external/api/atmo-france"
@@ -38,7 +42,8 @@ public class ApiAtmoFranceController {
      */
     @PostMapping("/air-quality/national-data/date/{date}") // TODO restrict acces to super-admin
     public ResponseEntity<String> loadDailyFranceAirQualityData(@PathVariable String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
-        apiAtmoFranceService.saveDailyFranceAirQualityData(date);
+        LocalDateTime timeStamp = getTimeStamp();
+        apiAtmoFranceService.saveDailyFranceAirQualityData(date, timeStamp);
         return ResponseEntity.ok().body("Données chargées en base avec succès");
     }
 

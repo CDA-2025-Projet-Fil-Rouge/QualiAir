@@ -28,11 +28,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
-
-import static fr.diginamic.qualiair.utils.DateUtils.toLocalDate;
 
 @Service
 public class ApiAtmoFranceService {
@@ -94,10 +92,9 @@ public class ApiAtmoFranceService {
      * @throws UnnecessaryApiRequestException La requete à déjà été executée pour cette date
      */
     @Transactional
-    public void saveDailyFranceAirQualityData(String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
-        LocalDate dateReleve = toLocalDate(date);
-        if (mesureAirService.existsByDateReleve(dateReleve)) {
-            throw new UnnecessaryApiRequestException(String.format("Measurements for date %s already exist, skipping", date));
+    public void saveDailyFranceAirQualityData(String date, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
+        if (mesureAirService.existsByDateReleve(timeStamp.toLocalDate())) {
+            throw new UnnecessaryApiRequestException(String.format("Measurements for date %s already exist, skipping", timeStamp));
         }
 
         List<Commune> communes = communeService.getAllCommunesWithCoordinates();
@@ -116,7 +113,7 @@ public class ApiAtmoFranceService {
             }
             Coordonnee savedCoordonnee = commune.getCoordonnee();
 
-            List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, dateReleve);
+            List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, timeStamp);
 
             mesureAir.forEach(mesure -> {
                 mesure.setCoordonnee(savedCoordonnee);
@@ -136,7 +133,6 @@ public class ApiAtmoFranceService {
         String token = getOrRefreshToken();
 
         try {
-
             URI fullUri = UriComponentsBuilder.fromUri(apiAtmoFrance.getUriAirQuality()).queryParam("date", date).build().toUri();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(token);

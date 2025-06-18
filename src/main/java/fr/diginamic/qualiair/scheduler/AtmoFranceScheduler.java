@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static fr.diginamic.qualiair.utils.DateUtils.getTimeStamp;
+import static fr.diginamic.qualiair.utils.DateUtils.toStringSimplePattern;
 
 /**
  * Scheduler pour l'api externe atmo-france
@@ -29,13 +31,13 @@ public class AtmoFranceScheduler {
      */
     @Scheduled(cron = "${atmo.schedule.cron.meteo}")
     public void fetchAirQualityDataAndPersist() {
-        String targetDate = LocalDate.now().minusDays(1).toString();
+        LocalDateTime timeStamp = getTimeStamp();
         logger.info("Scheduled task running at {}", LocalDateTime.now());
         try {
-            service.saveDailyFranceAirQualityData(targetDate);
-            logger.info("Executed automated persistence task for air quality data for date {}.", targetDate);
+            service.saveDailyFranceAirQualityData(toStringSimplePattern(timeStamp), timeStamp);
+            logger.info("Executed automated persistence task for air quality data for date {}.", timeStamp);
         } catch (ExternalApiResponseException | UnnecessaryApiRequestException e) {
-            logger.info("Failed automated persistence task for air quality data for date {}.", targetDate);
+            logger.info("Failed automated persistence task for air quality data for date {}.", timeStamp);
             throw new RuntimeException(e);
         }
         logger.info("Scheduled task fininished at {}", LocalDateTime.now());

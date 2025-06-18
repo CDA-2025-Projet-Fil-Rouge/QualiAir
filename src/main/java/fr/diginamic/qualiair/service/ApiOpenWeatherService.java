@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -23,7 +24,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.ThrowExceptionIfTrue;
@@ -53,13 +53,13 @@ public class ApiOpenWeatherService {
      * @return une liste de mesures sauvegargées en base
      * @throws ExternalApiResponseException La connexion vers l'api a échouée
      */
-    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType, Coordonnee coordonnee) throws ExternalApiResponseException {
+    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType, Coordonnee coordonnee, LocalDateTime timeStamp) throws ExternalApiResponseException {
         ResponseEntity<T> response = restTemplate.getForEntity(uri, responseType);
         responseValidator.validate(response);
 
         T dto = response.getBody();
 
-        List<MesurePrevision> mesures = factory.getInstanceList(dto);
+        List<MesurePrevision> mesures = factory.getInstanceList(dto, timeStamp);
 
         mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
         service.saveMesurePrevision(mesures);
@@ -76,23 +76,23 @@ public class ApiOpenWeatherService {
      * @throws UnnecessaryApiRequestException requete inutile
      * @throws FunctionnalException           ville absente en base
      */
-    public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException {
+    @Transactional
+    public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException {
 
         String codeInsee = commune.getCodeInsee();
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime startDate = now.truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime endDate = startDate.plusHours(1).minusNanos(1);
+
+        LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
         TypeReleve typeReleve = TypeReleve.ACTUEL;
 
-        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, typeReleve, codeInsee);
+        boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, typeReleve, codeInsee);
 
-        ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
+        ThrowExceptionIfTrue(exists, timeStamp, endDate, typeReleve);
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriCurrentWeather(), coordonnee.getLatitude(), coordonnee.getLongitude());
 
-        return fetchAndSaveForecast(uri, CurrentForecastDto.class, coordonnee);
+        return fetchAndSaveForecast(uri, CurrentForecastDto.class, coordonnee, timeStamp);
     }
 
     /**
@@ -103,22 +103,21 @@ public class ApiOpenWeatherService {
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
      */
-    public List<MesurePrevision> requestFiveDayForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException {
+    @Transactional
+    public List<MesurePrevision> requestFiveDayForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
 
         String codeInsee = commune.getCodeInsee();
-
-        LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime endDate = startDate.plusDays(1);
+        LocalDateTime endDate = timeStamp.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
-        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, TypeReleve.PREVISION_5J, codeInsee);
-        ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
+        boolean exists = service.existsForTodayByTypeReleveAndCodeInsee(timeStamp, TypeReleve.PREVISION_5J, codeInsee);
+        ThrowExceptionIfTrue(exists, timeStamp, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriWeather5Days(), coordonnee.getLatitude(), coordonnee.getLongitude());
 
-        return fetchAndSaveForecast(uri, ForecastFiveDayDto.class, coordonnee);
+        return fetchAndSaveForecast(uri, ForecastFiveDayDto.class, coordonnee, timeStamp);
     }
 
     /**
@@ -129,24 +128,25 @@ public class ApiOpenWeatherService {
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
      */
-    public List<MesurePrevision> requestSixteenDaysForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException {
+    @Transactional
+    public List<MesurePrevision> requestSixteenDaysForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
 
         String codeInsee = commune.getCodeInsee();
 
-        LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime endDate = startDate.plusDays(1);
+        LocalDateTime endDate = timeStamp.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_16J;
-        boolean exists = service.existsByHourAndCodeInsee(startDate, endDate, TypeReleve.PREVISION_16J, codeInsee);
-        ThrowExceptionIfTrue(exists, startDate, endDate, typeReleve);
+        boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, TypeReleve.PREVISION_16J, codeInsee);
+        ThrowExceptionIfTrue(exists, timeStamp, endDate, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriWeather16Days(), coordonnee.getLatitude(), coordonnee.getLongitude());
 
-        return fetchAndSaveForecast(uri, ForecastSixteenDays.class, coordonnee);
+        return fetchAndSaveForecast(uri, ForecastSixteenDays.class, coordonnee, timeStamp);
     }
 
 
+    @Transactional
     public LocalAirQualityDto requestLocalAirQuality(double latitude, double longitude) throws ExternalApiResponseException { //todo a voir si on implemente
         URI fullUri = getFullUri(api.getUriLocalAirData(), latitude, longitude);
         ResponseEntity<LocalAirQualityDto> response = restTemplate.getForEntity(fullUri, LocalAirQualityDto.class);
