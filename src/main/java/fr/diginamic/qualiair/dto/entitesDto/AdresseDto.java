@@ -5,7 +5,7 @@ public class AdresseDto {
     private Long id;
     private String numeroRue;
     private String libelleRue;
-    private int codePostal;
+    private String codePostal;
     private String nomCommune;
 
     public AdresseDto() {
@@ -63,7 +63,7 @@ public class AdresseDto {
      * Getter
      * @return codePostal
      */
-    public int getCodePostal() {
+    public String getCodePostal() {
         return codePostal;
     }
 
@@ -71,7 +71,7 @@ public class AdresseDto {
      * Setter
      * @param codePostal codePostal
      */
-    public void setCodePostal(int codePostal) {
+    public void setCodePostal(String codePostal) {
         this.codePostal = codePostal;
     }
 

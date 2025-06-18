@@ -176,7 +176,7 @@ public class UtilisateurService {
         adresse.setNumeroRue(dto.getNumeroRue());
         adresse.setLibelleRue(dto.getLibelleRue());
         Commune commune = communeRepository
-                .findByNomPostalAndCodePostal(dto.getNomCommune(), dto.getCodePostal())
+                .findByNomReelAndCodePostal(dto.getNomCommune(), dto.getCodePostal())
                 .orElseThrow(() -> new FileNotFoundException("Commune non trouvée"));
         adresse.setCommune(commune);
     }
