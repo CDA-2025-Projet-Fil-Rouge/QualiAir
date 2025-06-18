@@ -2,6 +2,9 @@ package fr.diginamic.qualiair.mapper;
 
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
+import fr.diginamic.qualiair.dto.insertion.DepartementDto;
+import fr.diginamic.qualiair.dto.insertion.RegionDto;
+import fr.diginamic.qualiair.utils.DepartementUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,16 +21,15 @@ public class RecensementCsvMapper {
      */
     public CommuneCoordDto mapToCommuneCoordDto(String[] tokens) {
         CommuneCoordDto dto = new CommuneCoordDto();
-        dto.setCodeCommuneINSEE(tokens[0]);
-        dto.setNomCommunePostal(tokens[1]);
-        dto.setCodePostal(tokens[2]);
-        dto.setLatitude(tokens[5]);
-        dto.setLongitude(tokens[6]);
-        dto.setNomCommuneComplet(tokens[10].trim().replace(" ", ""));
-        dto.setCodeDepartement(tokens[11]);
-        dto.setNomDepartement(tokens[12]);
-        dto.setCodeRegion(tokens[13]);
-        dto.setNomRegion(tokens[14]);
+        dto.setCodeDepartement(tokens[1]);
+        dto.setNomCommune(tokens[2]);
+        dto.setNomCommuneSimple(tokens[3]);
+        dto.setNomCommuneReel(tokens[4]);
+        dto.setCodePostal(tokens[5]);
+        dto.setCodeCommuneINSEE(tokens[6]);
+        dto.setLatitude(tokens[8]);
+        dto.setLongitude(tokens[9]);
+
         return dto;
     }
 
@@ -39,9 +41,24 @@ public class RecensementCsvMapper {
      */
     public CommuneHabitantDto mapToCommuneHabitantDto(String[] tokens) {
         CommuneHabitantDto dto = new CommuneHabitantDto();
-        dto.setNomCommune(tokens[6].trim().replace(" ", ""));
-        dto.setPopulationTotale(tokens[9].trim().replace(" ", ""));
-        dto.setPopulationMunicipale(tokens[7].trim().replace(" ", ""));
+        dto.setCodeInsee(tokens[6].trim().replace(" ", ""));
+        dto.setPopulationMunicipale(tokens[8].trim().replace(" ", ""));
+        return dto;
+    }
+
+    public DepartementDto mapToDepartementdto(String[] strings) {
+        DepartementDto dto = new DepartementDto();
+        dto.setCodeDepartement(DepartementUtils.normalizeCodeDetp(strings[1]));
+        dto.setNomDepartement(strings[2]);
+        dto.setRegionId(strings[3]);
+        return dto;
+    }
+
+    public RegionDto mapToRegionDto(String[] strings) {
+        RegionDto dto = new RegionDto();
+        dto.setCodeRegion(strings[1]);
+        dto.setNomRegion(strings[2]);
+        dto.setId(strings[0]);
         return dto;
     }
 }

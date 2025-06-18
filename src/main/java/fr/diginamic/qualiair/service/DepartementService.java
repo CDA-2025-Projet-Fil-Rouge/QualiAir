@@ -39,15 +39,15 @@ public class DepartementService {
      */
     public Departement findOrCreate(Departement departement) {
 
-        String key = departement.getNom();
+        String key = departement.getCode();
         Departement existing = cacheService.findInDepartementCache(key);
 
         if (existing != null) {
             return existing;
         }
         departementValidator.validate(departement);
-        departementDao.save(departement);
-        cacheService.putInDepartementCache(key, departement);
-        return departement;
+        Departement saved = departementDao.save(departement);
+        cacheService.putInDepartementCache(key, saved);
+        return saved;
     }
 }

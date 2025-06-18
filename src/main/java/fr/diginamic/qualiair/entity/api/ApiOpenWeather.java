@@ -17,6 +17,8 @@ public class ApiOpenWeather {
     @Value("${ow.uri.air}")
     private URI uriLocalAirData;
 
+    private URI uriWeather16Days;
+
     @Value("${ow.token}")
     private String token;
     @Value("${ow.param-name}")
@@ -68,4 +70,7 @@ public class ApiOpenWeather {
     }
 
 
+    public URI getUriWeather16Days() {
+        return uriWeather16Days;
+    }
 }

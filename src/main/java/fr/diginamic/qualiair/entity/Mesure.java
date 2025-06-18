@@ -6,10 +6,16 @@ import java.time.LocalDateTime;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "mesure")
+@Table(name = "mesure", indexes = {
+        @Index(name = "idx_mesure_coordonnee_date_desc",
+                columnList = "id_coordonnee, date_releve DESC"),
+        @Index(name = "idx_date_releve_desc",
+                columnList = "date_releve DESC")
+})
 public class Mesure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mesure")
     private Long id;
 
     @Enumerated(EnumType.STRING)

@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
-import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
 import fr.diginamic.qualiair.validator.MesureValidator;
 import org.slf4j.Logger;
@@ -12,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,24 +28,19 @@ public class MesurePrevisionService {
 
 
     public List<MesurePrevision> saveMesurePrevision(List<MesurePrevision> mesures) {
-
-        Iterator<MesurePrevision> iterator = mesures.iterator();
-        while (iterator.hasNext()) {
-            MesurePrevision mesure = iterator.next();
+        List<MesurePrevision> saved = new ArrayList<>();
+        for (MesurePrevision mesure : mesures) {
             try {
                 validator.validate(mesure);
-                repository.save(mesure);
+                saved.add(repository.save(mesure));
             } catch (BusinessRuleException e) {
                 logger.error(e.getMessage());
-                iterator.remove();
             }
         }
-        return mesures;
+        return saved;
     }
 
-    public boolean existsByHourAndNomPostal(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String nomPostal) throws UnnecessaryApiRequestException {
-        return repository.existsByNomPostalAndTypeMesureAndDateReleveBetween(
-                nomPostal, typeReleve, startDate, endDate);
+    public boolean existsByHourAndCodeInsee(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String codeInsee) {
+        return repository.existsByCodeInseeAndTypeMesureAndDateReleveBetween(codeInsee, typeReleve, startDate, endDate);
     }
-
 }

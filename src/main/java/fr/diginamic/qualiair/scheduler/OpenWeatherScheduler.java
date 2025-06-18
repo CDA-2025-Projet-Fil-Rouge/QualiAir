@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.scheduler;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.service.ApiOpenWeatherService;
 import org.slf4j.Logger;
@@ -13,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,15 +36,15 @@ public class OpenWeatherScheduler {
     @Scheduled(cron = "${ow.schedule.cron.meteo}")
     public void fetchLocalWeatherForTopCitiesEveryHour() {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
-
+        logger.info("Found {} communes with >= {} habitants", communes.size(), HAB);
+        logger.info("Scheduled task running at {}", LocalDateTime.now());
         for (Commune commune : communes) {
             try {
-                String nomPostal = commune.getNomPostal();
-                service.requestAndSaveCurrentForecast(nomPostal);
-            } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException |
-                     ParsedDataException e) {
-                logger.error("Failed to get weather data for {}, with error : {}", commune.getNomComplet(), e.getMessage());
+                service.requestAndSaveCurrentForecast(commune);
+            } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException e) {
+                logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
+        logger.info("Scheduled task fininished at {}", LocalDateTime.now());
     }
 }

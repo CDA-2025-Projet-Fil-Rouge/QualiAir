@@ -12,11 +12,10 @@ public class Commune {
     @Column(name = "id_commune")
     private Long id;
 
-    private String nomPostal;
-
-    private String nomComplet;
+    private String nomSimple;
+    private String nomReel;
     @Column(name = "code_postal")
-    private int codePostal;
+    private String codePostal;
     @Column(name = "code_insee")
     private String codeInsee;
 
@@ -25,7 +24,7 @@ public class Commune {
     private Departement departement;
 
     @OneToOne
-    @JoinColumn(name = "id_coordonnee")
+    @JoinColumn(name = "id_coordonnee_principale")
     private Coordonnee coordonnee;
 
     @OneToMany(mappedBy = "commune")
@@ -46,19 +45,37 @@ public class Commune {
     /**
      * Getter
      *
-     * @return nom
+     * @return nomSimple
      */
-    public String getNomComplet() {
-        return nomComplet;
+    public String getNomSimple() {
+        return nomSimple;
     }
 
     /**
      * Setter
      *
-     * @param nom sets value
+     * @param nomSimple sets value
      */
-    public void setNomComplet(String nom) {
-        this.nomComplet = nom;
+    public void setNomSimple(String nomSimple) {
+        this.nomSimple = nomSimple;
+    }
+
+    /**
+     * Getter
+     *
+     * @return nomReel
+     */
+    public String getNomReel() {
+        return nomReel;
+    }
+
+    /**
+     * Setter
+     *
+     * @param nomReel sets value
+     */
+    public void setNomReel(String nomReel) {
+        this.nomReel = nomReel;
     }
 
     /**
@@ -66,7 +83,7 @@ public class Commune {
      *
      * @return codePostal
      */
-    public int getCodePostal() {
+    public String getCodePostal() {
         return codePostal;
     }
 
@@ -75,7 +92,7 @@ public class Commune {
      *
      * @param codePostal sets value
      */
-    public void setCodePostal(int codePostal) {
+    public void setCodePostal(String codePostal) {
         this.codePostal = codePostal;
     }
 
@@ -149,23 +166,5 @@ public class Commune {
      */
     public void setAdresse(Set<Adresse> adresse) {
         this.adresse = adresse;
-    }
-
-    /**
-     * Getter
-     *
-     * @return libbelleAcheminenent
-     */
-    public String getNomPostal() {
-        return nomPostal;
-    }
-
-    /**
-     * Setter
-     *
-     * @param libbelleAcheminenent sets value
-     */
-    public void setNomPostal(String libbelleAcheminenent) {
-        this.nomPostal = libbelleAcheminenent;
     }
 }
