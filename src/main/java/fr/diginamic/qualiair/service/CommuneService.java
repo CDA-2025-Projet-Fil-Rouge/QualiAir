@@ -79,7 +79,7 @@ public class CommuneService {
     }
 
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecast(nbHabitant);
+        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(nbHabitant);
         List<InfoCarteCommune> dto = new ArrayList<>();
         communes.forEach(commune -> dto.add(mapper.toDto(commune)));
         return dto;
