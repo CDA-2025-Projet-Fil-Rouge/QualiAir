@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static fr.diginamic.qualiair.utils.DateUtils.getTimeStamp;
+
 /**
  * OpenWeather scheduler tasks
  */
@@ -33,18 +35,37 @@ public class OpenWeatherScheduler {
     /**
      * Charge en base la meteo  pour chaque ville (de plus de X habitants) à chaque heure, 1 minute et 10 secondes entre 06h et 22h
      */
-    @Scheduled(cron = "${ow.schedule.cron.meteo}")
-    public void fetchLocalWeatherForTopCitiesEveryHour() {
+    @Scheduled(cron = "${ow.schedule.cron.meteo.current}")
+    public void fetchLocalWeatherForTopCitiesEveryHour() throws UnnecessaryApiRequestException {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
-        logger.info("Found {} communes with >= {} habitants", communes.size(), HAB);
-        logger.info("Scheduled task running at {}", LocalDateTime.now());
+        LocalDateTime timeStamp = getTimeStamp();
+        logger.info("Scheduled task running at {} for : Requesting and persistence of weather measurements for the hour for cities above {} inhabitants", timeStamp, HAB);
         for (Commune commune : communes) {
             try {
-                service.requestAndSaveCurrentForecast(commune);
-            } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException e) {
+                service.requestAndSaveCurrentForecast(commune, timeStamp);
+            } catch (FunctionnalException | ExternalApiResponseException e) {
+                logger.debug("Current weather data error : Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
+            }
+        }
+        logger.info("Scheduled task finished at {} for : Requesting and persistence of weather measurements for the hour for cities above {} inhabitants", LocalDateTime.now(), HAB);
+    }
+
+    /**
+     * Charge en base les prévisions météo à 5 jours pour chaque ville (de plus de X habitants),
+     * chaque matin à 6h31:10
+     */
+    @Scheduled(cron = "${ow.schedule.cron.meteo.fivedays}")
+    public void fetchFiveDayForecastEveryMorning() throws UnnecessaryApiRequestException {
+        List<Commune> communes = service.getCommunesByNbHab(HAB);
+        logger.info("Scheduled task running at {}", LocalDateTime.now());
+        LocalDateTime timeStamp = getTimeStamp();
+        for (Commune commune : communes) {
+            try {
+                service.requestFiveDayForecast(commune, timeStamp);
+            } catch (ExternalApiResponseException e) {
                 logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
-        logger.info("Scheduled task fininished at {}", LocalDateTime.now());
+        logger.info("Scheduled task finished at {} for : Requesting and persistence of weather 5 days forecast for cities above {} inhabitants", LocalDateTime.now(), HAB);
     }
 }

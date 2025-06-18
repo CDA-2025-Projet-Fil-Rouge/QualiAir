@@ -42,7 +42,13 @@ public class MesureUtils {
 
     public static void ThrowExceptionIfTrue(boolean exists, LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve) throws UnnecessaryApiRequestException {
         if (exists) {
-            throw new UnnecessaryApiRequestException(String.format("Forecast already exists within range %s / %s for the type %s", DateUtils.toString(startDate), DateUtils.toString(endDate), typeReleve));
+            throw new UnnecessaryApiRequestException(String.format("Forecast already exists within range %s / %s for the type %s", DateUtils.toStringCompletePattern(startDate), DateUtils.toStringCompletePattern(endDate), typeReleve));
+        }
+    }
+
+    public static void ThrowExceptionIfTrue(boolean exists, LocalDateTime startDate, TypeReleve typeReleve) throws UnnecessaryApiRequestException {
+        if (exists) {
+            throw new UnnecessaryApiRequestException(String.format("Forecast already exists for today (%s) for the type %s", DateUtils.toStringCompletePattern(startDate), typeReleve));
         }
     }
 

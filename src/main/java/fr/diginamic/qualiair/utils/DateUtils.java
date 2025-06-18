@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 public class DateUtils {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
@@ -41,11 +42,15 @@ public class DateUtils {
      * @param date LocalDate to convert
      * @return date string in yyyy-MM-dd format
      */
-    public static String toString(LocalDate date) {
+    public static String toStringSimplePattern(LocalDate date) {
         return date.format(DATE_FORMATTER);
     }
 
-    public static String toString(LocalDateTime dateTime) {
+    public static String toStringSimplePattern(LocalDateTime date) {
+        return date.format(DATE_FORMATTER);
+    }
+
+    public static String toStringCompletePattern(LocalDateTime dateTime) {
         return dateTime.format(DATE_TIME_FORMATTER);
     }
 
@@ -62,5 +67,9 @@ public class DateUtils {
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+    public static LocalDateTime getTimeStamp() {
+        return LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
     }
 }

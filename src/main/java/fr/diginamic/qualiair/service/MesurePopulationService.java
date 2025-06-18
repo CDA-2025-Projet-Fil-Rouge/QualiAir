@@ -1,6 +1,8 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.entity.MesurePopulation;
+import fr.diginamic.qualiair.mapper.MesurePopulationMapper;
 import fr.diginamic.qualiair.repository.MesurePopulationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,14 +21,17 @@ public class MesurePopulationService {
      * MesurePopulation Repository
      */
     @Autowired
-    private MesurePopulationRepository mesurePopulationRepository;
+    private MesurePopulationRepository repository;
+
+    @Autowired
+    private MesurePopulationMapper mapper;
 
     public MesurePopulation save(MesurePopulation mesurePopulation) {
-        return mesurePopulationRepository.save(mesurePopulation);
+        return repository.save(mesurePopulation);
     }
 
     public void saveAll(List<MesurePopulation> mesures) {
-        mesurePopulationRepository.saveAll(mesures);
+        repository.saveAll(mesures);
     }
 
     public boolean existsByDate(LocalDate mesureDate) {
@@ -34,7 +39,7 @@ public class MesurePopulationService {
         LocalDateTime startOfDay = mesureDate.atStartOfDay();
         LocalDateTime startOfNextDay = mesureDate.plusDays(1).atStartOfDay();
 
-        return mesurePopulationRepository.existsByDate(startOfDay, startOfNextDay);
+        return repository.existsByDate(startOfDay, startOfNextDay);
     }
 
     /**
@@ -44,6 +49,12 @@ public class MesurePopulationService {
      * @return boolean
      */
     public boolean existByDateReleve(LocalDate dateReleve) {
-        return mesurePopulationRepository.existsMesurePopulationByDateReleve(dateReleve.atStartOfDay());
+        return repository.existsMesurePopulationByDateReleve(dateReleve.atStartOfDay());
+    }
+
+    public HistoriquePopulation getAllByCodeInseeBetwenDates(String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
+        List<MesurePopulation> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(codeInsee, dateStart, dateEnd);
+
+        return mapper.toHistoricalDto(mesures);
     }
 }

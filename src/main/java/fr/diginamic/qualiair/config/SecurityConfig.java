@@ -28,10 +28,10 @@ public class SecurityConfig {
 
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**").permitAll()
                         .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
-                        "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/forum/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+                                "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/forum/**", "/historique/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
 
                         .requestMatchers("/user/**").hasAnyRole("ADMIN", "SUPERADMIN")
 
