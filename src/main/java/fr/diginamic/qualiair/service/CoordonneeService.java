@@ -34,14 +34,12 @@ public class CoordonneeService {
      */
     public Coordonnee findOrCreate(Coordonnee coordonnee) {
 
-
         String key = coordonnee.getCommune().getCodeInsee();
 
         Coordonnee existing = cacheService.findInCoordoneeCache(key);
         if (existing != null) {
             return existing;
         }
-
         Coordonnee saved = dao.save(coordonnee);
         cacheService.putInCoordonneeCache(key, saved);
         return saved;

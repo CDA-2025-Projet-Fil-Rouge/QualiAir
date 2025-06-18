@@ -38,5 +38,6 @@ public class AtmoFranceScheduler {
             logger.info("Failed automated persistence task for air quality data for date {}.", targetDate);
             throw new RuntimeException(e);
         }
+        logger.info("Scheduled task fininished at {}", LocalDateTime.now());
     }
 }

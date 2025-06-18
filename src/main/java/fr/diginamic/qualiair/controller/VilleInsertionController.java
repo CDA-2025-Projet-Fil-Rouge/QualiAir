@@ -1,7 +1,6 @@
 package fr.diginamic.qualiair.controller;
 
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.service.RecensementParserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +29,7 @@ public class VilleInsertionController {
      * @throws IOException           erreur de parsing
      */
     @PostMapping({"/load-from-server-hosted-files"})
-    public String initializeLoadingFromLocalFiles() throws FileNotFoundException, IOException, ParsedDataException {
+    public String initializeLoadingFromLocalFiles() throws FileNotFoundException, IOException {
         recensementParserService.saveCommunesFromFichier();
         return "Insertion succesful";
 

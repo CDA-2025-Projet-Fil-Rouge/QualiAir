@@ -78,14 +78,6 @@ public class CommuneService {
         return cacheService.findInCommuneCache(communeName);
     }
 
-//    public Commune findByNomPostal(String nomPostal) throws FunctionnalException {
-//        Commune commune = communeRepository.findCommuneByNomPostal(nomPostal);
-//        if (commune == null) {
-//            throw new FunctionnalException("Commune not found for nomPostal: " + nomPostal);
-//        }
-//        return commune;
-//    }
-
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
         List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecast(nbHabitant);
         List<InfoCarteCommune> dto = new ArrayList<>();

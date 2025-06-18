@@ -4,7 +4,6 @@ import fr.diginamic.qualiair.dto.openweather.*;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.utils.DateUtils;
 import org.springframework.stereotype.Component;
 
@@ -23,9 +22,8 @@ public class MesurePrevisionMapper {
      * @param dto        réponse api
      * @param typeReleve type de relevé généré par la methode
      * @return liste de relevé
-     * @throws ParsedDataException erreur de conversion de données
      */
-    public List<MesurePrevision> toEntityList(CurrentForecastDto dto, TypeReleve typeReleve) throws ParsedDataException {
+    public List<MesurePrevision> toEntityList(CurrentForecastDto dto, TypeReleve typeReleve) {
         List<MesurePrevision> mesures = new ArrayList<>();
 
         LocalDateTime dateReleve = DateUtils.toLocalDateTime(dto.getDt());
@@ -75,9 +73,8 @@ public class MesurePrevisionMapper {
      *
      * @param dto objet reponse api
      * @return list de mesures
-     * @throws ParsedDataException erreurs de parsing
      */
-    public List<MesurePrevision> toEntityListFromCurrentWeather(CurrentForecastDto dto) throws ParsedDataException {
+    public List<MesurePrevision> toEntityListFromCurrentWeather(CurrentForecastDto dto) {
         return toEntityList(dto, TypeReleve.ACTUEL);
     }
 
@@ -86,9 +83,8 @@ public class MesurePrevisionMapper {
      *
      * @param dto objet reponse api
      * @return list de mesures
-     * @throws ParsedDataException erreurs de parsing
      */
-    public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto) throws ParsedDataException {
+    public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto) {
         List<MesurePrevision> mesures = new ArrayList<>();
         for (CurrentForecastDto dailyForecast : dto.getCurrentForecastDtos()) {
             mesures.addAll(toEntityList(dailyForecast, TypeReleve.PREVISION_5J));

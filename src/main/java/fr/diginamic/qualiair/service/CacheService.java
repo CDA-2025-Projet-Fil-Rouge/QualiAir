@@ -49,7 +49,6 @@ public class CacheService {
     @Transactional(readOnly = true)
     public void loadExistingCommunesWithRelations() {
         List<Commune> communeList = communeRepository.findAllWithRelations();
-        System.out.println("cache loaded");
         communeList.forEach(commune -> {
             Coordonnee coordonnee = commune.getCoordonnee();
             Departement departement = commune.getDepartement();

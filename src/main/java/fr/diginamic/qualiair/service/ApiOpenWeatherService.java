@@ -8,7 +8,6 @@ import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.entity.api.ApiOpenWeather;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
@@ -53,15 +52,15 @@ public class ApiOpenWeatherService {
      * @param <T>          La classe mère des dtos
      * @return une liste de mesures sauvegargées en base
      * @throws ExternalApiResponseException La connexion vers l'api a échouée
-     * @throws ParsedDataException          erreur de conversion de données
      */
-    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType, Coordonnee coordonnee) throws ExternalApiResponseException, ParsedDataException {
+    private <T extends OpenWeatherForecastDto> List<MesurePrevision> fetchAndSaveForecast(URI uri, Class<T> responseType, Coordonnee coordonnee) throws ExternalApiResponseException {
         ResponseEntity<T> response = restTemplate.getForEntity(uri, responseType);
         responseValidator.validate(response);
 
         T dto = response.getBody();
 
         List<MesurePrevision> mesures = factory.getInstanceList(dto);
+
         mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
         service.saveMesurePrevision(mesures);
 
@@ -76,9 +75,8 @@ public class ApiOpenWeatherService {
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
      * @throws FunctionnalException           ville absente en base
-     * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException, ParsedDataException {
+    public List<MesurePrevision> requestAndSaveCurrentForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, FunctionnalException {
 
         String codeInsee = commune.getCodeInsee();
 
@@ -104,9 +102,8 @@ public class ApiOpenWeatherService {
      * @return liste de mesures
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
-     * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestFiveDayForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
+    public List<MesurePrevision> requestFiveDayForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException {
 
         String codeInsee = commune.getCodeInsee();
 
@@ -131,9 +128,8 @@ public class ApiOpenWeatherService {
      * @return liste de mesures
      * @throws ExternalApiResponseException   api injoignable
      * @throws UnnecessaryApiRequestException requete inutile
-     * @throws ParsedDataException            erreur de conversion
      */
-    public List<MesurePrevision> requestSixteenDaysForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException, ParsedDataException {
+    public List<MesurePrevision> requestSixteenDaysForecast(Commune commune) throws ExternalApiResponseException, UnnecessaryApiRequestException {
 
         String codeInsee = commune.getCodeInsee();
 

@@ -3,7 +3,6 @@ package fr.diginamic.qualiair.scheduler;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
-import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.service.ApiOpenWeatherService;
 import org.slf4j.Logger;
@@ -42,10 +41,10 @@ public class OpenWeatherScheduler {
         for (Commune commune : communes) {
             try {
                 service.requestAndSaveCurrentForecast(commune);
-            } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException |
-                     ParsedDataException e) {
+            } catch (UnnecessaryApiRequestException | FunctionnalException | ExternalApiResponseException e) {
                 logger.debug("Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
+        logger.info("Scheduled task fininished at {}", LocalDateTime.now());
     }
 }
