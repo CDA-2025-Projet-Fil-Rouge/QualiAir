@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Commune repository
@@ -86,4 +87,9 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     List<Commune> findAllFavoritesByUserId(@Param("userId") Long userId);
 
     Commune getCommuneById(Long id);
+
+    Optional<Commune> findByNomReelAndCodePostal(String nomPostal, String codePostal);
+
+    @Query("SELECT DISTINCT c FROM Commune c JOIN FETCH Coordonnee cd JOIN FETCH Mesure m JOIN FETCH MesurePopulation mp WHERE mp.valeur >= :nbHab")
+    List<Commune> findTopByMesurePopulation(@Param("nbhab") int nbhab);
 }

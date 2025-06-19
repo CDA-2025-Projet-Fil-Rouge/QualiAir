@@ -38,7 +38,8 @@ public class SecurityConfig {
                                 "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
                         .requestMatchers("/forum/**", "/historique/**", "/favoris/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
 
-                        .requestMatchers("/user/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/**",
+                                "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
 
                         .requestMatchers("/commune/recensement/insertion/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 

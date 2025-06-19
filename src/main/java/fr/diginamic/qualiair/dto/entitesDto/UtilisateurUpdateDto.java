@@ -1,25 +1,17 @@
 package fr.diginamic.qualiair.dto.entitesDto;
 
-
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
-public class UtilisateurDto {
+public class UtilisateurUpdateDto {
 
     private Long id;
-
     private String prenom;
     private String nom;
-    LocalDate dateNaissance;
-    private LocalDateTime dateInscription;
     private String email;
-    private String motDePasse;
-    private RoleUtilisateur role;
+    private String ancienMotDePasse;
+    private String nouveauMotDePasse;
     private AdresseDto adresseDto;
 
-    public UtilisateurDto() {
+
+    public UtilisateurUpdateDto() {
     }
 
     /**
@@ -72,38 +64,6 @@ public class UtilisateurDto {
 
     /**
      * Getter
-     * @return dateNaissance
-     */
-    public LocalDate getDateNaissance() {
-        return dateNaissance;
-    }
-
-    /**
-     * Setter
-     * @param dateNaissance dateNaissance
-     */
-    public void setDateNaissance(LocalDate dateNaissance) {
-        this.dateNaissance = dateNaissance;
-    }
-
-    /**
-     * Getter
-     * @return dateInscription
-     */
-    public LocalDateTime getDateInscription() {
-        return dateInscription;
-    }
-
-    /**
-     * Setter
-     * @param dateInscription dateInscription
-     */
-    public void setDateInscription(LocalDateTime dateInscription) {
-        this.dateInscription = dateInscription;
-    }
-
-    /**
-     * Getter
      * @return email
      */
     public String getEmail() {
@@ -120,34 +80,34 @@ public class UtilisateurDto {
 
     /**
      * Getter
-     * @return motDePasse
+     * @return ancienMotDePasse
      */
-    public String getMotDePasse() {
-        return motDePasse;
+    public String getAncienMotDePasse() {
+        return ancienMotDePasse;
     }
 
     /**
      * Setter
-     * @param motDePasse motDePasse
+     * @param ancienMotDePasse ancienMotDePasse
      */
-    public void setMotDePasse(String motDePasse) {
-        this.motDePasse = motDePasse;
+    public void setAncienMotDePasse(String ancienMotDePasse) {
+        this.ancienMotDePasse = ancienMotDePasse;
     }
 
     /**
      * Getter
-     * @return role
+     * @return nouveauMotDePasse
      */
-    public RoleUtilisateur getRole() {
-        return role;
+    public String getNouveauMotDePasse() {
+        return nouveauMotDePasse;
     }
 
     /**
      * Setter
-     * @param role role
+     * @param nouveauMotDePasse nouveauMotDePasse
      */
-    public void setRole(RoleUtilisateur role) {
-        this.role = role;
+    public void setNouveauMotDePasse(String nouveauMotDePasse) {
+        this.nouveauMotDePasse = nouveauMotDePasse;
     }
 
     /**

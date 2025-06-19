@@ -30,7 +30,9 @@ public class Utilisateur {
     private String email;
     @Column(name = "mot_de_passe", nullable = false)
     private String motDePasse;
-    private RoleUtilisateur role;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleUtilisateur role = RoleUtilisateur.UTILISATEUR;
 
 
     @ManyToOne(optional = false)
