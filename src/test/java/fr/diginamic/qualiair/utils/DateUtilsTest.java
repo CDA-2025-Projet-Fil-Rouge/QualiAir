@@ -27,14 +27,15 @@ class DateUtilsTest {
     void toString_shouldFormatLocalDate() {
         LocalDate input = LocalDate.of(2025, 6, 15);
         String expected = "2025-06-15";
-        assertEquals(expected, DateUtils.toString(input));
+        assertEquals(expected, DateUtils.toStringSimplePattern(input));
     }
+
 
     @Test
     void toString_shouldFormatLocalDateTime() {
         LocalDateTime input = LocalDateTime.of(2025, 6, 15, 14, 30);
         String expected = "2025-06-15 14:30";
-        assertEquals(expected, DateUtils.toString(input));
+        assertEquals(expected, DateUtils.toStringCompletePattern(input));
     }
 
     @Test
