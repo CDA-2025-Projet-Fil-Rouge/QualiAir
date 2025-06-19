@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.entity.Adresse;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.UtilisateurMapper;
@@ -24,16 +25,15 @@ import org.springframework.stereotype.Service;
 public class UtilisateurService {
 
     @Autowired
-    UtilisateurRepository utilisateurRepository;
+    private UtilisateurRepository utilisateurRepository;
     @Autowired
-    UtilisateurMapper utilisateurMapper;
+    private UtilisateurMapper utilisateurMapper;
+    @Autowired
+    private RoleManagementService roleManagementService;
     @Autowired
     private UtilisateurValidator utilisateurValidator;
     @Autowired
     private AdresseRepository adresseRepository;
-    @Autowired
-    RoleManagementService roleManagementService;
-
 
     /**
      * Récupérer un utilisateur à partir de son email.
@@ -47,11 +47,20 @@ public class UtilisateurService {
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé avec l'email : " + email));
     }
 
+    public Utilisateur getUserById(Long id) throws DataNotFoundException {
+        return utilisateurRepository.findById(id).orElseThrow((() -> new DataNotFoundException("Utilisateur non trouvé pour l'id: " + id)));
+    }
+
+    public Utilisateur saveUser(Utilisateur utilisateur) throws BusinessRuleException {
+        utilisateurValidator.validate(utilisateur);
+        return utilisateurRepository.save(utilisateur);
+    }
+
     /**
      * Récupérer la liste paginée de tous les utilisateurs inscrits.
      * Accessible uniquement aux administrateurs et super-administrateurs.
      *
-     * @param pageable objet de pagination contenant le numéro de page, la taille de page, et éventuellement le tri
+     * @param pageable  objet de pagination contenant le numéro de page, la taille de page, et éventuellement le tri
      * @param demandeur utilisateur authentifié à l'origine de la requête
      * @return une page de UtilisateurDto représentant les utilisateurs
      * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
@@ -66,7 +75,7 @@ public class UtilisateurService {
      * Cette démarche n'est possible que pour un superadmin.
      *
      * @param userDto Admin à créer (non encore persisté)
-     * @param role Rôle à affecter au nouvel utilisateur
+     * @param role    Rôle à affecter au nouvel utilisateur
      * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
      * @throws BusinessRuleException si les règles métier ne sont pas respectées
      * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
@@ -84,7 +93,8 @@ public class UtilisateurService {
     /**
      * Active ou désactive un utilisateur (inversion selon son rôle actuel)
      * Accessible uniquement pour les admins et super admins
-     * @param idCible identifiant de l'utilisateur à activer/désactiver
+     *
+     * @param idCible   identifiant de l'utilisateur à activer/désactiver
      * @param demandeur utilisateur à l'origine de la requête
      * @return le message de confirmation du changement de rôle
      * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
@@ -103,7 +113,8 @@ public class UtilisateurService {
     /**
      * Banni ou débanni un utilisateur (inversion selon son rôle actuel)
      * Accessible uniquement pour les admins et super admins
-     * @param idCible identifiant de l'utilisateur à bannir/débannir
+     *
+     * @param idCible   identifiant de l'utilisateur à bannir/débannir
      * @param demandeur utilisateur à l'origine de la requête
      * @return le message de confirmation du changement de rôle
      * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
@@ -119,4 +130,3 @@ public class UtilisateurService {
         );
     }
 }
-

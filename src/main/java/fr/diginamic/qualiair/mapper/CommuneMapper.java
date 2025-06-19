@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.mapper;
 import fr.diginamic.qualiair.dto.InfoCarteCommune;
 import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailMeteo;
 import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailQualiteAir;
+import fr.diginamic.qualiair.dto.InfoFavorite;
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.entity.*;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,8 @@ public class CommuneMapper {
         List<MesurePrevision> latestPrevisions = getMesurePrevision(mesures);
 
         InfoCarteCommune carte = new InfoCarteCommune();
+        carte.setId(commune.getId());
+        carte.setCodeInsee(commune.getCodeInsee());
         carte.setLatitude(coordonnee.getLatitude());
         carte.setLongitude(coordonnee.getLongitude());
         carte.setNomVille(commune.getNomSimple());
@@ -58,4 +61,10 @@ public class CommuneMapper {
     }
 
 
+    public InfoFavorite toDto(Commune commune, Long userId) {
+        InfoFavorite fav = new InfoFavorite();
+        fav.setFavID(userId, commune.getId());
+        fav.setInformations(toDto(commune));
+        return fav;
+    }
 }

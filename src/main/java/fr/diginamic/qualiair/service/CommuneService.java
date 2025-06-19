@@ -1,8 +1,11 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dao.CommuneDao;
+import fr.diginamic.qualiair.dto.CommuneDto;
 import fr.diginamic.qualiair.dto.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
+import fr.diginamic.qualiair.exception.RouteParamException;
 import fr.diginamic.qualiair.mapper.CommuneMapper;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.validator.CommuneValidator;
@@ -91,5 +94,25 @@ public class CommuneService {
 
     public List<Commune> getAllCommunesWithCoordinates() {
         return communeRepository.findAllWithCoordinates();
+    }
+
+    public List<CommuneDto> matchTop10ByName(String containing) throws RouteParamException {
+        if (containing.length() < 3) {
+            throw new RouteParamException("Route params must contain at least 3 characters");
+        }
+        return null;
+    }
+
+
+    public List<Commune> getAllFavoritesByUserId(Long userId) {
+        return communeRepository.findAllFavoritesByUserId(userId);
+    }
+
+    public Commune getCommuneById(Long communeId) throws DataNotFoundException {
+        Commune commune = communeRepository.getCommuneById(communeId);
+        if (commune == null) {
+            throw new DataNotFoundException("Commune non trouvée pour l'id" + communeId);
+        }
+        return commune;
     }
 }

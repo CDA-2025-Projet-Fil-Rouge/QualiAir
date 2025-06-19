@@ -3,6 +3,8 @@ package fr.diginamic.qualiair.dto;
 import fr.diginamic.qualiair.enumeration.DescriptionMeteo;
 
 public class InfoCarteCommune {
+    private Long id;
+    private String codeInsee;
     private String nomVille;
     private int indiceQualiteAir;
     private InfoCarteCommuneDetailQualiteAir detailQualiteAir;
@@ -146,5 +148,41 @@ public class InfoCarteCommune {
      */
     public void setDetailMeteo(InfoCarteCommuneDetailMeteo detailMeteo) {
         this.detailMeteo = detailMeteo;
+    }
+
+    /**
+     * Getter
+     *
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * Setter
+     *
+     * @param id sets value
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * Getter
+     *
+     * @return codeInsee
+     */
+    public String getCodeInsee() {
+        return codeInsee;
+    }
+
+    /**
+     * Setter
+     *
+     * @param codeInsee sets value
+     */
+    public void setCodeInsee(String codeInsee) {
+        this.codeInsee = codeInsee;
     }
 }

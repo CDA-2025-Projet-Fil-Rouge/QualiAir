@@ -1,7 +1,10 @@
 package fr.diginamic.qualiair.security;
 
 import fr.diginamic.qualiair.entity.Utilisateur;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,6 +44,7 @@ public class JwtAuthentificationService implements IJwtAuthentificationService {
         System.out.println("Role: " + user.getRole());
         String jwt = Jwts.builder()
                 .subject(user.getEmail())
+                .claim("id", user.getId())
                 .claim("role", user.getRole().toString())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRES_IN))
                 .signWith(getSecuredKey())
