@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.controller;
 
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
+import fr.diginamic.qualiair.dto.entitesDto.UtilisateurUpdateDto;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.service.UtilisateurService;
 import fr.diginamic.qualiair.utils.api.HttpRequestUtils;
@@ -24,6 +24,20 @@ public class UtilisateurController {
     HttpRequestUtils httpRequestUtils;
 
     /**
+     * Récupère les informations personnelles de l'utilisateur connecté.
+     *
+     * @param request la requête HTTP contenant le token JWT
+     * @return les données personnelles de l'utilisateur connecté
+     * @throws Exception si l'utilisateur n'est pas authentifié
+     */
+    @GetMapping("/get-personal-data")
+    public ResponseEntity<UtilisateurDto> getPersonalData(HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        UtilisateurDto dto = utilisateurService.getPersonalData(user.getId());
+        return ResponseEntity.ok(dto);
+    }
+
+    /**
      * Retourne la liste paginée de tous les utilisateurs inscrits,
      * Accessible uniquement par un administrateur ou super administrateur.
      *
@@ -44,21 +58,19 @@ public class UtilisateurController {
     }
 
     /**
-     * Création d'un nouvel admin (autorisée uniquement à un utilisateur de type superadmin)
-     *
-     * @param userDto utilisateur dans le corps de la requête
-     * @param request la requête HTTP contenant le cookie JWT pour authentification
-     * @return message de confirmation si l'inscription réussit
-     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     * Permet à un utilisateur connecté de modifier ses informations personnelles
+     * @param dto données utilisateur à modifier dans le corps de la requête
+     * @param request la requête HTTP contenant le token JWT
+     * @return les données personnelles de l'utilisateur connecté
+     * @throws Exception si l'utilisateur n'est pas authentifié
      */
-    @PostMapping("/create-admin")
-    public ResponseEntity<String> createAdmin(
-            @RequestBody UtilisateurDto userDto,
+    @PutMapping("/update-personal-data")
+    public ResponseEntity<UtilisateurUpdateDto> updatePersonalData(
+            @RequestBody UtilisateurUpdateDto dto,
             HttpServletRequest request) throws Exception {
-
-        Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
-        utilisateurService.createAdmin(userDto, demandeur, RoleUtilisateur.ADMIN);
-        return ResponseEntity.ok("Admin créé");
+        Utilisateur utilisateur = httpRequestUtils.getUtilisateurFromRequest(request);
+        UtilisateurUpdateDto updated = utilisateurService.updatePersonalData(utilisateur, dto);
+        return ResponseEntity.ok(updated);
     }
 
     /**
@@ -69,8 +81,25 @@ public class UtilisateurController {
      * @return message de confirmation si le changement a réussi
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
-    @PutMapping("/toggle-role/{id}")
-    public ResponseEntity<String> toggleUserRole(
+    @PostMapping("/toggle-admin/{id}")
+    public ResponseEntity<String> toggleAdminRole(
+            @PathVariable("id") Long idUser,
+            HttpServletRequest request) throws Exception {
+
+        Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
+        String message = utilisateurService.toggleAdminUser(idUser, demandeur);
+        return ResponseEntity.ok(message);
+    }
+    /**
+     * Changement de rôle en cas de désactivation ou réactivation d'un utilisateur
+     * (autorisé uniquement à un admin ou superadmin)
+     * @param idUser identifiant de l'utilisateur à activer/désactiver
+     * @param request la requête HTTP contenant le cookie JWT pour authentification
+     * @return message de confirmation si le changement a réussi
+     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
+     */
+    @PutMapping("/toggle-activation/{id}")
+    public ResponseEntity<String> toggleActivationRole(
             @PathVariable("id") Long idUser,
             HttpServletRequest request) throws Exception {
         Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);

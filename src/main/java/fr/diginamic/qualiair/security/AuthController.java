@@ -27,10 +27,9 @@ public class AuthController {
      *
      * @param userDto utilisateur à l'origine de la tentative de connexion
      * @return message de succès (et création de cookie) si connexion réussie
-     * @throws Exception si la connexion échoue
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UtilisateurDto userDto) throws Exception {
+    public ResponseEntity<String> login(@RequestBody UtilisateurDto userDto) {
             ResponseCookie cookie = authService.logUser(userDto);
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, cookie.toString())
@@ -46,6 +45,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<String> createUser(@RequestBody UtilisateurDto userDto) throws Exception {
+
         authService.createUser(userDto, RoleUtilisateur.UTILISATEUR);
         return ResponseEntity.ok("Utilisateur créé");
     }
