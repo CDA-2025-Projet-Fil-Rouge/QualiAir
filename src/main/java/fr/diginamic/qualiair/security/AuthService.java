@@ -1,96 +1,28 @@
 package fr.diginamic.qualiair.security;
 
-import fr.diginamic.qualiair.dto.entitesDto.AdresseDto;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
-import fr.diginamic.qualiair.entity.Adresse;
-import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
-import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.AdresseMapper;
-import fr.diginamic.qualiair.mapper.UtilisateurMapper;
-import fr.diginamic.qualiair.repository.AdresseRepository;
-import fr.diginamic.qualiair.repository.CommuneRepository;
-import fr.diginamic.qualiair.repository.UtilisateurRepository;
-import fr.diginamic.qualiair.service.UtilisateurService;
-import fr.diginamic.qualiair.validator.AdresseValidator;
-import fr.diginamic.qualiair.validator.UtilisateurValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
 
-/**
- * Classe de service dédiée à l'inscription/connexion sécurisée des utilisateurs
- */
-@Service
-public class AuthService {
-
-    @Autowired
-    UtilisateurService utilisateurService;
-    @Autowired
-    BCryptPasswordEncoder bcrypt;
-    @Autowired
-    IJwtAuthentificationService IJwtAuthentificationService;
-    @Autowired
-    AdresseRepository adresseRepository;
-    @Autowired
-    UtilisateurRepository utilisateurRepository;
-    @Autowired
-    UtilisateurMapper utilisateurMapper;
-    @Autowired
-    UtilisateurValidator utilisateurValidator;
-    @Autowired
-    CommuneRepository communeRepository;
-    @Autowired
-    private AdresseMapper adresseMapper;
-    @Autowired
-    private AdresseValidator adresseValidator;
-
+public interface AuthService {
     /**
      * Authentifie un utilisateur en comparant le mot de passe, puis génère un token JWT.
      *
      * @param userDto L'utilisateur à authentifier
      * @return un cookie contenant le token JWT
      */
-    public ResponseCookie logUser(UtilisateurDto userDto) {
-        Utilisateur utilisateur;
-        try {
-            utilisateur = utilisateurService.getUser(userDto.getEmail());
-        } catch (UsernameNotFoundException e) {
-            throw new BadCredentialsException("Email ou mot de passe incorrect");
-        }
-
-        if (bcrypt.matches(userDto.getMotDePasse(), utilisateur.getMotDePasse())) {
-            return IJwtAuthentificationService.generateToken(utilisateur);
-        }
-        throw new BadCredentialsException("Email ou mot de passe incorrect");
-    }
+    ResponseCookie logUser(UtilisateurDto userDto);
 
     /**
      * Crée un nouvel utilisateur après validation des règles métier.
      *
      * @param userDto Utilisateur à créer (non encore persisté)
-     * @param role Rôle à affecter au nouvel utilisateur
+     * @param role    Rôle à affecter au nouvel utilisateur
      * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
      * @throws BusinessRuleException si les règles métier ne sont pas respectées
      */
-    public void createUser(UtilisateurDto userDto, RoleUtilisateur role)
-            throws FileNotFoundException, BusinessRuleException {
-
-        AdresseDto adresseDto = userDto.getAdresseDto();
-        Commune commune = communeRepository.findByNomReelAndCodePostal(adresseDto.getNomCommune(), adresseDto.getCodePostal())
-                .orElseThrow(() -> new FileNotFoundException("Commune non trouvée"));
-
-        Adresse adresse = adresseMapper.fromDto(adresseDto, commune);
-        adresseValidator.validate(adresse);
-        adresseRepository.save(adresse);
-
-        Utilisateur userToSave = utilisateurMapper.fromDto(userDto, adresse, role);
-        utilisateurValidator.validate(userToSave);
-        utilisateurRepository.save(userToSave);
-    }
+    void createUser(UtilisateurDto userDto, RoleUtilisateur role)
+            throws FileNotFoundException, BusinessRuleException;
 }

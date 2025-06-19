@@ -4,63 +4,14 @@ import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.Departement;
 import fr.diginamic.qualiair.entity.Region;
-import fr.diginamic.qualiair.repository.CommuneRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Loads entities in a local cache. Meant to be used during costly insertion of all cities in the database
- */
-@Service
-public class CacheService {
-    /**
-     * Commune code Insee - commune entity map
-     */
-    private final Map<String, Commune> communeCache = new HashMap<>();
-    /**
-     * Region code - region entity map
-     */
-    private final Map<Integer, Region> regionCache = new HashMap<>();
-    /**
-     * Departement code - department entity map
-     */
-    private final Map<String, Departement> departementCache = new HashMap<>();
-    /**
-     * Code Insee commune - coordinates entity map
-     */
-    private final Map<String, Coordonnee> coordonneeCache = new HashMap<>();
-
-
-    /**
-     * commune repository
-     */
-    @Autowired
-    private CommuneRepository communeRepository;
-
-
+public interface CacheService {
     /**
      * Loads entity present in base
      */
     @Transactional(readOnly = true)
-    public void loadExistingCommunesWithRelations() {
-        List<Commune> communeList = communeRepository.findAllWithRelations();
-        communeList.forEach(commune -> {
-            Coordonnee coordonnee = commune.getCoordonnee();
-            Departement departement = commune.getDepartement();
-            Region region = commune.getDepartement().getRegion();
-
-            communeCache.put(commune.getCodeInsee(), commune);
-            regionCache.put(region.getCode(), region);
-            departementCache.put(departement.getCode(), departement);
-            coordonneeCache.put(commune.getCodeInsee(), coordonnee);
-        });
-
-    }
+    void loadExistingCommunesWithRelations();
 
     /**
      * Recherche dans le cache communes
@@ -68,13 +19,9 @@ public class CacheService {
      * @param codeInsee code insee de la commune
      * @return commune ou null
      */
-    public Commune findInCommuneCache(String codeInsee) {
-        return communeCache.get(codeInsee);
-    }
+    Commune findInCommuneCache(String codeInsee);
 
-    public void putInCommuneCache(String key, Commune commune) {
-        communeCache.put(key, commune);
-    }
+    void putInCommuneCache(String key, Commune commune);
 
     /**
      * Recherche dans le cache regions
@@ -82,13 +29,9 @@ public class CacheService {
      * @param key nom  de la region
      * @return region ou null
      */
-    public Region findInRegionCache(int key) {
-        return regionCache.get(key);
-    }
+    Region findInRegionCache(int key);
 
-    public void putInRegionCache(int key, Region region) {
-        regionCache.put(key, region);
-    }
+    void putInRegionCache(int key, Region region);
 
     /**
      * Recherche dans le cache departement
@@ -96,13 +39,9 @@ public class CacheService {
      * @param key nom  de la region
      * @return region ou null
      */
-    public Departement findInDepartementCache(String key) {
-        return departementCache.get(key);
-    }
+    Departement findInDepartementCache(String key);
 
-    public void putInDepartementCache(String key, Departement departement) {
-        departementCache.put(key, departement);
-    }
+    void putInDepartementCache(String key, Departement departement);
 
     /**
      * Recherche dans le cache coordonnées
@@ -110,22 +49,12 @@ public class CacheService {
      * @param key codeInsee  de la commune rattachée
      * @return coordonnées ou null
      */
-    public Coordonnee findInCoordoneeCache(String key) {
-        return coordonneeCache.get(key);
-    }
+    Coordonnee findInCoordoneeCache(String key);
 
-    public void putInCoordonneeCache(String key, Coordonnee coordonnee) {
-        coordonneeCache.put(key, coordonnee);
-    }
-
+    void putInCoordonneeCache(String key, Coordonnee coordonnee);
 
     /**
      * cleans up cache
      */
-    public void clearCaches() {
-        communeCache.clear();
-        regionCache.clear();
-        departementCache.clear();
-        coordonneeCache.clear();
-    }
+    void clearCaches();
 }

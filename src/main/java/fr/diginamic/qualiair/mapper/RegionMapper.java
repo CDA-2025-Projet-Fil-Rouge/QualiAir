@@ -2,13 +2,8 @@ package fr.diginamic.qualiair.mapper;
 
 import fr.diginamic.qualiair.dto.insertion.RegionDto;
 import fr.diginamic.qualiair.entity.Region;
-import org.springframework.stereotype.Component;
 
-/**
- * Region mapper
- */
-@Component
-public class RegionMapper {
+public interface RegionMapper {
     /**
      * Map a dto from csv to entity
      *
@@ -17,10 +12,5 @@ public class RegionMapper {
      */
 
 
-    public Region toEntity(RegionDto dto) {
-        Region region = new Region();
-        region.setCode(Integer.parseInt(dto.getCodeRegion().trim()));
-        region.setNom(dto.getNomRegion());
-        return region;
-    }
+    Region toEntity(RegionDto dto);
 }
