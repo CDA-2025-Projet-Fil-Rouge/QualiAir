@@ -78,7 +78,7 @@ public class TopicService {
         topic.setCreateur(createur);
         topic.setDateCreation(LocalDateTime.now());
 
-        Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, dto.getId());
+        Rubrique rubrique = ForumUtils.findRubriqueOrThrow(rubriqueRepository, dto.getIdRubrique());
         topic.setRubrique(rubrique);
         topicValidator.validate(topic);
         topicRepository.save(topic);

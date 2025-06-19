@@ -17,6 +17,8 @@ public class UtilisateurMapper {
 
     @Autowired
     BCryptPasswordEncoder bcrypt;
+    @Autowired
+    private AdresseMapper adresseMapper;
 
     /**
      * Convertit une entité Utilisateur en UtilisateurDto
@@ -35,6 +37,7 @@ public class UtilisateurMapper {
         userDto.setEmail(user.getEmail());
         userDto.setDateInscription(user.getDateInscription());
         userDto.setRole(user.getRole());
+        userDto.setAdresseDto(adresseMapper.toDto(user.getAdresse()));
 
         return userDto;
     }
