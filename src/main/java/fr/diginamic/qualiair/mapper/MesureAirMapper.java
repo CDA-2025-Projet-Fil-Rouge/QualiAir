@@ -1,9 +1,9 @@
 package fr.diginamic.qualiair.mapper;
 
-import fr.diginamic.qualiair.dto.AlerteInfo;
 import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
 import fr.diginamic.qualiair.dto.atmofrance.AirDataPropertiesDto;
 import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
+import fr.diginamic.qualiair.dto.notification.AlerteInfo;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;

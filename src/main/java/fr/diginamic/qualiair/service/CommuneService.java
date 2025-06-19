@@ -2,7 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dao.CommuneDao;
 import fr.diginamic.qualiair.dto.CommuneDto;
-import fr.diginamic.qualiair.dto.InfoCarteCommune;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.RouteParamException;

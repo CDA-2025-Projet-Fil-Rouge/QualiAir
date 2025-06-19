@@ -1,9 +1,9 @@
 package fr.diginamic.qualiair.mapper;
 
-import fr.diginamic.qualiair.dto.InfoCarteCommune;
-import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailMeteo;
-import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailQualiteAir;
-import fr.diginamic.qualiair.dto.InfoFavorite;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailMeteo;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailQualiteAir;
+import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.entity.*;
 import org.springframework.stereotype.Component;

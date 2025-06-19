@@ -1,8 +1,8 @@
 package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.annotation.DoNotInstanciate;
-import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailMeteo;
-import fr.diginamic.qualiair.dto.InfoCarteCommuneDetailQualiteAir;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailMeteo;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailQualiteAir;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.exception.ParsedDataException;

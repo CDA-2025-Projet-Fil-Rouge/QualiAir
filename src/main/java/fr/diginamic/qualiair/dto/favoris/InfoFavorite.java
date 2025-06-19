@@ -1,4 +1,6 @@
-package fr.diginamic.qualiair.dto;
+package fr.diginamic.qualiair.dto.favoris;
+
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 
 import java.util.HashMap;
 import java.util.Map;

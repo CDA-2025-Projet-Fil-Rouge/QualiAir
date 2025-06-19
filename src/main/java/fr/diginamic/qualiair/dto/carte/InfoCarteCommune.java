@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.dto;
+package fr.diginamic.qualiair.dto.carte;
 
 import fr.diginamic.qualiair.enumeration.DescriptionMeteo;
 

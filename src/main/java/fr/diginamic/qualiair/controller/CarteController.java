@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.controller;
 
-import fr.diginamic.qualiair.dto.InfoCarteCommune;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.service.CommuneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

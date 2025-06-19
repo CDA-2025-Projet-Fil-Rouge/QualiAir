@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.controller;
 
-import fr.diginamic.qualiair.dto.InfoFavorite;
+import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.UpdateException;

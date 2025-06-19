@@ -32,7 +32,9 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
             """)
     List<String> findByAdresse_Commune_Departement_Region_Code(int code);
 
+    @Query("SELECT u.email FROM Utilisateur u")
     List<String> findAllEmails();
+
     boolean existsByEmail(String email);
 
 }

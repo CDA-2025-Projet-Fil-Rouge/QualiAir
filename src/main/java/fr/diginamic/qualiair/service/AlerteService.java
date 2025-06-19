@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.dto.AlerteInfo;
-import fr.diginamic.qualiair.dto.DemandeNotification;
+import fr.diginamic.qualiair.dto.notification.AlerteInfo;
+import fr.diginamic.qualiair.dto.notification.DemandeNotification;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.enumeration.TypeAlerte;

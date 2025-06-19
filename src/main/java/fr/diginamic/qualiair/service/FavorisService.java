@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.dto.InfoFavorite;
+import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
@@ -58,7 +58,7 @@ public class FavorisService {
             throw new UpdateException("Commune déjà présente dans les favoris de l'utilisateur: " + commune.getNomSimple());
         }
         utilisateur.getFavCommunes().add(commune);
-        utilisateurService.saveUser(utilisateur);
+        utilisateurService.updateUser(utilisateur);
 
         return utilisateur.getFavCommunes().stream().map(c -> mapper.toDto(c, user.getId())).toList();
     }
@@ -80,7 +80,7 @@ public class FavorisService {
             throw new DataNotFoundException("Cette commune ne fait pas partie des favoris de l'utilisateur: " + utilisateur.getEmail());
         }
         utilisateur.getFavCommunes().remove(commune);
-        utilisateurService.saveUser(utilisateur);
+        utilisateurService.updateUser(utilisateur);
         return utilisateur.getFavCommunes().stream().map(c -> mapper.toDto(c, user.getId())).toList();
     }
 }

@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.dto;
+package fr.diginamic.qualiair.dto.notification;
 
 import fr.diginamic.qualiair.enumeration.TypeAlerte;
 
