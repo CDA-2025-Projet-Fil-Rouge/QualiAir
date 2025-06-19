@@ -25,18 +25,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Pages authentification
+
                         .requestMatchers("/auth/**").permitAll()
-                        // Accès forum
-                        .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
+
+                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**").permitAll()
                         .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
-                        "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/forum/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
-                        // Accès requêtes utilisateur
-                        .requestMatchers("/user/get-personal-data", "/user/update-personal-data").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
-                        .requestMatchers("/user/create-admin", "/user/get-all",
+                                "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers("/forum/**", "/historique/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+
+                        .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/",
                                 "/user/toggle-role/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        // insertion recensement
+
                         .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 
                         .anyRequest().authenticated()

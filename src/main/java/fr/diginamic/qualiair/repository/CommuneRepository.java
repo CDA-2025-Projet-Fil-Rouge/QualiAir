@@ -19,11 +19,6 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     @Query("SELECT c FROM Commune c JOIN FETCH c.coordonnee JOIN FETCH c.departement d JOIN FETCH d.region")
     List<Commune> findAllWithRelations();
 
-
-//    @Query("SELECT DISTINCT c FROM Commune  c JOIN FETCH Coordonnee cd ON cd.commune = c WHERE c.nomPostal = :nomPostal")
-//    Commune findCommuneByNomPostal(@Param("nomPostal") String nomPostal);
-
-
     @Query(value = """
             SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
@@ -46,7 +41,21 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
               AND mprev.dateReleve = (SELECT m2.dateReleve FROM MesurePrevision m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
               AND mair.dateReleve = (SELECT m2.dateReleve FROM MesureAir m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
             """)
-    List<Commune> findTopByMesurePopulationWithCurrentForecast(@Param("nbHab") int nbHab);
+    List<Commune> findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(@Param("nbHab") int nbHab);
+
+
+    @Query(value = """
+            SELECT DISTINCT c FROM Commune c
+            JOIN FETCH c.coordonnee cd
+            
+            JOIN FETCH MesurePopulation mpop ON mpop.coordonnee = cd
+            LEFT JOIN FETCH MesurePrevision mprev ON mprev.coordonnee = cd AND mprev.dateReleve = (SELECT m2.dateReleve FROM MesurePrevision m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+            LEFT JOIN FETCH MesureAir mair ON mair.coordonnee = cd AND mair.dateReleve = (SELECT m2.dateReleve FROM MesureAir m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+            
+            WHERE mpop.valeur >= :nbHab
+              AND mpop.dateReleve = (SELECT m2.dateReleve FROM MesurePopulation m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+            """)
+    List<Commune> findTopByMesurePopulationWithCurrentForecastWithOptionalReleveRelations(@Param("nbHab") int nbHab);
 
     @Query(value = """
             SELECT mp.coordonnee.id FROM MesurePopulation mp

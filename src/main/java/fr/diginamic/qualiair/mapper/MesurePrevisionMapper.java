@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.mapper;
 
+import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.dto.openweather.*;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
@@ -23,46 +24,45 @@ public class MesurePrevisionMapper {
      * @param typeReleve type de relevé généré par la methode
      * @return liste de relevé
      */
-    public List<MesurePrevision> toEntityList(CurrentForecastDto dto, TypeReleve typeReleve) {
+    public List<MesurePrevision> toEntityList(CurrentForecastDto dto, TypeReleve typeReleve, LocalDateTime timeStamp) {
         List<MesurePrevision> mesures = new ArrayList<>();
 
         LocalDateTime dateReleve = DateUtils.toLocalDateTime(dto.getDt());
-        LocalDateTime dateMaj = LocalDateTime.now();
 
         Temperature temp = dto.getMain();
         if (temp != null) {
-            addIfNotNull(mesures, temp.getTemp(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.TEMPERATURE);
-            addIfNotNull(mesures, temp.getFeels_like(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.TEMPERATURE_FELT);
-            addIfNotNull(mesures, temp.getTemp_max(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.TEMPERATURE_MAX);
-            addIfNotNull(mesures, temp.getTemp_min(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.TEMPERATURE_MIN);
-            addIfNotNull(mesures, temp.getHumidity(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.HUMIDITY);
-            addIfNotNull(mesures, temp.getPressure(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.PRESSURE);
+            addIfNotNull(mesures, temp.getTemp(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.TEMPERATURE);
+            addIfNotNull(mesures, temp.getFeels_like(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.TEMPERATURE_FELT);
+            addIfNotNull(mesures, temp.getTemp_max(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.TEMPERATURE_MAX);
+            addIfNotNull(mesures, temp.getTemp_min(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.TEMPERATURE_MIN);
+            addIfNotNull(mesures, temp.getHumidity(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.HUMIDITY);
+            addIfNotNull(mesures, temp.getPressure(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.PRESSURE);
         }
 
-        addIfNotNull(mesures, dto.getVisibility(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.VISIBILITY);
+        addIfNotNull(mesures, dto.getVisibility(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.VISIBILITY);
 
         Wind wind = dto.getWind();
         if (wind != null) {
-            addIfNotNull(mesures, wind.getSpeed(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.WIND_SPEED);
-            addIfNotNull(mesures, wind.getGust(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.WIND_SPEED_GUST);
-            addIfNotNull(mesures, wind.getDeg(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.WIND_ORIENTATION);
+            addIfNotNull(mesures, wind.getSpeed(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.WIND_SPEED);
+            addIfNotNull(mesures, wind.getGust(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.WIND_SPEED_GUST);
+            addIfNotNull(mesures, wind.getDeg(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.WIND_ORIENTATION);
         }
 
         Clouds clouds = dto.getClouds();
         if (clouds != null) {
-            addIfNotNull(mesures, clouds.getAll(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.CLOUD_COVERAGE);
+            addIfNotNull(mesures, clouds.getAll(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.CLOUD_COVERAGE);
         }
 
         Rain rain = dto.getRain();
         if (rain != null) {
-            addIfNotNull(mesures, rain.getRainOneHour(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.RAIN_1H);
-            addIfNotNull(mesures, rain.getRainThreeHour(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.RAIN_3H);
+            addIfNotNull(mesures, rain.getRainOneHour(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.RAIN_1H);
+            addIfNotNull(mesures, rain.getRainThreeHour(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.RAIN_3H);
         }
 
         Snow snow = dto.getSnow();
         if (snow != null) {
-            addIfNotNull(mesures, snow.getSnowOneH(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.SNOW_1H);
-            addIfNotNull(mesures, snow.getSnowThreeH(), typeReleve, dateReleve, dateMaj, NatureMesurePrevision.SNOW_3H);
+            addIfNotNull(mesures, snow.getSnowOneH(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.SNOW_1H);
+            addIfNotNull(mesures, snow.getSnowThreeH(), typeReleve, dateReleve, timeStamp, NatureMesurePrevision.SNOW_3H);
         }
 
         return mesures;
@@ -74,8 +74,8 @@ public class MesurePrevisionMapper {
      * @param dto objet reponse api
      * @return list de mesures
      */
-    public List<MesurePrevision> toEntityListFromCurrentWeather(CurrentForecastDto dto) {
-        return toEntityList(dto, TypeReleve.ACTUEL);
+    public List<MesurePrevision> toEntityListFromCurrentWeather(CurrentForecastDto dto, LocalDateTime timeStamp) {
+        return toEntityList(dto, TypeReleve.ACTUEL, timeStamp);
     }
 
     /**
@@ -84,10 +84,10 @@ public class MesurePrevisionMapper {
      * @param dto objet reponse api
      * @return list de mesures
      */
-    public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto) {
+    public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto, LocalDateTime timeStamp) {
         List<MesurePrevision> mesures = new ArrayList<>();
         for (CurrentForecastDto dailyForecast : dto.getCurrentForecastDtos()) {
-            mesures.addAll(toEntityList(dailyForecast, TypeReleve.PREVISION_5J));
+            mesures.addAll(toEntityList(dailyForecast, TypeReleve.PREVISION_5J, timeStamp));
         }
         return mesures;
     }
@@ -99,9 +99,18 @@ public class MesurePrevisionMapper {
      * @return list de mesures
      * //     * @throws ParsedDataException erreurs de parsing
      */
-    public List<MesurePrevision> toEntityListFromSixteenDaysForecast(ForecastSixteenDays dto) {
+    public List<MesurePrevision> toEntityListFromSixteenDaysForecast(ForecastSixteenDays dto, LocalDateTime timeStamp) {
         return List.of(); // todo impl
     }
 
 
+    public HistoriquePrevision toHistoricalDto(NatureMesurePrevision nature, List<MesurePrevision> mesures) {
+        HistoriquePrevision dto = new HistoriquePrevision();
+        dto.setNature(nature.toString());
+        dto.setUnite(mesures.getFirst().getUnite());
+        for (MesurePrevision m : mesures) {
+            dto.addValeur(m.getDateEnregistrement(), m.getValeur());
+        }
+        return dto;
+    }
 }
