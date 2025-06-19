@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
+import fr.diginamic.qualiair.entity.api.AtmoFranceToken;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
@@ -18,7 +18,7 @@ class ApiAtmoFranceServiceTest {
 
     @Test
     void requestToken() throws ExternalApiResponseException, BusinessRuleException, TokenExpiredException {
-        ApiAtmoFranceToken token = apiAtmoFranceService.requestToken();
+        AtmoFranceToken token = apiAtmoFranceService.requestToken();
         System.out.println(token.getToken());
         assertTrue(token.getToken().length() >= 15);
     }
