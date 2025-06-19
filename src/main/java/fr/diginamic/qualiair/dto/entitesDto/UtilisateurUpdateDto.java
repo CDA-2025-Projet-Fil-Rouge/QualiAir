@@ -8,6 +8,7 @@ public class UtilisateurUpdateDto {
     private String email;
     private String ancienMotDePasse;
     private String nouveauMotDePasse;
+    private AdresseDto adresseDto;
 
 
     public UtilisateurUpdateDto() {
@@ -107,5 +108,23 @@ public class UtilisateurUpdateDto {
      */
     public void setNouveauMotDePasse(String nouveauMotDePasse) {
         this.nouveauMotDePasse = nouveauMotDePasse;
+    }
+
+    /**
+     * Getter
+     *
+     * @return adresseDto
+     */
+    public AdresseDto getAdresseDto() {
+        return adresseDto;
+    }
+
+    /**
+     * Setter
+     *
+     * @param adresseDto adresseDto
+     */
+    public void setAdresseDto(AdresseDto adresseDto) {
+        this.adresseDto = adresseDto;
     }
 }

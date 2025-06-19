@@ -2,29 +2,12 @@ package fr.diginamic.qualiair.dto.entitesDto;
 
 public class AdresseDto {
 
-    private Long id;
     private String numeroRue;
     private String libelleRue;
     private String codePostal;
     private String nomCommune;
 
     public AdresseDto() {
-    }
-
-    /**
-     * Getter
-     * @return id
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     * Setter
-     * @param id id
-     */
-    public void setId(Long id) {
-        this.id = id;
     }
 
     /**

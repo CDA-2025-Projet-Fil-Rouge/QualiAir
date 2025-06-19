@@ -9,14 +9,13 @@ import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.AdresseMapper;
 import fr.diginamic.qualiair.mapper.UtilisateurMapper;
-import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import fr.diginamic.qualiair.utils.CheckUtils;
 import fr.diginamic.qualiair.utils.UtilisateurUtils;
+import fr.diginamic.qualiair.validator.AdresseValidator;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 
 @Service
@@ -38,13 +38,13 @@ public class UtilisateurService {
     @Autowired
     private UtilisateurValidator utilisateurValidator;
     @Autowired
-    private AdresseRepository adresseRepository;
-    @Autowired
     RoleManagementService roleManagementService;
     @Autowired
     BCryptPasswordEncoder bcrypt;
     @Autowired
     CommuneRepository communeRepository;
+    @Autowired
+    private AdresseValidator adresseValidator;
     @Autowired
     private AdresseMapper adresseMapper;
 
@@ -89,44 +89,77 @@ public class UtilisateurService {
     }
 
     /**
-     * Créer un nouvel admin après validation des règles métier.
-     * Cette démarche n'est possible que pour un superadmin.
-     *
-     * @param userDto Admin à créer (non encore persisté)
-     * @param role    Rôle à affecter au nouvel utilisateur
-     * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
-     * @throws BusinessRuleException si les règles métier ne sont pas respectées
-     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
-     */
-    public void createAdmin(UtilisateurDto userDto, Utilisateur demandeur, RoleUtilisateur role)
-            throws FileNotFoundException, BusinessRuleException, TokenExpiredException {
-
-        UtilisateurUtils.isSuperadmin(demandeur);
-        Adresse adresse = UtilisateurUtils.findAdresseOrThrow(adresseRepository, userDto.getIdAdresse());
-        Utilisateur userToSave = utilisateurMapper.fromDto(userDto, adresse, role);
-        utilisateurValidator.validate(userToSave);
-        utilisateurRepository.save(userToSave);
-    }
-
-    /**
      * Permet à un utilisateur connecté de modifier ses informations personnelles
      *
      * @param user utilisateur connecté souhaitant modifier ses informations
      * @param dto  dto envoyé dans le corps de la requête
      * @return dto de l'utilisateur modifié
      * @throws BusinessRuleException si une erreur métier est rencontrée
+     * @throws FileNotFoundException si la commune indiquée dans l'adresse n'est pas trouvée
      */
     public UtilisateurUpdateDto updatePersonalData(Utilisateur user, UtilisateurUpdateDto dto)
-            throws BusinessRuleException {
+            throws BusinessRuleException, FileNotFoundException {
         CheckUtils.ensureMatchingIds(user.getId(), dto.getId());
-        // Si changement d'email, vérifie qu'il n'y a pas de doublons
-        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
-            CheckUtils.ensureUniqueEmail(utilisateurRepository, dto.getEmail());
-        }
+        checkEmailIfChanged(user, dto.getEmail());
+
+        updateAdresse(user, dto);
         utilisateurMapper.updateFromDto(user, dto);
         handlePasswordUpdate(user, dto);
+
+        utilisateurValidator.validate(user);
         utilisateurRepository.save(user);
         return utilisateurMapper.toUpdateDto(user);
+    }
+
+    /**
+     * Vérifie si l'adresse est concernée par la modification de l'utilisateur
+     * @param adresse adresse de l'utilisateur à modifier
+     * @param dto instance dto de l'adresse modifiée
+     * @return true si l'adresse a été modifiée
+     */
+    private boolean isAdresseChanged(Adresse adresse, AdresseDto dto) {
+        return !Objects.equals(adresse.getNumeroRue(), dto.getNumeroRue()) ||
+                !Objects.equals(adresse.getLibelleRue(), dto.getLibelleRue()) ||
+                !Objects.equals(adresse.getCommune().getCodePostal(), dto.getCodePostal()) ||
+                !Objects.equals(adresse.getCommune().getNomReel(), dto.getNomCommune());
+    }
+
+    /**
+     * Mise à jour de l'adresse si modifiée lorsque l'utilisateur modifie ses informations personnelles
+     * @param user utilisateur à l'origine de la modification
+     * @param userDto instance dto de l'utilisateur, contenant la nouvelle adresse
+     * @throws FileNotFoundException si la commune indiquée dans l'adresse n'est pas trouvée
+     * @throws BusinessRuleException si une erreur de validation est rencontrée
+     */
+    public void updateAdresse(Utilisateur user, UtilisateurUpdateDto userDto)
+    throws FileNotFoundException, BusinessRuleException {
+        AdresseDto adresseDto = userDto.getAdresseDto();
+        Adresse adresse = user.getAdresse();
+        if(!isAdresseChanged(adresse, adresseDto)) {
+            return;
+        }
+        Commune commune = UtilisateurUtils.findCommuneOrThrow(
+                communeRepository, adresseDto.getNomCommune(), adresseDto.getCodePostal());
+
+        Adresse adresseToValidate = adresseMapper.fromDto(adresseDto, commune);
+        adresseValidator.validate(adresseToValidate);
+
+        adresse.setNumeroRue(adresseToValidate.getNumeroRue());
+        adresse.setLibelleRue(adresseToValidate.getLibelleRue());
+        adresse.setCommune(adresseToValidate.getCommune());
+    }
+
+    /**
+     * Vérifie l'adresse email si elle est changée lors de la demande de modification des données personnelles,
+     * afin de s'assurer qu'elle est unique
+     * @param user utilisateur à l'origine de la modification
+     * @param newEmail email éventuellement modifié
+     * @throws BusinessRuleException si l'email existe déjà en base
+     */
+    private void checkEmailIfChanged(Utilisateur user, String newEmail) throws BusinessRuleException {
+        if (newEmail != null && !newEmail.equals(user.getEmail())) {
+            CheckUtils.ensureUniqueEmail(utilisateurRepository, newEmail);
+        }
     }
 
     /**
@@ -146,39 +179,23 @@ public class UtilisateurService {
     }
 
     /**
-     * Permet à un utilisateur connecté de modifier son adresse personnelle
-     *
-     * @param user utilisateur à l'origine de la demande de modification
-     * @param dto  instance d'AdresseDto présent dans le corps de la requête
-     * @return la nouvelle adresseDto
-     * @throws FileNotFoundException si une donnée nécessaire n'est pas trouvée
+     * Modifie le rôle d'un utilisateur pour qu'il devienne admin, ou inversement s'il l'est déjà
+     * Accessible uniquement pour les admins et super admins
+     * @param idCible identifiant de l'utilisateur à modifier
+     * @param demandeur utilisateur à l'origine de la requête
+     * @return le message de confirmation de changement de rôle
+     * @throws FileNotFoundException si l'utilisateur ciblé n'est pas trouvé
+     * @throws BusinessRuleException si l'utilisateur connecté n'a pas les droits suffisants
      */
-    @Transactional
-    public AdresseDto updateUserAdresse(Utilisateur user, AdresseDto dto)
-            throws FileNotFoundException {
-        CheckUtils.ensureMatchingIds(user.getAdresse().getId(), dto.getId());
-
-        Adresse adresse = adresseRepository.findById(dto.getId())
-                .orElseThrow(() -> new FileNotFoundException("Adresse non trouvée"));
-
-        updateAdresseFromDto(adresse, dto);
-
-        return adresseMapper.toDto(adresse);
-    }
-
-    /**
-     * Met à jour les champs d'une entité Adresse à partir des données fournies dans un AdresseDto.
-     * @param adresse l'entité Adresse à modifier
-     * @param dto les nouvelles données de l'adresse transmises par le client
-     * @throws FileNotFoundException si la commune spécifiée dans le DTO n'existe pas en base
-     */
-    private void updateAdresseFromDto(Adresse adresse, AdresseDto dto) throws FileNotFoundException {
-        adresse.setNumeroRue(dto.getNumeroRue());
-        adresse.setLibelleRue(dto.getLibelleRue());
-        Commune commune = communeRepository
-                .findByNomReelAndCodePostal(dto.getNomCommune(), dto.getCodePostal())
-                .orElseThrow(() -> new FileNotFoundException("Commune non trouvée"));
-        adresse.setCommune(commune);
+    public String toggleAdminUser(Long idCible, Utilisateur demandeur)
+        throws FileNotFoundException, BusinessRuleException {
+        UtilisateurUtils.isAdmin(demandeur);
+        return roleManagementService.toggleUserRole(
+                demandeur, idCible,
+                RoleUtilisateur.ADMIN, RoleUtilisateur.UTILISATEUR,
+                "Rôle mis à jour : utilisateur devenu admin",
+                "Rôle mis à jour: admin devenu utilisateur"
+        );
     }
 
     /**
@@ -194,6 +211,7 @@ public class UtilisateurService {
      */
     public String toggleActivationUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
+        UtilisateurUtils.isAdmin(demandeur);
         return roleManagementService.toggleUserRole(
                 demandeur, idCible,
                 RoleUtilisateur.INACTIF, RoleUtilisateur.UTILISATEUR,
@@ -214,6 +232,7 @@ public class UtilisateurService {
      */
     public String toggleBanUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
+        UtilisateurUtils.isAdmin(demandeur);
         return roleManagementService.toggleUserRole(
                 demandeur, idCible,
                 RoleUtilisateur.BANNI, RoleUtilisateur.UTILISATEUR,

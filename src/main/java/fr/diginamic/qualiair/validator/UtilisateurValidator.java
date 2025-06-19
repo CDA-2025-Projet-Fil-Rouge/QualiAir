@@ -2,7 +2,6 @@ package fr.diginamic.qualiair.validator;
 
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
-import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,7 @@ public class UtilisateurValidator implements IUtilisateurValidator {
      * @throws BusinessRuleException si une règle métier est violée
      */
     @Override
-    public boolean validate(Utilisateur user) throws BusinessRuleException, TokenExpiredException {
+    public boolean validate(Utilisateur user) throws BusinessRuleException {
         isTrue(user.getEmail() != null && !user.getEmail().isBlank(), "L'email est obligatoire.");
         isTrue(user.getMotDePasse() != null && !user.getMotDePasse().isBlank(), "Le mot de passe est obligatoire.");
         isTrue(user.getPrenom() != null && !user.getPrenom().isBlank(), "Le prénom est obligatoire.");

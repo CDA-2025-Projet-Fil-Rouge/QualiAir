@@ -34,7 +34,6 @@ public class UtilisateurMapper {
         }
         userDto.setEmail(user.getEmail());
         userDto.setDateInscription(user.getDateInscription());
-        userDto.setIdAdresse(user.getAdresse().getId());
         userDto.setRole(user.getRole());
 
         return userDto;

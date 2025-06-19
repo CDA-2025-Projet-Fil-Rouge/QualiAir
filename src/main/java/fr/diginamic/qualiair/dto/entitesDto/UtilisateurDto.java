@@ -17,7 +17,7 @@ public class UtilisateurDto {
     private String email;
     private String motDePasse;
     private RoleUtilisateur role;
-    private Long idAdresse;
+    private AdresseDto adresseDto;
 
     public UtilisateurDto() {
     }
@@ -152,17 +152,19 @@ public class UtilisateurDto {
 
     /**
      * Getter
-     * @return idAdresse
+     *
+     * @return adresseDto
      */
-    public Long getIdAdresse() {
-        return idAdresse;
+    public AdresseDto getAdresseDto() {
+        return adresseDto;
     }
 
     /**
      * Setter
-     * @param idAdresse idAdresse
+     *
+     * @param adresseDto adresseDto
      */
-    public void setIdAdresse(Long idAdresse) {
-        this.idAdresse = idAdresse;
+    public void setAdresseDto(AdresseDto adresseDto) {
+        this.adresseDto = adresseDto;
     }
 }

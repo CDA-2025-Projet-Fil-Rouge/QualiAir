@@ -1,11 +1,12 @@
 package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.entity.Adresse;
+import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
-import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.repository.AdresseRepository;
+import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -63,6 +64,13 @@ public final class UtilisateurUtils {
     public static Adresse findAdresseOrThrow(AdresseRepository repo, Long id) throws FileNotFoundException {
         return repo.findById(id)
                 .orElseThrow(() -> new FileNotFoundException("Adresse introuvable"));
+    }
+
+    public static Commune findCommuneOrThrow(CommuneRepository repo,
+                                             String nomCommune,
+                                             String codePostal ) throws FileNotFoundException {
+        return repo.findByNomReelAndCodePostal(nomCommune, codePostal)
+                .orElseThrow(() -> new FileNotFoundException("Commune introuvable"));
     }
 
     /**

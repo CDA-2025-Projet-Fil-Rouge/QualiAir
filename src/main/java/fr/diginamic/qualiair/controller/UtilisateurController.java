@@ -1,9 +1,7 @@
 package fr.diginamic.qualiair.controller;
 
-import fr.diginamic.qualiair.dto.entitesDto.AdresseDto;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurUpdateDto;
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.service.UtilisateurService;
 import fr.diginamic.qualiair.utils.api.HttpRequestUtils;
@@ -60,24 +58,6 @@ public class UtilisateurController {
     }
 
     /**
-     * Création d'un nouvel admin (autorisée uniquement à un utilisateur de type superadmin)
-     *
-     * @param userDto utilisateur dans le corps de la requête
-     * @param request la requête HTTP contenant le cookie JWT pour authentification
-     * @return message de confirmation si l'inscription réussit
-     * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
-     */
-    @PostMapping("/create-admin")
-    public ResponseEntity<String> createAdmin(
-            @RequestBody UtilisateurDto userDto,
-            HttpServletRequest request) throws Exception {
-
-        Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
-        utilisateurService.createAdmin(userDto, demandeur, RoleUtilisateur.ADMIN);
-        return ResponseEntity.ok("Admin créé");
-    }
-
-    /**
      * Permet à un utilisateur connecté de modifier ses informations personnelles
      * @param dto données utilisateur à modifier dans le corps de la requête
      * @param request la requête HTTP contenant le token JWT
@@ -94,21 +74,22 @@ public class UtilisateurController {
     }
 
     /**
-     * Permet à un utilisateur connecté de modifier son adresse personnelle
-     * @param dto instance de AdresseDto correspondant à la nouvelle adresse
-     * @param request la requête HTTP contenant le token JWT
-     * @return la dto correspondant à l'utilisateur modifié
+     * Changement de rôle en cas de désactivation ou réactivation d'un utilisateur
+     * (autorisé uniquement à un admin ou superadmin)
+     * @param idUser identifiant de l'utilisateur à activer/désactiver
+     * @param request la requête HTTP contenant le cookie JWT pour authentification
+     * @return message de confirmation si le changement a réussi
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
-    @PutMapping("/update-adresse")
-    public ResponseEntity<AdresseDto> updateAdresse(
-            @RequestBody AdresseDto dto,
+    @PostMapping("/toggle-admin/{id}")
+    public ResponseEntity<String> toggleAdminRole(
+            @PathVariable("id") Long idUser,
             HttpServletRequest request) throws Exception {
-        Utilisateur utilisateur = httpRequestUtils.getUtilisateurFromRequest(request);
-        AdresseDto updated = utilisateurService.updateUserAdresse(utilisateur, dto);
-        return ResponseEntity.ok(updated);
-    }
 
+        Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
+        String message = utilisateurService.toggleAdminUser(idUser, demandeur);
+        return ResponseEntity.ok(message);
+    }
     /**
      * Changement de rôle en cas de désactivation ou réactivation d'un utilisateur
      * (autorisé uniquement à un admin ou superadmin)
@@ -117,8 +98,8 @@ public class UtilisateurController {
      * @return message de confirmation si le changement a réussi
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
-    @PutMapping("/toggle-role/{id}")
-    public ResponseEntity<String> toggleUserRole(
+    @PutMapping("/toggle-activation/{id}")
+    public ResponseEntity<String> toggleActivationRole(
             @PathVariable("id") Long idUser,
             HttpServletRequest request) throws Exception {
         Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
