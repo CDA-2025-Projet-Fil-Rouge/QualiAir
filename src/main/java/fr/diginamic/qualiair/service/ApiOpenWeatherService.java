@@ -10,6 +10,7 @@ import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
+import fr.diginamic.qualiair.utils.MesureUtils;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static fr.diginamic.qualiair.utils.MesureUtils.ThrowExceptionIfTrue;
+import static fr.diginamic.qualiair.utils.MesureUtils.throwIfExists;
 
 @Service
 public class ApiOpenWeatherService {
@@ -87,7 +88,7 @@ public class ApiOpenWeatherService {
 
         boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, typeReleve, codeInsee);
 
-        ThrowExceptionIfTrue(exists, timeStamp, endDate, typeReleve);
+        MesureUtils.throwIfExists(exists, timeStamp, endDate, typeReleve);
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriCurrentWeather(), coordonnee.getLatitude(), coordonnee.getLongitude());
@@ -111,7 +112,7 @@ public class ApiOpenWeatherService {
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
         boolean exists = service.existsForTodayByTypeReleveAndCodeInsee(timeStamp, TypeReleve.PREVISION_5J, codeInsee);
-        ThrowExceptionIfTrue(exists, timeStamp, typeReleve);
+        throwIfExists(exists, timeStamp, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
 
@@ -136,7 +137,7 @@ public class ApiOpenWeatherService {
         LocalDateTime endDate = timeStamp.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_16J;
         boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, TypeReleve.PREVISION_16J, codeInsee);
-        ThrowExceptionIfTrue(exists, timeStamp, endDate, typeReleve);
+        MesureUtils.throwIfExists(exists, timeStamp, endDate, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
 

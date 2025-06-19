@@ -1,14 +1,28 @@
 package fr.diginamic.qualiair.utils;
 
+import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.Normalizer;
 
+/**
+ * Classe utilisateur regroupant différentes méthodes de conversion dédiée à l'entité {@link Commune}.
+ * Cette class ne doit pas être instanciée.
+ */
+@DoNotInstanciate
 public class CommuneUtils {
     public CommuneUtils() {
     }
 
+    /**
+     * Convertit une chaîne de caractères en entier.
+     *
+     * @param string la chaîne à convertir
+     * @return la valeur entière
+     * @throws ParsedDataException si la chaîne est vide ou invalide
+     */
     public static int toInt(String string) throws ParsedDataException {
         if (string.trim().isEmpty()) {
             throw new ParsedDataException("Insee code can't be null");
@@ -16,6 +30,7 @@ public class CommuneUtils {
         return Integer.parseInt(string.trim());
     }
 
+    @Deprecated
     public static String toNomPostal(String name) throws ParsedDataException {
         if (name == null) {
             throw new ParsedDataException("Commune name can't be null");
@@ -41,6 +56,7 @@ public class CommuneUtils {
         return normalized.toUpperCase();
     }
 
+    @Deprecated
     public static String withoutArrondissement(String name) throws ParsedDataException {
         if (name == null) {
             throw new ParsedDataException("Commune name can't be null");
