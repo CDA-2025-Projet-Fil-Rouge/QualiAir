@@ -25,8 +25,18 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Recensement Parser Service
- * Contains methods to parse, map and persist entities from csv files
+ * Service responsable de l'import et du traitement des fichiers de recensement.
+ * <p>
+ * Il permet de parser les fichiers CSV contenant les données suivantes :
+ * <ul>
+ *     <li>{@link Region}</li>
+ *     <li>{@link Departement}</li>
+ *     <li>{@link Commune}</li>
+ *     <li>{@link MesurePopulation}</li>
+ * </ul>
+ * Ces données sont ensuite mappées en entités JPA et persistées dans la base de données.
+ * Le service utilise également un système de cache pour éviter les doublons.
+ * </p>
  */
 @Service
 public class RecensementParserService {
@@ -66,6 +76,13 @@ public class RecensementParserService {
     @Value("${recensement.fichier.region.path}")
     private String pathFichierRegion;
 
+    /**
+     * Lance le processus global de lecture, parsing et insertion des fichiers de recensement.
+     * Ce processus est transactionnel : tout échec bloque l'ensemble de l'opération.
+     *
+     * @throws IOException           en cas d'erreur de lecture d'un fichier
+     * @throws FileNotFoundException si un chemin de fichier requis est manquant
+     */
     @Transactional
     public void saveCommunesFromFichier() throws IOException, FileNotFoundException {
         validateFilePaths();
@@ -89,23 +106,56 @@ public class RecensementParserService {
         cacheService.clearCaches();
     }
 
+    /**
+     * Parse le fichier des régions en liste de {@link RegionDto}.
+     *
+     * @param path chemin vers le fichier CSV
+     * @return liste des objets {@link RegionDto}
+     * @throws IOException en cas d'échec de lecture
+     */
     private List<RegionDto> parseRegionFile(String path) throws IOException {
         return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToRegionDto);
     }
 
+    /**
+     * Parse le fichier des départements en liste de {@link DepartementDto}.
+     *
+     * @param path chemin vers le fichier CSV
+     * @return liste des objets {@link DepartementDto}
+     * @throws IOException en cas d'échec de lecture
+     */
     private List<DepartementDto> parseDepartementFile(String path) throws IOException {
 
         return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToDepartementdto);
     }
 
+    /**
+     * Parse le fichier des coordonnées des communes en liste de {@link CommuneCoordDto}.
+     *
+     * @param path chemin vers le fichier CSV
+     * @return liste des objets {@link CommuneCoordDto}
+     * @throws IOException en cas d'échec de lecture
+     */
     private List<CommuneCoordDto> parseCoordFile(String path) throws IOException {
         return CsvParser.parseRecensementCsv(path, true, ",", recensementCsvMapper::mapToCommuneCoordDto);
     }
 
+    /**
+     * Parse le fichier des populations communales en liste de {@link CommuneHabitantDto}.
+     *
+     * @param path chemin vers le fichier CSV
+     * @return liste des objets {@link CommuneHabitantDto}
+     * @throws IOException en cas d'échec de lecture
+     */
     private List<CommuneHabitantDto> parsePopFile(String path) throws IOException {
         return CsvParser.parseRecensementCsv(path, false, ",", recensementCsvMapper::mapToCommuneHabitantDto);
     }
 
+    /**
+     * Vérifie que tous les chemins de fichiers requis sont bien configurés.
+     *
+     * @throws FileNotFoundException si l’un des chemins est null
+     */
     private void validateFilePaths() throws FileNotFoundException {
         if (pathFichierCoord == null) throw new FileNotFoundException("Missing coordinate file");
         if (pathFichierPop == null) throw new FileNotFoundException("Missing population file");
@@ -113,6 +163,14 @@ public class RecensementParserService {
         if (pathFichierDepartement == null) throw new FileNotFoundException("Missing departement file");
     }
 
+    /**
+     * Traite la sauvegarde des communes et de leurs coordonnées géographiques.
+     * <p>
+     * Les doublons sont évités via la méthode {@code findOrCreate}.
+     * </p>
+     *
+     * @param communeDtos liste des DTO à persister
+     */
     private void saveCommunesAndCoords(List<CommuneCoordDto> communeDtos) {
         for (CommuneCoordDto dto : communeDtos) {
             Commune commune = communeMapper.toEntityFromCommuneCoordDto(dto);
@@ -135,6 +193,13 @@ public class RecensementParserService {
         }
     }
 
+    /**
+     * Persiste les régions et départements à partir de leurs DTOs respectifs.
+     * Les entités sont associées entre elles avant insertion.
+     *
+     * @param departementDtos liste des départements
+     * @param regionDtos      liste des régions
+     */
     private void saveRegionAndDepartement(List<DepartementDto> departementDtos, List<RegionDto> regionDtos) {
         Map<String, Region> regionsById = new HashMap<>();
         for (RegionDto regionDto : regionDtos) {
@@ -151,6 +216,15 @@ public class RecensementParserService {
         }
     }
 
+    /**
+     * Enregistre les mesures de population en base de données à partir des DTOs.
+     * <p>
+     * L'enregistrement est conditionné par l'absence de mesures existantes pour la date donnée.
+     * </p>
+     *
+     * @param dtos       liste des DTOs de population
+     * @param dateReleve date de relevé au format {@code yyyy-MM-dd}
+     */
     private void savePopulationFromDtos(List<CommuneHabitantDto> dtos, String dateReleve) {
         LocalDate date = DateUtils.toLocalDate(dateReleve);
         if (mesurePopulationService.existByDateReleve(date)) {

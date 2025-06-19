@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.controller;
 import fr.diginamic.qualiair.dto.AlerteInfo;
 import fr.diginamic.qualiair.dto.DemandeNotification;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.RouteParamException;
@@ -26,7 +27,7 @@ public class AlerteController {
     }
 
     @PostMapping("/notify-users")
-    public ResponseEntity<?> notifyUsers(@RequestBody DemandeNotification demandeNotification) throws RouteParamException, ExternalApiResponseException, ParsedDataException {
+    public ResponseEntity<?> notifyUsers(@RequestBody DemandeNotification demandeNotification) throws RouteParamException, ExternalApiResponseException, ParsedDataException, DataNotFoundException {
         service.sendAlert(demandeNotification);
         return ResponseEntity.ok().build();
     }

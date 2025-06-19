@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * Cordinates service
+ * Service permettant la gestion des {@link Coordonnee}.
  */
 @Service
 public class CoordonneeService {

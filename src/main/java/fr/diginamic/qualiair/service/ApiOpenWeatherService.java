@@ -29,6 +29,10 @@ import java.util.List;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.throwIfExists;
 
+/**
+ * Service dédié aux opérations sortantes vers l'api Open Weather.
+ * Les méthodes et URI pris en charges sont les requetes meteo 1h, les prévision court terme (5j) et long terme (16j)
+ */
 @Service
 public class ApiOpenWeatherService {
     private static final Logger logger = LoggerFactory.getLogger(ApiOpenWeatherService.class);

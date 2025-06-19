@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Commune service
+ * Service permettant la gestion des {@link Commune}.
  */
 @Service
 public class CommuneService {
@@ -42,19 +42,19 @@ public class CommuneService {
     private CommuneMapper mapper;
 
     /**
-     * Update a commune from its name
+     * Met à jour une commune à partir de son nom.
      *
-     * @param commune commune
+     * @param commune la commune à mettre à jour
      */
     public void updateByName(Commune commune) {
 
     }
 
     /**
-     * Find from cache or create an entity and add it to the cache
+     * Cherche une commune dans le cache ou la crée et l'ajoute au cache.
      *
-     * @param commune commune entity
-     * @return existing or created entity
+     * @param commune la commune à chercher ou créer
+     * @return la commune existante ou nouvellement créée
      */
     public Commune findOrCreate(Commune commune) {
 
@@ -71,16 +71,22 @@ public class CommuneService {
     }
 
     /**
-     * Return a commune present in the cache from its name
+     * Récupère une commune dans le cache à partir de son nom.
      *
-     * @param communeName commune name
-     * @return existing commune
+     * @param communeName nom de la commune
+     * @return la commune trouvée dans le cache, ou null si absente
      */
     public Commune getFromCache(String communeName) {
 
         return cacheService.findInCommuneCache(communeName);
     }
 
+    /**
+     * Récupère une liste DTO des communes avec une population minimale donnée.
+     *
+     * @param nbHabitant nombre d'habitants minimum
+     * @return liste des DTO {@link InfoCarteCommune}
+     */
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
         List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(nbHabitant);
         List<InfoCarteCommune> dto = new ArrayList<>();
@@ -88,14 +94,33 @@ public class CommuneService {
         return dto;
     }
 
+    /**
+     * Récupère une liste des communes avec la plus récente mesure de population,
+     * filtrée par population minimale.
+     *
+     * @param nbHabitant nombre d'habitants minimum
+     * @return liste des communes
+     */
     public List<Commune> getListTopCommunesByPopulation(int nbHabitant) {
         return communeRepository.findTopByLastestMesurePopulation(nbHabitant);
     }
 
+    /**
+     * Récupère toutes les communes qui ont des coordonnées.
+     *
+     * @return liste des communes
+     */
     public List<Commune> getAllCommunesWithCoordinates() {
         return communeRepository.findAllWithCoordinates();
     }
 
+    /**
+     * Recherche jusqu'à 10 communes dont le nom contient la chaîne donnée.
+     *
+     * @param containing chaîne à chercher (min. 3 caractères)
+     * @return liste des DTO {@link CommuneDto}
+     * @throws RouteParamException si la chaîne est trop courte
+     */
     public List<CommuneDto> matchTop10ByName(String containing) throws RouteParamException {
         if (containing.length() < 3) {
             throw new RouteParamException("Route params must contain at least 3 characters");
@@ -103,11 +128,23 @@ public class CommuneService {
         return null;
     }
 
-
+    /**
+     * Récupère toutes les communes favorites d'un utilisateur.
+     *
+     * @param userId identifiant de l'utilisateur
+     * @return liste des communes favorites
+     */
     public List<Commune> getAllFavoritesByUserId(Long userId) {
         return communeRepository.findAllFavoritesByUserId(userId);
     }
 
+    /**
+     * Récupère une commune par son identifiant.
+     *
+     * @param communeId identifiant de la commune
+     * @return la commune trouvée
+     * @throws DataNotFoundException si aucune commune ne correspond à l'id
+     */
     public Commune getCommuneById(Long communeId) throws DataNotFoundException {
         Commune commune = communeRepository.getCommuneById(communeId);
         if (commune == null) {

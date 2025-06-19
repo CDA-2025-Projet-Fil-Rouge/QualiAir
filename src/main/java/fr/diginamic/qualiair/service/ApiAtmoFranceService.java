@@ -32,6 +32,10 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * Service dédié aux opérations sortantes vers l'api Atmo France.
+ * Les méthodes et URI pris en charges sont les requetes d'authentification pour récupérer le {@link AtmoFranceToken} et la demande de {@link MesureAir} pour toutes la France.
+ */
 @Service
 public class ApiAtmoFranceService {
     /**

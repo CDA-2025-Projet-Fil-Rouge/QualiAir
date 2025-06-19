@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * DepartementService
+ * Service permettant la gestion des {@link Departement}.
  */
 @Service
 public class DepartementService {

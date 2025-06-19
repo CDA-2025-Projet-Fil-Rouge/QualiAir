@@ -1,9 +1,7 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
-import fr.diginamic.qualiair.entity.Adresse;
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
-import fr.diginamic.qualiair.entity.Utilisateur;
+import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
@@ -134,21 +132,63 @@ public class UtilisateurService {
         );
     }
 
-    public List<String> getEmailsByCommune(String code) {
-        return utilisateurRepository.findByAdresse_Commune_CodeInsee(code);
+    /**
+     * Récupare l'e-mail de tous les {@link Utilisateur} d'une {@link Commune}.
+     *
+     * @param code le code de la commune
+     * @return liste d'e-mails
+     * @throws DataNotFoundException aucune donnée récupérée en base
+     */
+    public List<String> getEmailsByCommune(String code) throws DataNotFoundException {
+        List<String> emails = utilisateurRepository.findByAdresse_Commune_CodeInsee(code);
+        if (emails.isEmpty()) {
+            throw new DataNotFoundException("Aucun utilisateur trouvé dans cette commune: " + code);
+        }
+        return emails;
     }
 
-    public List<String> getEmailsByDepartement(String code) {
-        return utilisateurRepository.findByAdresse_Commune_Departement_Code(code);
+    /**
+     * Récupare l'e-mail de tous les {@link Utilisateur} d'un {@link Departement}.
+     *
+     * @param code le code du departement
+     * @return liste d'e-mails
+     * @throws DataNotFoundException aucune donnée récupérée en base
+     */
+    public List<String> getEmailsByDepartement(String code) throws DataNotFoundException {
+        List<String> emails = utilisateurRepository.findByAdresse_Commune_Departement_Code(code);
+        if (emails.isEmpty()) {
+            throw new DataNotFoundException("Aucun utilisateur trouvé dans cette commune: " + code);
+        }
+        return emails;
     }
 
-    public List<String> getEmailsByRegion(String code) throws ParsedDataException {
-
-        return utilisateurRepository.findByAdresse_Commune_Departement_Region_Code(toInt(code));
+    /**
+     * Récupare l'e-mail de tous les {@link Utilisateur} d'une {@link Region}.
+     *
+     * @param code le code de la commune
+     * @return liste d'e-mails
+     * @throws ParsedDataException le code reçu n'est pas convertible en int
+     */
+    public List<String> getEmailsByRegion(String code) throws ParsedDataException, DataNotFoundException {
+        List<String> emails = utilisateurRepository.findByAdresse_Commune_Departement_Region_Code(toInt(code));
+        if (emails.isEmpty()) {
+            throw new DataNotFoundException("Aucun utilisateur trouvé dans cette commune: " + code);
+        }
+        return emails;
 
     }
 
-    public List<String> getAllEmails() {
-        return utilisateurRepository.findAllEmails();
+    /**
+     * Récupare l'e-mail de tous les {@link Utilisateur}
+     *
+     * @return liste d'e-mails
+     * @throws DataNotFoundException aucune donnée récupérée en base
+     */
+    public List<String> getAllEmails() throws DataNotFoundException {
+        List<String> emails = utilisateurRepository.findAllEmails();
+        if (emails.isEmpty()) {
+            throw new DataNotFoundException("Aucun utilisateur trouvé");
+        }
+        return emails;
     }
 }

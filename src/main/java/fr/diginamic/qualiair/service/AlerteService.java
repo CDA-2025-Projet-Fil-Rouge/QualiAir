@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.DemandeNotification;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.enumeration.TypeAlerte;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.RouteParamException;
@@ -51,7 +52,7 @@ public class AlerteService {
         return mesures.map(m -> mapper.toDto(m));
     }
 
-    public void sendAlert(DemandeNotification notification) throws RouteParamException, ExternalApiResponseException, ParsedDataException {
+    public void sendAlert(DemandeNotification notification) throws RouteParamException, ExternalApiResponseException, ParsedDataException, DataNotFoundException {
         String message = notification.getMessage();
         TypeAlerte alerte = notification.getType();
         String code = notification.getCode();
