@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import java.net.URI;
 
 @Configuration
-@PropertySource("classpath:brevo.properties")
+@PropertySource("classpath:mail.properties")
 public class BrevoEmailConfig {
 
     @Value("${brevo.api.key}")
@@ -18,6 +18,10 @@ public class BrevoEmailConfig {
     private URI baseUrl;
     @Value("${brevo.api.send-email-url}")
     private URI sendEmailUrl;
+    @Value("${mail.sender.email}")
+    private String senderMail;
+    @Value("${mail.sender.nom}")
+    private String senderName;
 
     /**
      * Getter
@@ -53,5 +57,23 @@ public class BrevoEmailConfig {
      */
     public URI getSendEmailUrl() {
         return sendEmailUrl;
+    }
+
+    /**
+     * Getter
+     *
+     * @return senderMail
+     */
+    public String getSenderMail() {
+        return senderMail;
+    }
+
+    /**
+     * Getter
+     *
+     * @return senderName
+     */
+    public String getSenderName() {
+        return senderName;
     }
 }

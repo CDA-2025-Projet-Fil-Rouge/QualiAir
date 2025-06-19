@@ -6,8 +6,8 @@ import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.entity.api.ApiAtmoFrance;
-import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.ApiToken;
+import fr.diginamic.qualiair.entity.api.AtmoFranceToken;
 import fr.diginamic.qualiair.entity.api.UtilisateurAtmoFrance;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
@@ -63,8 +63,8 @@ public class ApiAtmoFranceService {
      * @return new token timestamped at obtention
      * @throws ExternalApiResponseException the request failed
      */
-    public ApiAtmoFranceToken requestToken() throws ExternalApiResponseException {
-        ApiAtmoFranceToken api = new ApiAtmoFranceToken();
+    public AtmoFranceToken requestToken() throws ExternalApiResponseException {
+        AtmoFranceToken api = new AtmoFranceToken();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

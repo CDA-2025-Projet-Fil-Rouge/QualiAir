@@ -130,4 +130,24 @@ public class MesureUtils {
         }
     }
 
+    /**
+     * Crée une mesure air
+     *
+     * @param codeElement code de l'élément récupéré par la requete
+     * @param indice      valeur indexée de la mesure (convention //todo trouver la norme euro d'indexation
+     * @param dateReleve  date du relevé
+     * @param timeStamp   date d'insertion
+     * @return mesure créée
+     */
+    public static MesureAir createMesureAir(String codeElement, String indice,
+                                            LocalDateTime dateReleve, LocalDateTime timeStamp) {
+        MesureAir mesure = new MesureAir();
+        mesure.setTypeMesure(TypeMesure.RELEVE_AIR);
+        mesure.setCodeElement(cleanUpElementCode(codeElement));
+        mesure.setIndice(Integer.parseInt(indice));
+        mesure.setDateReleve(dateReleve);
+        mesure.setDateEnregistrement(timeStamp);
+
+        return mesure;
+    }
 }

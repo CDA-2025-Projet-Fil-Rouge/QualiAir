@@ -1,7 +1,10 @@
 package fr.diginamic.qualiair.dto.email;
 
+import fr.diginamic.qualiair.annotation.DoNotUseDirectly;
+
 import java.util.List;
 
+@DoNotUseDirectly(useInstead = EmailBuilder.class)
 public class BrevoEmailRequest {
     private Sender sender;
     private List<Receiver> receivers;
@@ -9,13 +12,6 @@ public class BrevoEmailRequest {
     private String htmlContent;
 
     BrevoEmailRequest() {
-    }
-
-    public BrevoEmailRequest(Sender sender, List<Receiver> receivers, String subject, String htmlContent) {
-        this.sender = sender;
-        this.receivers = receivers;
-        this.subject = subject;
-        this.htmlContent = htmlContent;
     }
 
     /**
@@ -78,6 +74,7 @@ public class BrevoEmailRequest {
      * @return htmlContent
      */
     public String getHtmlContent() {
+
         return htmlContent;
     }
 

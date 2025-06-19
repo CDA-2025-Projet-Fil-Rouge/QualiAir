@@ -1,5 +1,8 @@
 package fr.diginamic.qualiair.dto.email;
 
+import fr.diginamic.qualiair.annotation.DoNotUseDirectly;
+
+@DoNotUseDirectly(useInstead = EmailBuilder.class)
 public class Sender {
     private String name;
     private String email;

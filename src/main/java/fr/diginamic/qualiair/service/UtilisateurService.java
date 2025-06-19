@@ -7,7 +7,7 @@ import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.exception.TokenExpiredException;
+import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.UtilisateurMapper;
 import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
@@ -19,6 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static fr.diginamic.qualiair.utils.RegionUtils.toInt;
 
 
 @Service
@@ -81,7 +85,7 @@ public class UtilisateurService {
      * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
      */
     public void createAdmin(UtilisateurDto userDto, Utilisateur demandeur, RoleUtilisateur role)
-            throws FileNotFoundException, BusinessRuleException, TokenExpiredException {
+            throws FileNotFoundException, BusinessRuleException {
 
         UtilisateurUtils.isSuperadmin(demandeur);
         Adresse adresse = UtilisateurUtils.findAdresseOrThrow(adresseRepository, userDto.getIdAdresse());
@@ -128,5 +132,23 @@ public class UtilisateurService {
                 RoleUtilisateur.BANNI, RoleUtilisateur.UTILISATEUR,
                 "Utilisateur banni", "Utilisateur débanni"
         );
+    }
+
+    public List<String> getEmailsByCommune(String code) {
+        return utilisateurRepository.findByAdresse_Commune_CodeInsee(code);
+    }
+
+    public List<String> getEmailsByDepartement(String code) {
+        return utilisateurRepository.findByAdresse_Commune_Departement_Code(code);
+    }
+
+    public List<String> getEmailsByRegion(String code) throws ParsedDataException {
+
+        return utilisateurRepository.findByAdresse_Commune_Departement_Region_Code(toInt(code));
+
+    }
+
+    public List<String> getAllEmails() {
+        return utilisateurRepository.findAllEmails();
     }
 }

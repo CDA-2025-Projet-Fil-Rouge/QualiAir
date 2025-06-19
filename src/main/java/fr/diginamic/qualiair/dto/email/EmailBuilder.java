@@ -1,7 +1,9 @@
 package fr.diginamic.qualiair.dto.email;
 
+import java.util.List;
+
 public class EmailBuilder {
-    private BrevoEmailRequest request;
+    private final BrevoEmailRequest request;
 
     public EmailBuilder() {
         this.request = new BrevoEmailRequest();
@@ -17,8 +19,20 @@ public class EmailBuilder {
         return this;
     }
 
-    public EmailBuilder content(String htmlContent) {
-        request.setHtmlContent(htmlContent);
+    public EmailBuilder receiver(List<String> emails) {
+
+        request.getReceivers().addAll(emails.stream().map(Receiver::new).toList());
+        return this;
+    }
+
+    public EmailBuilder subject(String subject) {
+        request.setSubject(subject);
+        return this;
+    }
+
+    public EmailBuilder htmlContent(String htmlContent) {
+        String content = new StringBuilder().append("<html><body>").append(htmlContent).append("</body></html>").toString();
+        request.setHtmlContent(content);
         return this;
     }
 

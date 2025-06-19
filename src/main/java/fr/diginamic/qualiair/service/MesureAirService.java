@@ -6,6 +6,8 @@ import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.repository.MesureAirRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -32,6 +34,11 @@ public class MesureAirService {
     public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
         List<MesureAir> mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant, codeInsee, dateStart, dateEnd);
 
-        return mapper.toHistoricalDto(polluant, mesures);
+        return mapper.toDto(polluant, mesures);
     }
+
+    public Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(AirPolluant polluant, int maxIndice, Pageable pageable) {
+        return repository.findWithDetailsByTypeAndIndiceLessThan(polluant, maxIndice, pageable);
+    }
+
 }

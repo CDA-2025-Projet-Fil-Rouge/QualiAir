@@ -12,4 +12,5 @@ public class RegionUtils {
         }
         return Integer.parseInt(string.trim());
     }
+
 }
