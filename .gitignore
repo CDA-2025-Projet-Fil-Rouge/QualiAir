@@ -9,7 +9,6 @@ target/
 src/main/resources/application.properties
 *.properties
 *.sql
-
 ### STS ###
 .apt_generated
 .classpath

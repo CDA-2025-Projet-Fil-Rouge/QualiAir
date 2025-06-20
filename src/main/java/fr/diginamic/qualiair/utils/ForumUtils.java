@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
+import fr.diginamic.qualiair.annotation.DoNotInstanciate;
 import fr.diginamic.qualiair.entity.forum.Message;
 import fr.diginamic.qualiair.entity.forum.Rubrique;
 import fr.diginamic.qualiair.entity.forum.Topic;
@@ -14,9 +15,11 @@ import fr.diginamic.qualiair.repository.TopicRepository;
  * Concerne les entités Rubrique, Topic et Message
  * Recherche d'entité par Id grâce à leur repository, sinon FileNotFoundException
  */
+@DoNotInstanciate
 public final class ForumUtils {
 
-    private ForumUtils() {}
+    private ForumUtils() {
+    }
 
     /**
      * Récupère une rubrique par son identifiant ou déclenche une exception si elle n'existe pas.
@@ -29,6 +32,7 @@ public final class ForumUtils {
         return repo.findById(id)
                 .orElseThrow(() -> new FileNotFoundException("Rubrique introuvable"));
     }
+
     /**
      * Récupère un topic par son identifiant ou déclenche une exception s'il n'existe pas.
      *
@@ -40,6 +44,7 @@ public final class ForumUtils {
         return repo.findById(id)
                 .orElseThrow(() -> new FileNotFoundException("Topic introuvable"));
     }
+
     /**
      * Récupère un message par son identifiant ou déclenche une exception s'il n'existe pas.
      *
@@ -54,12 +59,13 @@ public final class ForumUtils {
 
     /**
      * Vérifie si une rubrique est vide (ne contient aucun topic).
+     *
      * @param topicRepository repository des topics
-     * @param idRubrique identifiant de la rubrique
+     * @param idRubrique      identifiant de la rubrique
      * @throws IllegalStateException si des topics sont liés à cette rubrique
      */
     public static void assertRubriqueIsEmpty(TopicRepository topicRepository, Long idRubrique)
-    throws  BusinessRuleException {
+            throws BusinessRuleException {
         if (topicRepository.countByRubriqueId(idRubrique) > 0) {
             throw new BusinessRuleException("La rubrique contient des topics et ne peut pas être supprimée.");
         }
@@ -67,12 +73,13 @@ public final class ForumUtils {
 
     /**
      * Vérifie si un topic est vide (ne contient aucun message).
+     *
      * @param messageRepository repository des messages
-     * @param idTopic identifiant du topic
+     * @param idTopic           identifiant du topic
      * @throws IllegalStateException si des messages sont liés à ce topic
      */
     public static void assertTopicIsEmpty(MessageRepository messageRepository, Long idTopic)
-    throws BusinessRuleException {
+            throws BusinessRuleException {
         if (messageRepository.countByTopicId(idTopic) > 0) {
             throw new BusinessRuleException("Le topic contient des messages et ne peut pas être supprimé.");
         }

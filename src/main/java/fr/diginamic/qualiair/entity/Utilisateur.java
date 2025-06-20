@@ -55,9 +55,13 @@ public class Utilisateur {
     @OneToMany(mappedBy = "utilisateur")
     private Set<ReactionMessage> reactions = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "favoris_utilisateur_commune",
+            joinColumns = @JoinColumn(name = "id_utilisateur", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_commune", referencedColumnName = "id_commune"))
+    private Set<Commune> favCommunes;
 
-    public Utilisateur()
-    {
+    public Utilisateur() {
 
     }
 
@@ -68,6 +72,15 @@ public class Utilisateur {
      */
     public Long getId() {
         return id;
+    }
+
+    /**
+     * Setter
+     *
+     * @param id sets value
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 
     /**
@@ -160,9 +173,9 @@ public class Utilisateur {
         this.email = email;
     }
 
-
     /**
      * Getter
+     *
      * @return motDePasse
      */
     public String getMotDePasse() {
@@ -171,12 +184,13 @@ public class Utilisateur {
 
     /**
      * Setter
+     *
      * @param motDePasse sets value
      */
     public void setMotDePasse(String motDePasse) {
         this.motDePasse = motDePasse;
     }
-  
+
     /**
      * Getter
      *
@@ -269,6 +283,7 @@ public class Utilisateur {
 
     /**
      * Getter
+     *
      * @return messagesModifies
      */
     public Set<Message> getMessagesModifies() {
@@ -277,6 +292,7 @@ public class Utilisateur {
 
     /**
      * Setter
+     *
      * @param messagesModifies sets value
      */
     public void setMessagesModifies(Set<Message> messagesModifies) {
@@ -285,6 +301,7 @@ public class Utilisateur {
 
     /**
      * Getter
+     *
      * @return topicsModifies
      */
     public Set<Topic> getTopicsModifies() {
@@ -293,6 +310,7 @@ public class Utilisateur {
 
     /**
      * Setter
+     *
      * @param topicsModifies sets value
      */
     public void setTopicsModifies(Set<Topic> topicsModifies) {
@@ -301,6 +319,7 @@ public class Utilisateur {
 
     /**
      * Getter
+     *
      * @return rubriquesModifiees
      */
     public Set<Rubrique> getRubriquesModifiees() {
@@ -309,6 +328,7 @@ public class Utilisateur {
 
     /**
      * Setter
+     *
      * @param rubriquesModifiees sets value
      */
     public void setRubriquesModifiees(Set<Rubrique> rubriquesModifiees) {
@@ -317,6 +337,7 @@ public class Utilisateur {
 
     /**
      * Getter
+     *
      * @return reactions
      */
     public Set<ReactionMessage> getReactions() {
@@ -325,9 +346,28 @@ public class Utilisateur {
 
     /**
      * Setter
+     *
      * @param reactions sets value
      */
     public void setReactions(Set<ReactionMessage> reactions) {
         this.reactions = reactions;
+    }
+
+    /**
+     * Getter
+     *
+     * @return favCommunes
+     */
+    public Set<Commune> getFavCommunes() {
+        return favCommunes;
+    }
+
+    /**
+     * Setter
+     *
+     * @param favCommunes sets value
+     */
+    public void setFavCommunes(Set<Commune> favCommunes) {
+        this.favCommunes = favCommunes;
     }
 }

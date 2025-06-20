@@ -26,7 +26,7 @@ public class ApiAtmoFrance {
     @Autowired
     private UtilisateurAtmoFrance utilisateur;
 
-    private ApiAtmoFranceToken token;
+    private AtmoFranceToken token;
 
     public ApiAtmoFrance() {
     }
@@ -54,7 +54,7 @@ public class ApiAtmoFrance {
      *
      * @return token
      */
-    public ApiAtmoFranceToken getToken() {
+    public AtmoFranceToken getToken() {
         return token;
     }
 
@@ -63,7 +63,7 @@ public class ApiAtmoFrance {
      *
      * @param token sets value
      */
-    public void setToken(ApiAtmoFranceToken token) {
+    public void setToken(AtmoFranceToken token) {
         this.token = token;
     }
 

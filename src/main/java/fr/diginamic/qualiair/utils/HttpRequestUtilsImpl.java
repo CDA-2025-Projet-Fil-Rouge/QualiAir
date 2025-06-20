@@ -1,4 +1,4 @@
-package fr.diginamic.qualiair.utils.api;
+package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.security.JwtAuthentificationService;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
  * Classe utilitaire pour extraire des informations utiles de la requête HTTP.
  */
 @Component
-public class HttpRequestUtils {
+public class HttpRequestUtilsImpl implements HttpRequestUtils {
 
     @Autowired
     private JwtAuthentificationService jwtAuthentificationService;
@@ -19,13 +19,7 @@ public class HttpRequestUtils {
     @Autowired
     private UtilisateurService utilisateurService;
 
-    /**
-     * Récupère l'utilisateur à partir du JWT contenu dans les cookies de la requête.
-     *
-     * @param request requête HTTP
-     * @return utilisateur authentifié
-     * @throws Exception en cas de JWT invalide ou d'utilisateur introuvable
-     */
+    @Override
     public Utilisateur getUtilisateurFromRequest(HttpServletRequest request) throws Exception {
         String email = jwtAuthentificationService.getEmailFromCookie(request);
         return utilisateurService.getUser(email);

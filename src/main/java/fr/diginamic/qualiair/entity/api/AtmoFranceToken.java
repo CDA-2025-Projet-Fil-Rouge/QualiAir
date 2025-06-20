@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Token de l'api Atmo France, étant valide 1h ce token doit toujours être confirmé avant utilisation
  */
-public class ApiAtmoFranceToken extends ApiToken {
+public class AtmoFranceToken extends ApiToken {
 
 
     /**
@@ -13,11 +13,11 @@ public class ApiAtmoFranceToken extends ApiToken {
      */
     private final LocalDateTime obtentionDate;
 
-    public ApiAtmoFranceToken() {
+    public AtmoFranceToken() {
         this.obtentionDate = LocalDateTime.now();
     }
 
-    public ApiAtmoFranceToken(ApiToken bearerToken, LocalDateTime obtentionDate) {
+    public AtmoFranceToken(ApiToken bearerToken, LocalDateTime obtentionDate) {
         this.obtentionDate = LocalDateTime.now();
     }
 

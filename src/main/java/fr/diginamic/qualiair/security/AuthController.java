@@ -1,27 +1,11 @@
 package fr.diginamic.qualiair.security;
 
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
-import fr.diginamic.qualiair.entity.RoleUtilisateur;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
-/**
- * Authentication controller : gestion de l'inscription,
- * de la connexion et de la déconnexion d'un utilisateur
- */
-@RestController
-@RequestMapping("/auth")
-public class AuthController {
-
-    @Autowired
-    private AuthService authService;
-    @Value("${jwt.cookie}")
-    private String TOKEN_COOKIE;
-
+public interface AuthController {
     /**
      * Connexion d'un utilisateur déjà inscrit
      *
@@ -29,12 +13,7 @@ public class AuthController {
      * @return message de succès (et création de cookie) si connexion réussie
      */
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UtilisateurDto userDto) {
-            ResponseCookie cookie = authService.logUser(userDto);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                    .body("Vous êtes connecté");
-    }
+    ResponseEntity<String> login(@RequestBody UtilisateurDto userDto);
 
     /**
      * Création d'un nouvel utilisateur
@@ -44,28 +23,13 @@ public class AuthController {
      * @throws Exception si des erreurs métier sont rencontrées
      */
     @PostMapping("/register")
-    public ResponseEntity<String> createUser(@RequestBody UtilisateurDto userDto) throws Exception {
-
-        authService.createUser(userDto, RoleUtilisateur.UTILISATEUR);
-        return ResponseEntity.ok("Utilisateur créé");
-    }
+    ResponseEntity<String> createUser(@RequestBody UtilisateurDto userDto) throws Exception;
 
     /**
      * Déconnexion d'un utilisateur connecté
+     *
      * @return message de confirmation
      */
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        ResponseCookie deleteCookie = ResponseCookie.from(TOKEN_COOKIE, "")
-                .path("/")
-                .maxAge(0)
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Strict")
-                .build();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
-                .body("Déconnexion réussie");
-    }
+    ResponseEntity<String> logout();
 }

@@ -1,95 +1,84 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.dao.CommuneDao;
-import fr.diginamic.qualiair.dto.InfoCarteCommune;
+import fr.diginamic.qualiair.dto.CommuneDto;
+import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
-import fr.diginamic.qualiair.mapper.CommuneMapper;
-import fr.diginamic.qualiair.repository.CommuneRepository;
-import fr.diginamic.qualiair.validator.CommuneValidator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
+import fr.diginamic.qualiair.exception.RouteParamException;
 
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Commune service
- */
-@Service
-public class CommuneService {
-
+public interface CommuneService {
     /**
-     * Cache service
-     */
-    @Autowired
-    private CacheService cacheService;
-    /**
-     * Commune repository
-     */
-    @Autowired
-    private CommuneRepository communeRepository;
-    /**
-     * Commune validator
-     */
-    @Autowired
-    private CommuneValidator communeValidator;
-    @Autowired
-    private CommuneDao dao;
-    @Autowired
-    private CommuneMapper mapper;
-
-    /**
-     * Update a commune from its name
+     * Met à jour une commune à partir de son nom.
      *
-     * @param commune commune
+     * @param commune la commune à mettre à jour
      */
-    public void updateByName(Commune commune) {
-
-    }
+    void updateByName(Commune commune);
 
     /**
-     * Find from cache or create an entity and add it to the cache
+     * Cherche une commune dans le cache ou la crée et l'ajoute au cache.
      *
-     * @param commune commune entity
-     * @return existing or created entity
+     * @param commune la commune à chercher ou créer
+     * @return la commune existante ou nouvellement créée
      */
-    public Commune findOrCreate(Commune commune) {
-
-        String key = commune.getCodeInsee();
-        Commune existing = cacheService.findInCommuneCache(key);
-
-        if (existing != null) {
-            return existing;
-        }
-        communeValidator.validate(commune);
-        Commune saved = dao.save(commune);
-        cacheService.putInCommuneCache(key, saved);
-        return saved;
-    }
+    Commune findOrCreate(Commune commune);
 
     /**
-     * Return a commune present in the cache from its name
+     * Récupère une commune dans le cache à partir de son nom.
      *
-     * @param communeName commune name
-     * @return existing commune
+     * @param communeName nom de la commune
+     * @return la commune trouvée dans le cache, ou null si absente
      */
-    public Commune getFromCache(String communeName) {
+    Commune getFromCache(String communeName);
 
-        return cacheService.findInCommuneCache(communeName);
-    }
+    /**
+     * Récupère une liste DTO des communes avec une population minimale donnée.
+     *
+     * @param nbHabitant nombre d'habitants minimum
+     * @return liste des DTO {@link InfoCarteCommune}
+     */
+    List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant);
 
-    public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(nbHabitant);
-        List<InfoCarteCommune> dto = new ArrayList<>();
-        communes.forEach(commune -> dto.add(mapper.toDto(commune)));
-        return dto;
-    }
+    /**
+     * Récupère une liste des communes avec la plus récente mesure de population,
+     * filtrée par population minimale.
+     *
+     * @param nbHabitant nombre d'habitants minimum
+     * @return liste des communes
+     */
+    List<Commune> getListTopCommunesByPopulation(int nbHabitant);
 
-    public List<Commune> getListTopCommunesByPopulation(int nbHabitant) {
-        return communeRepository.findTopByLastestMesurePopulation(nbHabitant);
-    }
+    /**
+     * Récupère toutes les communes qui ont des coordonnées.
+     *
+     * @return liste des communes
+     */
+    List<Commune> getAllCommunesWithCoordinates();
 
-    public List<Commune> getAllCommunesWithCoordinates() {
-        return communeRepository.findAllWithCoordinates();
-    }
+    /**
+     * Recherche jusqu'à 10 communes dont le nom contient la chaîne donnée.
+     *
+     * @param containing chaîne à chercher (min. 3 caractères)
+     * @return liste des DTO {@link CommuneDto}
+     * @throws RouteParamException si la chaîne est trop courte
+     */
+    List<CommuneDto> matchTop10ByName(String containing) throws RouteParamException;
+
+    /**
+     * Récupère toutes les communes favorites d'un utilisateur.
+     *
+     * @param userId identifiant de l'utilisateur
+     * @return liste des communes favorites
+     */
+    List<Commune> getAllFavoritesByUserId(Long userId);
+
+    /**
+     * Récupère une commune par son identifiant.
+     *
+     * @param communeId identifiant de la commune
+     * @return la commune trouvée
+     * @throws DataNotFoundException si aucune commune ne correspond à l'id
+     */
+    Commune getCommuneById(Long communeId) throws DataNotFoundException;
 }

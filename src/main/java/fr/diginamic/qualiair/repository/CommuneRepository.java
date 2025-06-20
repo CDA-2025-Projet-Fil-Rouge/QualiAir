@@ -79,6 +79,15 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     @Query("SELECT c FROM Commune c JOIN FETCH c.coordonnee")
     List<Commune> findAllWithCoordinates();
 
+
+    @Query(value = """
+                        SELECT c.favCommunes FROM Utilisateur c
+                        WHERE c.id = :userId
+            """)
+    List<Commune> findAllFavoritesByUserId(@Param("userId") Long userId);
+
+    Commune getCommuneById(Long id);
+
     Optional<Commune> findByNomReelAndCodePostal(String nomPostal, String codePostal);
 
     @Query("SELECT DISTINCT c FROM Commune c JOIN FETCH Coordonnee cd JOIN FETCH Mesure m JOIN FETCH MesurePopulation mp WHERE mp.valeur >= :nbHab")

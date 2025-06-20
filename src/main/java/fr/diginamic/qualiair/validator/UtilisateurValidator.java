@@ -35,7 +35,7 @@ public class UtilisateurValidator implements IUtilisateurValidator {
         isTrue(user.getAdresse() != null, "L'adresse est obligatoire.");
         isTrue(utilisateurRepository.findByEmail(user.getEmail()).isEmpty(),
                 "Un utilisateur avec cet email existe déjà.");
-
         return true;
     }
+
 }

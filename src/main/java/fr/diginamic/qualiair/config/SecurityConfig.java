@@ -28,16 +28,20 @@ public class SecurityConfig {
 
                         .requestMatchers("/auth/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**", "/api-docs").permitAll()
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
                                 "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/forum/**", "/historique/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+                        .requestMatchers("/forum/**", "/historique/**", "/favoris/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
 
                         .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/**",
                                 "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
 
-                        .requestMatchers("/ville/insertion/recensement/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
+                        .requestMatchers("/commune/recensement/insertion/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

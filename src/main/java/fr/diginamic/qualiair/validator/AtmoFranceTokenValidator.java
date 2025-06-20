@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.validator;
 
-import fr.diginamic.qualiair.entity.api.ApiAtmoFranceToken;
+import fr.diginamic.qualiair.entity.api.AtmoFranceToken;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class AtmoFranceTokenValidator implements IApiAtmoFranceTokenValidator {
 
     @Override
-    public boolean validate(ApiAtmoFranceToken entity) throws TokenExpiredException, BusinessRuleException {
+    public boolean validate(AtmoFranceToken entity) throws TokenExpiredException, BusinessRuleException {
         LocalDateTime timestamp = entity.getObtentionDate();
 
         Duration duration = Duration.between(timestamp, LocalDateTime.now());

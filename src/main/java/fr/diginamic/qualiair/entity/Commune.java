@@ -30,6 +30,9 @@ public class Commune {
     @OneToMany(mappedBy = "commune")
     private Set<Adresse> adresse;
 
+    @ManyToMany(mappedBy = "favCommunes")
+    private Set<Utilisateur> utilisateurs;
+
     public Commune() {
     }
 
@@ -166,5 +169,24 @@ public class Commune {
      */
     public void setAdresse(Set<Adresse> adresse) {
         this.adresse = adresse;
+    }
+
+
+    /**
+     * Getter
+     *
+     * @return utilisateurs
+     */
+    public Set<Utilisateur> getUtilisateurs() {
+        return utilisateurs;
+    }
+
+    /**
+     * Setter
+     *
+     * @param utilisateurs sets value
+     */
+    public void setUtilisateurs(Set<Utilisateur> utilisateurs) {
+        this.utilisateurs = utilisateurs;
     }
 }

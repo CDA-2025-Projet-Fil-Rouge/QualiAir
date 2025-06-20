@@ -1,187 +1,96 @@
 package fr.diginamic.qualiair.service.forumService;
 
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
-import fr.diginamic.qualiair.entity.forum.Message;
-import fr.diginamic.qualiair.entity.forum.ReactionType;
-import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.entity.Utilisateur;
+import fr.diginamic.qualiair.entity.forum.ReactionType;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
-import fr.diginamic.qualiair.mapper.forumMapper.MessageMapper;
-import fr.diginamic.qualiair.repository.MessageRepository;
-import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.utils.CheckUtils;
-import fr.diginamic.qualiair.utils.ForumUtils;
-import fr.diginamic.qualiair.utils.UtilisateurUtils;
-import fr.diginamic.qualiair.validator.forumValidator.MessageValidator;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Service métier pour la gestion des messages du forum.
- * Gère la création, la mise à jour, et la récupération des messages,
- * tout en assurant les règles métier et les contrôles d'accès.
- */
-@Service
-public class MessageService {
-
-    @Autowired
-    private MessageRepository messageRepository;
-    @Autowired
-    private MessageMapper messageMapper;
-    @Autowired
-    private TopicRepository topicRepository;
-    @Autowired
-    private MessageValidator messageValidator;
-    @Autowired
-    private ReactionMessageService reactionService;
-
+public interface MessageService {
     /**
      * Récupère tous les messages présents en base.
+     *
      * @return liste de MessageDto représentant tous les messages.
      */
-    public Page<MessageDto> getAllMessages(Pageable pageable) {
-        return messageRepository.findAll(pageable).map(messageMapper::toDto);
-    }
+    Page<MessageDto> getAllMessages(Pageable pageable);
 
     /**
      * Récupère la liste de tous les messages associés à un topic
+     *
      * @param idTopic désigne l'id du topic parent
      * @return la liste de tous les messages associés à ce topic
      */
-    public List<MessageDto> getMessagesByTopic(Long idTopic) {
-        return messageRepository.findByTopicId(idTopic).stream()
-                .map(messageMapper::toDto)
-                .toList();
-    }
+    List<MessageDto> getMessagesByTopic(Long idTopic);
 
     /**
      * Crée un nouveau message dans un topic existant.
      *
-     * @param dto les données du message à créer.
+     * @param dto      les données du message à créer.
      * @param createur l'utilisateur connecté, auteur du message.
      * @return le message créé sous forme de DTO.
-     * @throws BusinessRuleException si le message ne respecte pas les règles métier.
+     * @throws BusinessRuleException    si le message ne respecte pas les règles métier.
      * @throws IllegalArgumentException si le topic lié est introuvable.
-     * @throws FileNotFoundException si le topic associé n'est pas trouvé
+     * @throws FileNotFoundException    si le topic associé n'est pas trouvé
      */
-    public MessageDto createMessage(MessageDto dto, Utilisateur createur)
-            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
-        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());
-
-        Message message = messageMapper.toEntity(dto);
-        message.setCreateur(createur);
-        message.setDateCreation(LocalDateTime.now());
-        message.setTopic(topic);
-        messageValidator.validate(message);
-        messageRepository.save(message);
-        return messageMapper.toDto(message);
-    }
+    MessageDto createMessage(MessageDto dto, Utilisateur createur)
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException;
 
     /**
      * Met à jour un message existant si l'utilisateur est l'auteur ou un administrateur.
      *
-     * @param idMessage identifiant du message à modifier.
-     * @param dto les nouvelles données du message.
+     * @param idMessage    identifiant du message à modifier.
+     * @param dto          les nouvelles données du message.
      * @param modificateur l'utilisateur connecté tentant la modification.
      * @return le message modifié sous forme de DTO.
-     * @throws AccessDeniedException si l'utilisateur n'est ni admin ni auteur du message.
+     * @throws AccessDeniedException    si l'utilisateur n'est ni admin ni auteur du message.
      * @throws IllegalArgumentException si le message est introuvable ou invalide.
-     * @throws BusinessRuleException si le message modifié ne respecte pas les règles métier.
-     * @throws FileNotFoundException si le message n'est pas trouvé
+     * @throws BusinessRuleException    si le message modifié ne respecte pas les règles métier.
+     * @throws FileNotFoundException    si le message n'est pas trouvé
      */
-    public MessageDto updateMessage(Long idMessage, MessageDto dto, Utilisateur modificateur)
-            throws BusinessRuleException, FileNotFoundException, TokenExpiredException {
-
-        CheckUtils.ensureMatchingIds(idMessage, dto.getId());
-        Message message = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
-        UtilisateurUtils.checkAuthorOrAdmin(modificateur,message.getCreateur().getId());
-        Topic topic = ForumUtils.findTopicOrThrow(topicRepository, dto.getIdTopic());
-
-        message.setContenu(dto.getContenu());
-        message.setTopic(topic);
-        message.setDateModification(LocalDateTime.now());
-        message.setModificateur(modificateur);
-        messageValidator.validate(message);
-        messageRepository.save(message);
-        return messageMapper.toDto(message);
-    }
+    MessageDto updateMessage(Long idMessage, MessageDto dto, Utilisateur modificateur)
+            throws BusinessRuleException, FileNotFoundException, TokenExpiredException;
 
     /**
-     *  Suppression d'un message existant si l'utilisateur est l'auteur ou un administrateur.
+     * Suppression d'un message existant si l'utilisateur est l'auteur ou un administrateur.
      *
      * @param idMessage identifiant du message à supprimer.
-     * @param user l'utilisateur connecté tentant la suppression.
+     * @param user      l'utilisateur connecté tentant la suppression.
      * @throws FileNotFoundException si le message n'est pas trouvé
      */
-    public void deleteMessage(Long idMessage, Utilisateur user) throws FileNotFoundException {
-        Message messageASupprimer = ForumUtils.findMessageOrThrow(messageRepository, idMessage);
-        UtilisateurUtils.checkAuthorOrAdmin(user, messageASupprimer.getCreateur().getId());
-
-        messageRepository.delete(messageASupprimer);
-    }
+    void deleteMessage(Long idMessage, Utilisateur user) throws FileNotFoundException;
 
     /**
      * Incrémente l'attribut de Message concerné par la réaction associée au message
+     *
      * @param messageId identifiant du message à l'origine de la réaction
-     * @param user utilisateur qui réagit au message
-     * @param type type de réaction (like, dislike ou report)
+     * @param user      utilisateur qui réagit au message
+     * @param type      type de réaction (like, dislike ou report)
      * @return la confirmation contenant le message à l'origine de la réaction
      * @throws BusinessRuleException si ce type de réaction à ce message a déjà été fait par cet utilisateur
      * @throws FileNotFoundException si le message n'est pas trouvé
      */
     @Transactional
-    public MessageDto reactToMessage(Long messageId, Utilisateur user, ReactionType type)
-            throws FileNotFoundException, BusinessRuleException {
-
-        Message message = ForumUtils.findMessageOrThrow(messageRepository, messageId);
-        reactionService.createReaction(user, message, type);
-
-        updateReactionCounter(message, type, +1);
-        messageRepository.save(message);
-        return messageMapper.toDto(message);
-    }
+    MessageDto reactToMessage(Long messageId, Utilisateur user, ReactionType type)
+            throws FileNotFoundException, BusinessRuleException;
 
     /**
      * Décrémente l'attribut de Message concerné par la réaction associée au message
+     *
      * @param messageId identifiant du message à l'origine de la réaction
-     * @param user utilisateur qui annule une précédente réaction au message
-     * @param type type de réaction à annuler (like, dislike ou report)
+     * @param user      utilisateur qui annule une précédente réaction au message
+     * @param type      type de réaction à annuler (like, dislike ou report)
      * @return la confirmation contenant le message duquel la réaction a été annulée
      * @throws BusinessRuleException si ce type de réaction à ce message n'a pas été fait par cet utilisateur
      * @throws FileNotFoundException si le message n'est pas trouvé
      */
     @Transactional
-    public MessageDto removeReaction(Long messageId, Utilisateur user, ReactionType type)
-    throws FileNotFoundException, BusinessRuleException {
-        Message message = ForumUtils.findMessageOrThrow(messageRepository, messageId);
-        reactionService.removeReaction(user, message, type);
-
-        updateReactionCounter(message, type, -1);
-        messageRepository.save(message);
-        return  messageMapper.toDto(message);
-    }
-
-    /**
-     * Met à jour le compteur correspondant à une réaction (like, dislike ou signalement) sur un message
-     *
-     * @param message message dont le compteur doit être mis à jour.
-     * @param type type de réaction à appliquer (LIKE, DISLIKE ou REPORT).
-     * @param i décalage à appliquer au compteur (+1 pour ajout, -1 pour suppression).
-     */
-    private void updateReactionCounter(Message message, ReactionType type, int i) {
-        switch (type) {
-            case LIKE -> message.setNbLike(Math.max(0, message.getNbLike() + i));
-            case DISLIKE -> message.setNbDislike(Math.max(0, message.getNbDislike() + i));
-            case REPORT -> message.setNbSignalement(Math.max(0, message.getNbSignalement() + i));
-        }
-    }
+    MessageDto removeReaction(Long messageId, Utilisateur user, ReactionType type)
+            throws FileNotFoundException, BusinessRuleException;
 }
