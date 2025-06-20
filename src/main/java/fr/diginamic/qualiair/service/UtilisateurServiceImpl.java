@@ -197,26 +197,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
         );
     }
 
-//    /**
-//     * Créer un nouvel admin après validation des règles métier.
-//     * Cette démarche n'est possible que pour un superadmin.
-//     *
-//     * @param userDto Admin à créer (non encore persisté)
-//     * @param role    Rôle à affecter au nouvel utilisateur
-//     * @throws FileNotFoundException si l'adresse associée à l'utilisateur n'est pas trouvée
-//     * @throws BusinessRuleException si les règles métier ne sont pas respectées
-//     * @throws AccessDeniedException si l'utilisateur connecté n'a pas les droits suffisants
-//     */
-//    public void createAdmin(UtilisateurDto userDto, Utilisateur demandeur, RoleUtilisateur role)
-//            throws FileNotFoundException, BusinessRuleException {
-//
-//        UtilisateurUtils.isSuperadmin(demandeur);
-//        Adresse adresse = UtilisateurUtils.findAdresseOrThrow(adresseRepository, userDto.getIdAdresse());
-//        Utilisateur userToSave = utilisateurMapper.fromDto(userDto, adresse, role);
-//        utilisateurValidator.validate(userToSave);
-//        utilisateurRepository.save(userToSave);
-//    }
-
     @Override
     public List<String> getEmailsByCommune(String code) throws DataNotFoundException {
         List<String> emails = utilisateurRepository.findByAdresse_Commune_CodeInsee(code);
