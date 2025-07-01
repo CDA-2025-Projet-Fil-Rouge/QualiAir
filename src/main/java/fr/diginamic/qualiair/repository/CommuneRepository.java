@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.repository;
 
 import fr.diginamic.qualiair.entity.Commune;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,6 +27,11 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             WHERE mpop.valeur >= :nbHab
               AND mpop.dateReleve = (SELECT m2.dateReleve FROM MesurePopulation m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
             """)
+    @EntityGraph(attributePaths = {
+            "coordonnee.mesurePopulations",
+            "coordonnee.mesureAirs",
+            "coordonnee.mesurePrevisions"
+    })
     List<Commune> findTopByLastestMesurePopulation(@Param("nbHab") int nbHab);
 
     @Query(value = """
@@ -92,4 +98,31 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
 
     @Query("SELECT DISTINCT c FROM Commune c JOIN FETCH Coordonnee cd JOIN FETCH Mesure m JOIN FETCH MesurePopulation mp WHERE mp.valeur >= :nbHab")
     List<Commune> findTopByMesurePopulation(@Param("nbHab") int nbhab);
+
+    @Query(value = """
+            SELECT c.id FROM Commune c
+            WHERE c.codeInsee NOT LIKE '97%'
+              AND EXISTS (
+                  SELECT 1 FROM MesurePopulation mp
+                  WHERE mp.coordonnee = c.coordonnee
+                    AND mp.valeur >= :nbHab
+                    AND mp.dateReleve = (
+                        SELECT MAX(mp2.dateReleve)
+                        FROM MesurePopulation mp2
+                        WHERE mp2.coordonnee = c.coordonnee
+                    )
+              )
+            """)
+    List<Long> findCommuneIdsByPopulation(@Param("nbHab") int nbHab);
+
+    @Query("""
+            SELECT DISTINCT c FROM Commune c
+            JOIN FETCH c.coordonnee cd
+            JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH c.departement d
+            LEFT JOIN FETCH d.region r
+            WHERE c.id IN :ids
+              AND c.codeInsee NOT LIKE '97%'
+            """)
+    List<Commune> findWithMesuresById(@Param("ids") List<Long> ids);
 }

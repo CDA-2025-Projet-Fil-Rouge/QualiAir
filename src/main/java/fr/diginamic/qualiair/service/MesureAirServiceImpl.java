@@ -72,7 +72,7 @@ public class MesureAirServiceImpl implements MesureAirService {
     public boolean existsByHourReleve(LocalDateTime timeStamp) {
         LocalDateTime start = timeStamp.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime end = timeStamp.truncatedTo(ChronoUnit.HOURS).plusHours(1).minusNanos(1);
-        return repository.findByDateReleveBetween(start, end);
+        return repository.existsMesureAirByDateReleveBetween(start, end);
     }
 
 }

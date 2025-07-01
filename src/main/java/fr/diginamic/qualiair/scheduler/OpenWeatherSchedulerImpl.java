@@ -66,14 +66,14 @@ public class OpenWeatherSchedulerImpl implements OpenWeatherScheduler {
 
     @Scheduled(cron = "10 5 6-22 * * *")
     @Override
-    public void fetchLocalAirDataForTopCitiesEveryHour() throws UnnecessaryApiRequestException, ExternalApiResponseException {
+    public void fetchLocalAirDataForTopCitiesEveryHour() throws UnnecessaryApiRequestException {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
         LocalDateTime timeStamp = getTimeStamp();
         logger.info("Scheduled task running at {} for : Requesting and persistence of air measurements for the hour for cities above {} inhabitants", timeStamp, HAB);
         for (Commune commune : communes) {
             try {
                 service.requestLocalAirQuality(commune, timeStamp);
-            } catch (ExternalApiResponseException | UnnecessaryApiRequestException e) {
+            } catch (ExternalApiResponseException e) {
                 logger.debug("Current weather data error : Failed to get Air data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }

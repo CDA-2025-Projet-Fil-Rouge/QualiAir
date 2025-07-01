@@ -12,7 +12,6 @@ import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,10 +68,13 @@ public class CommuneServiceImpl implements CommuneService {
 
     @Override
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findTopByLastestMesurePopulation(nbHabitant);
-        List<InfoCarteCommune> dto = new ArrayList<>();
-        communes.forEach(commune -> dto.add(mapper.toDto(commune)));
-        return dto;
+        List<Long> communeIds = communeRepository.findCommuneIdsByPopulation(nbHabitant);
+
+        List<Commune> communes = communeRepository.findWithMesuresById(communeIds);
+
+        return communes.stream()
+                .map(mapper::toDto)
+                .toList();
     }
 
     @Override
