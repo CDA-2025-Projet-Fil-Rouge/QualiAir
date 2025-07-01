@@ -6,8 +6,11 @@ import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface MesureAirService {
     /**
@@ -46,4 +49,9 @@ public interface MesureAirService {
      * @return une sous-liste de {@link MesureAir}
      */
     Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(AirPolluant polluant, int maxIndice, Pageable pageable);
+
+    @Transactional
+    List<MesureAir> saveMesureList(List<MesureAir> mesures);
+
+    boolean existsByHourReleve(LocalDateTime timeStamp);
 }

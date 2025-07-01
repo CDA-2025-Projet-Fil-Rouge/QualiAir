@@ -6,6 +6,7 @@ import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailQualiteAir;
 import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
 import fr.diginamic.qualiair.entity.*;
+import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.enumeration.DescriptionMeteo;
 import org.springframework.stereotype.Component;
 
@@ -56,7 +57,7 @@ public class CommuneMapperImpl implements CommuneMapper {
 
         carte.setDetailMeteo(detailMeteo);
         carte.setDetailQualiteAir(detailAir);
-
+        carte.setIndiceQualiteAir(detailAir.getIndice(AirPolluant.ATMO));
         extrapolateDescriptionMeteo(carte);
         return carte;
     }

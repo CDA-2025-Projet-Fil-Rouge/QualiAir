@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Tag(name = "Extraction depuis l'api Atmo France", description = "Gère la récupération des relevés qualité de l'air depuis l'Api Atmo-France")
+@Deprecated
 public interface ApiAtmoFranceController {
     /**
      * Load in base daily air quality data from Atmo France.

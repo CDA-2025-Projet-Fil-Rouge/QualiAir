@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
  * Classe utilitaire pour les opérations courantes de manipulation de dates et heures.
  */
 @DoNotInstanciate
+//TODO better error handling
 public class DateUtils {
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm";
@@ -53,6 +54,13 @@ public class DateUtils {
      */
     public static LocalDateTime toLocalDateTime(String unix) {
         return Instant.ofEpochSecond(Long.parseLong(unix)).atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    /**
+     * Convertit une chaîne de date au format "yyyy-MM-dd" en LocalDateTime.
+     */
+    public static LocalDateTime fromDateString(String dateString) {
+        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy-MM-dd")).atStartOfDay();
     }
 
     /**

@@ -69,7 +69,7 @@ public class CommuneServiceImpl implements CommuneService {
 
     @Override
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(nbHabitant);
+        List<Commune> communes = communeRepository.findTopByLastestMesurePopulation(nbHabitant);
         List<InfoCarteCommune> dto = new ArrayList<>();
         communes.forEach(commune -> dto.add(mapper.toDto(commune)));
         return dto;

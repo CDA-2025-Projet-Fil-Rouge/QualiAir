@@ -8,10 +8,17 @@ import jakarta.persistence.Table;
 public class MesureAir extends Mesure {
     private String codeElement;
     private int indice;
-    private int valeur;
+    private double valeur;
     private String unite;
 
     public MesureAir() {
+    }
+
+    public MesureAir(String codeElement, double valeur, String unite) {
+        super();
+        this.codeElement = codeElement;
+        this.valeur = valeur;
+        this.unite = unite;
     }
 
     /**
@@ -37,7 +44,7 @@ public class MesureAir extends Mesure {
      *
      * @return valeur
      */
-    public int getValeur() {
+    public double getValeur() {
         return valeur;
     }
 
@@ -46,7 +53,7 @@ public class MesureAir extends Mesure {
      *
      * @param valeur sets value
      */
-    public void setValeur(int valeur) {
+    public void setValeur(double valeur) {
         this.valeur = valeur;
     }
 

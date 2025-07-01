@@ -1,7 +1,7 @@
 package fr.diginamic.qualiair.service;
 
-import fr.diginamic.qualiair.dto.openweather.LocalAirQualityDto;
 import fr.diginamic.qualiair.entity.Commune;
+import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.FunctionnalException;
@@ -46,8 +46,7 @@ public interface ApiOpenWeatherService {
     @Transactional
     List<MesurePrevision> requestSixteenDaysForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException;
 
-    @Transactional
-    LocalAirQualityDto requestLocalAirQuality(double latitude, double longitude) throws ExternalApiResponseException;
+    List<MesureAir> requestLocalAirQuality(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException;
 
     List<Commune> getCommunesByNbHab(int hab);
 }

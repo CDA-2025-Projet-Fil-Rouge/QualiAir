@@ -3,6 +3,8 @@ package fr.diginamic.qualiair.mapper;
 import fr.diginamic.qualiair.dto.atmofrance.AirDataFeatureDto;
 import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
 import fr.diginamic.qualiair.dto.notification.AlerteInfo;
+import fr.diginamic.qualiair.dto.openweather.LocalAirQualityDto;
+import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 
@@ -19,4 +21,6 @@ public interface MesureAirMapper {
     HistoriqueAirQuality toDto(AirPolluant polluant, List<MesureAir> mesures);
 
     AlerteInfo toDto(MesureAir mesure);
+
+    List<MesureAir> toEntityList(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
 }

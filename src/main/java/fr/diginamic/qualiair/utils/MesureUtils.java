@@ -241,4 +241,22 @@ public class MesureUtils {
         mesure.setDateEnregistrement(timeStamp);
         return mesure;
     }
+
+    public static MesureAir createMesureAir(String codeElement, String unite, double valeur, LocalDateTime dateReleveTime, LocalDateTime timestamp) {
+        MesureAir mAir = new MesureAir();
+        mAir.setTypeMesure(TypeMesure.RELEVE_AIR);
+        mAir.setCodeElement(codeElement);
+        mAir.setUnite(codeElement);
+        mAir.setValeur(valeur);
+        mAir.setDateReleve(dateReleveTime);
+        mAir.setDateEnregistrement(timestamp);
+        //todo calc indice based on valeur
+        return mAir;
+    }
+
+    public static void throwIfExists(boolean exists, LocalDateTime timeStamp, LocalDateTime endDate) throws UnnecessaryApiRequestException {
+        if (exists) {
+            throw new UnnecessaryApiRequestException(String.format("Air Forecast already exists this hour %s", DateUtils.toStringCompletePattern(timeStamp)));
+        }
+    }
 }

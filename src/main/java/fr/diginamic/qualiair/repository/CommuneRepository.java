@@ -91,5 +91,5 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Optional<Commune> findByNomReelAndCodePostal(String nomPostal, String codePostal);
 
     @Query("SELECT DISTINCT c FROM Commune c JOIN FETCH Coordonnee cd JOIN FETCH Mesure m JOIN FETCH MesurePopulation mp WHERE mp.valeur >= :nbHab")
-    List<Commune> findTopByMesurePopulation(@Param("nbhab") int nbhab);
+    List<Commune> findTopByMesurePopulation(@Param("nbHab") int nbhab);
 }
