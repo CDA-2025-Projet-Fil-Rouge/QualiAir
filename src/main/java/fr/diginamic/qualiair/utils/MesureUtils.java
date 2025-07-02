@@ -214,10 +214,16 @@ public class MesureUtils {
         if (!latestAirs.isEmpty()) {
             for (MesureAir ma : latestAirs) {
                 try {
-                    AirPolluant polluant = AirPolluant.valueOf(ma.getCodeElement().toUpperCase());
-                    detailAir.addIndice(polluant, ma.getIndice());
-                } catch (IllegalArgumentException e) {
-                    // Code inconnu
+                    String codeElement = ma.getCodeElement().toUpperCase();
+                    AirPolluant polluant = AirPolluant.valueOf(codeElement);
+
+                    if (polluant == AirPolluant.ATMO) {
+                        detailAir.addIndice(polluant, ma.getIndice());
+                    } else {
+                        detailAir.addValue(codeElement, ma.getValeur());
+                        detailAir.addUnit(codeElement, ma.getUnite());
+                    }
+                } catch (IllegalArgumentException ignored) {
                 }
             }
         }

@@ -133,8 +133,8 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     @Override
     public List<MesureAir> requestLocalAirQuality(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
         LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
-        boolean exists = mesureAirService.existsByHourReleve(timeStamp);
-
+        String codeInsee = commune.getCodeInsee();
+        boolean exists = mesureAirService.existsByHour(codeInsee, timeStamp, endDate);
         MesureUtils.throwIfExists(exists, timeStamp, endDate);
 
         Coordonnee coordonnee = commune.getCoordonnee();
@@ -147,7 +147,6 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
         List<MesureAir> mesures = mesureAirMapper.toEntityList(dto, coordonnee, timeStamp);
 
         mesureAirService.saveMesureList(mesures);
-
         return mesures;
     }
 

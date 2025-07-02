@@ -53,5 +53,6 @@ public interface MesureAirService {
     @Transactional
     List<MesureAir> saveMesureList(List<MesureAir> mesures);
 
-    boolean existsByHourReleve(LocalDateTime timeStamp);
+
+    boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate);
 }

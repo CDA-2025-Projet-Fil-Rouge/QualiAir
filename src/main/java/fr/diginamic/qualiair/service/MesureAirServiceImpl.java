@@ -68,11 +68,10 @@ public class MesureAirServiceImpl implements MesureAirService {
         return saved;
     }
 
-    @Override
-    public boolean existsByHourReleve(LocalDateTime timeStamp) {
+    public boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate) {
         LocalDateTime start = timeStamp.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime end = timeStamp.truncatedTo(ChronoUnit.HOURS).plusHours(1).minusNanos(1);
-        return repository.existsMesureAirByDateReleveBetween(start, end);
+        return repository.existsMesureAirByCodeInseeAndDateReleveBetween(codeInsee, start, end);
     }
 
 }

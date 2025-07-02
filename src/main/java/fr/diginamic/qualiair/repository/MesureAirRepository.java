@@ -34,5 +34,10 @@ public interface MesureAirRepository extends JpaRepository<MesureAir, Long> {
     Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(@Param("polluant") AirPolluant polluant, @Param("maxIndice") int maxIndice, Pageable pageable);
 
 
-    boolean existsMesureAirByDateReleveBetween(LocalDateTime dateReleveAfter, LocalDateTime dateReleveBefore);
+    @Query("""
+            SELECT CASE WHEN COUNT(mair) > 0 THEN true ELSE false END
+            FROM MesureAir mair
+            WHERE mair.coordonnee.commune.codeInsee = :codeInsee
+            AND mair.dateReleve BETWEEN :startDate AND :endDate""")
+    boolean existsMesureAirByCodeInseeAndDateReleveBetween(@Param("codeInsee") String codeInsee, @Param("startDate") LocalDateTime dateReleveAfter, @Param("endDate") LocalDateTime dateReleveBefore);
 }
