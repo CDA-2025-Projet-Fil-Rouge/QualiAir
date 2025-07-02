@@ -132,10 +132,10 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
 
     @Override
     public List<MesureAir> requestLocalAirQuality(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
-//        LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
-//        boolean exists = mesureAirService.existsByHourReleve(timeStamp);
-//
-//        MesureUtils.throwIfExists(exists, timeStamp, endDate);
+        LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
+        boolean exists = mesureAirService.existsByHourReleve(timeStamp);
+
+        MesureUtils.throwIfExists(exists, timeStamp, endDate);
 
         Coordonnee coordonnee = commune.getCoordonnee();
         URI fullUri = getFullUri(api.getUriLocalAirData(), coordonnee.getLatitude(), coordonnee.getLongitude());

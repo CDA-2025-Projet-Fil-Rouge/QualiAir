@@ -148,11 +148,12 @@ public class MesureUtils {
         mesure.setNature(nature.toString());
         switch (nature) {
             case HUMIDITY, CLOUD_COVERAGE -> mesure.setUnite("%");
-            case TEMPERATURE, TEMPERATURE_MAX, TEMPERATURE_FELT, TEMPERATURE_MIN -> mesure.setUnite("Celcius");
+            case TEMPERATURE, TEMPERATURE_MAX, TEMPERATURE_FELT, TEMPERATURE_MIN, WIND_ORIENTATION ->
+                    mesure.setUnite("°");
             case PRESSURE -> mesure.setUnite("hpa");
-            case VISIBILITY -> mesure.setUnite("km");
+            case VISIBILITY -> mesure.setUnite("m");
             case WIND_SPEED, WIND_SPEED_GUST -> mesure.setUnite("m/s");
-            case WIND_ORIENTATION -> mesure.setUnite("degre");
+            case RAIN_1H, RAIN_3H, SNOW_1H, SNOW_3H -> mesure.setUnite("mm/h");
             default -> mesure.setUnite("tbd");
         }
     }
@@ -242,11 +243,11 @@ public class MesureUtils {
         return mesure;
     }
 
-    public static MesureAir createMesureAir(String codeElement, String unite, double valeur, LocalDateTime dateReleveTime, LocalDateTime timestamp) {
+    public static MesureAir createMesureAirWithValue(String codeElement, String unite, double valeur, LocalDateTime dateReleveTime, LocalDateTime timestamp) {
         MesureAir mAir = new MesureAir();
         mAir.setTypeMesure(TypeMesure.RELEVE_AIR);
         mAir.setCodeElement(codeElement);
-        mAir.setUnite(codeElement);
+        mAir.setUnite(unite);
         mAir.setValeur(valeur);
         mAir.setDateReleve(dateReleveTime);
         mAir.setDateEnregistrement(timestamp);

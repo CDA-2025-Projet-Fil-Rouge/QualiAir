@@ -11,6 +11,7 @@ import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.utils.MesureUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -103,28 +104,28 @@ public class MesureAirMapperImpl implements MesureAirMapper {
             mesures.add(createMesureAir("ATMO", dtoMesures.getMain().getAqi(), dateReleveTime, timestamp));
         }
         if (values.getCo() != null) {
-            mesures.add(createMesureAir("CO", "μg/m3", values.getCo(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("CO", "μg/m3", values.getCo(), dateReleveTime, timestamp));
         }
         if (values.getNo() != null) {
-            mesures.add(createMesureAir("NO", "μg/m3", values.getNo(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("NO", "μg/m3", values.getNo(), dateReleveTime, timestamp));
         }
         if (values.getNo2() != null) {
-            mesures.add(createMesureAir("NO2", "μg/m3", values.getNo2(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("NO2", "μg/m3", values.getNo2(), dateReleveTime, timestamp));
         }
         if (values.getO3() != null) {
-            mesures.add(createMesureAir("O3", "μg/m3", values.getO3(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("O3", "μg/m3", values.getO3(), dateReleveTime, timestamp));
         }
         if (values.getSo2() != null) {
-            mesures.add(createMesureAir("SO2", "μg/m3", values.getSo2(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("SO2", "μg/m3", values.getSo2(), dateReleveTime, timestamp));
         }
         if (values.getPm2_5() != null) {
-            mesures.add(createMesureAir("PM2.5", "μg/m3", values.getPm2_5(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("PM2.5", "μg/m3", values.getPm2_5(), dateReleveTime, timestamp));
         }
         if (values.getPm10() != null) {
-            mesures.add(createMesureAir("PM10", "μg/m3", values.getPm10(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("PM10", "μg/m3", values.getPm10(), dateReleveTime, timestamp));
         }
         if (values.getNh3() != null) {
-            mesures.add(createMesureAir("NH3", "μg/m3", values.getNh3(), dateReleveTime, timestamp));
+            mesures.add(MesureUtils.createMesureAirWithValue("NH3", "μg/m3", values.getNh3(), dateReleveTime, timestamp));
         }
         mesures.forEach(m -> m.setCoordonnee(coordonnee));
 

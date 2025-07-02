@@ -1,7 +1,6 @@
 package fr.diginamic.qualiair.repository;
 
 import fr.diginamic.qualiair.entity.Commune;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,18 +19,23 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     @Query("SELECT c FROM Commune c JOIN FETCH c.coordonnee JOIN FETCH c.departement d JOIN FETCH d.region")
     List<Commune> findAllWithRelations();
 
-    @Query(value = """
+    @Query("""
             SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
-            JOIN FETCH MesurePopulation mpop ON mpop.coordonnee = cd
-            WHERE mpop.valeur >= :nbHab
-              AND mpop.dateReleve = (SELECT m2.dateReleve FROM MesurePopulation m2 WHERE m2.coordonnee = cd ORDER BY m2.dateReleve DESC LIMIT 1)
+            JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH c.departement d
+            LEFT JOIN FETCH d.region r
+            WHERE EXISTS (
+                SELECT 1 FROM MesurePopulation mp
+                WHERE mp.coordonnee = cd
+                  AND mp.valeur >= :nbHab
+                  AND mp.dateReleve = (
+                      SELECT MAX(mp2.dateReleve)
+                      FROM MesurePopulation mp2
+                      WHERE mp2.coordonnee = cd
+                  )
+            )
             """)
-    @EntityGraph(attributePaths = {
-            "coordonnee.mesurePopulations",
-            "coordonnee.mesureAirs",
-            "coordonnee.mesurePrevisions"
-    })
     List<Commune> findTopByLastestMesurePopulation(@Param("nbHab") int nbHab);
 
     @Query(value = """
@@ -125,4 +129,29 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
               AND c.codeInsee NOT LIKE '97%'
             """)
     List<Commune> findWithMesuresById(@Param("ids") List<Long> ids);
+
+    @Query(value = """
+            SELECT c.id FROM Commune c
+            WHERE c.codeInsee = :codeInsee
+              AND EXISTS (
+                  SELECT 1 FROM MesurePopulation mp
+                  WHERE mp.coordonnee = c.coordonnee
+                    AND mp.dateReleve = (
+                        SELECT MAX(mp2.dateReleve)
+                        FROM MesurePopulation mp2
+                        WHERE mp2.coordonnee = c.coordonnee
+                    )
+              )
+            """)
+    Long findCommuneIdByCodeInsee(@Param("codeInsee") String codeInsee);
+
+    @Query("""
+            SELECT c FROM Commune c
+            JOIN FETCH c.coordonnee cd
+            JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH c.departement d
+            LEFT JOIN FETCH d.region r
+            WHERE c.id = :id
+            """)
+    Commune findWithMesuresById(@Param("id") Long id);
 }

@@ -93,9 +93,9 @@ public class CommuneMapperImpl implements CommuneMapper {
 
         DescriptionMeteo description;
 
-        if (snow > 0.1) {
+        if (snow > 4) {
             description = DescriptionMeteo.NEIGE;
-        } else if (rain > 0.1) {
+        } else if (rain > 4) {
             description = DescriptionMeteo.PLUIE;
         } else if (gust > 50.0) {
             description = DescriptionMeteo.ORAGE;

@@ -108,4 +108,13 @@ public class CommuneServiceImpl implements CommuneService {
         }
         return commune;
     }
+
+    @Override
+    public InfoCarteCommune getCommuneDtoByCodeInsee(String codeInsee) {
+        Long communeId = communeRepository.findCommuneIdByCodeInsee(codeInsee);
+
+        Commune commune = communeRepository.findWithMesuresById(communeId);
+
+        return mapper.toDto(commune);
+    }
 }

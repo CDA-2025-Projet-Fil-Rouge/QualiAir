@@ -16,9 +16,16 @@ public class CarteControllerImpl implements CarteController {
     private CommuneService communeService;
 
     @CrossOrigin
-    @GetMapping("/commune/get-thumbnail-data")
+    @GetMapping("/commune/get-all-thumbnail-data")
     @Override
     public ResponseEntity<List<InfoCarteCommune>> getThumbnailData(@RequestParam int nbHabitant) {
         return ResponseEntity.ok().body(communeService.getListCommunesDtoByPopulation(nbHabitant));
+    }
+
+    @Override
+    @CrossOrigin
+    @GetMapping("/commune/get-thumbnail-data/{codeInsee}")
+    public ResponseEntity<InfoCarteCommune> getThumbnailDataByCodeInsee(@PathVariable String codeInsee) {
+        return ResponseEntity.ok().body(communeService.getCommuneDtoByCodeInsee(codeInsee));
     }
 }

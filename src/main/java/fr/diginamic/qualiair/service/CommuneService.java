@@ -81,4 +81,7 @@ public interface CommuneService {
      * @throws DataNotFoundException si aucune commune ne correspond à l'id
      */
     Commune getCommuneById(Long communeId) throws DataNotFoundException;
+
+    InfoCarteCommune getCommuneDtoByCodeInsee(String codeInsee);
+
 }

@@ -34,14 +34,14 @@ public class OpenWeatherSchedulerImpl implements OpenWeatherScheduler {
 
     @Scheduled(cron = "${ow.schedule.cron.meteo.current}")
     @Override
-    public void fetchLocalWeatherForTopCitiesEveryHour() throws UnnecessaryApiRequestException {
+    public void fetchLocalWeatherForTopCitiesEveryHour() {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
         LocalDateTime timeStamp = getTimeStamp();
         logger.info("Scheduled task running at {} for : Requesting and persistence of weather measurements for the hour for cities above {} inhabitants", timeStamp, HAB);
         for (Commune commune : communes) {
             try {
                 service.requestAndSaveCurrentForecast(commune, timeStamp);
-            } catch (FunctionnalException | ExternalApiResponseException e) {
+            } catch (FunctionnalException | ExternalApiResponseException | UnnecessaryApiRequestException e) {
                 logger.debug("Current weather data error : Failed to get weather data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
@@ -66,14 +66,14 @@ public class OpenWeatherSchedulerImpl implements OpenWeatherScheduler {
 
     @Scheduled(cron = "10 5 6-22 * * *")
     @Override
-    public void fetchLocalAirDataForTopCitiesEveryHour() throws UnnecessaryApiRequestException {
+    public void fetchLocalAirDataForTopCitiesEveryHour() {
         List<Commune> communes = service.getCommunesByNbHab(HAB);
         LocalDateTime timeStamp = getTimeStamp();
         logger.info("Scheduled task running at {} for : Requesting and persistence of air measurements for the hour for cities above {} inhabitants", timeStamp, HAB);
         for (Commune commune : communes) {
             try {
                 service.requestLocalAirQuality(commune, timeStamp);
-            } catch (ExternalApiResponseException e) {
+            } catch (ExternalApiResponseException | UnnecessaryApiRequestException e) {
                 logger.debug("Current weather data error : Failed to get Air data for {}, with error : {}", commune.getNomSimple(), e.getMessage());
             }
         }
