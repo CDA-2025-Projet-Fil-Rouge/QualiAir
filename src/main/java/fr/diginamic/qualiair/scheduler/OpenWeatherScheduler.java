@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.scheduler;
 
+import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -16,4 +17,10 @@ public interface OpenWeatherScheduler {
      */
     @Scheduled(cron = "${ow.schedule.cron.meteo.fivedays}")
     void fetchFiveDayForecastEveryMorning() throws UnnecessaryApiRequestException;
+
+    /**
+     * Charge en base les relevé air toutes les heures pour chaque ville de plus de X habitants
+     */
+    @Scheduled(cron = "10 5 6-22 * * *")
+    void fetchLocalAirDataForTopCitiesEveryHour() throws UnnecessaryApiRequestException, ExternalApiResponseException;
 }

@@ -70,7 +70,7 @@ public class MesurePrevisionMapperImpl implements MesurePrevisionMapper {
     @Override
     public List<MesurePrevision> toEntityListFromFiveDaysForecast(ForecastFiveDayDto dto, LocalDateTime timeStamp) {
         List<MesurePrevision> mesures = new ArrayList<>();
-        for (CurrentForecastDto dailyForecast : dto.getCurrentForecastDtos()) {
+        for (CurrentForecastDto dailyForecast : dto.getList()) {
             mesures.addAll(toEntityList(dailyForecast, TypeReleve.PREVISION_5J, timeStamp));
         }
         return mesures;

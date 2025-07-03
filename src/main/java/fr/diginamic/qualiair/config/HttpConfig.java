@@ -5,6 +5,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 
 @Configuration
 public class HttpConfig {
@@ -17,6 +20,6 @@ public class HttpConfig {
      */
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder.build();
+        return builder.connectTimeout(Duration.of(5, ChronoUnit.SECONDS)).readTimeout(Duration.of(20, ChronoUnit.SECONDS)).build();
     }
 }

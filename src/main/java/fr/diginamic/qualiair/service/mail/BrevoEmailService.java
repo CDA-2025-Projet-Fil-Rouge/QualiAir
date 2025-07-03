@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public interface BrevoEmailService {
+interface BrevoEmailService {
     /**
      * Construit et Envoie un e-mail à un listing d'utilisateurs
      *

@@ -32,7 +32,7 @@ public class FavorisServiceImpl implements FavorisService {
     public List<InfoFavorite> getAllUserFavorites(CusomUserPrincipal user) {
         Long userId = user.getId();
         List<Commune> communes = communeService.getAllFavoritesByUserId(userId);
-        return communes.stream().map(c -> mapper.toDto(c, userId)).toList();
+        return communes.stream().map(c -> mapper.toMapDataView(c, userId)).toList();
     }
 
     @Transactional
@@ -46,7 +46,7 @@ public class FavorisServiceImpl implements FavorisService {
         utilisateur.getFavCommunes().add(commune);
         utilisateurService.updateUser(utilisateur);
 
-        return utilisateur.getFavCommunes().stream().map(c -> mapper.toDto(c, user.getId())).toList();
+        return utilisateur.getFavCommunes().stream().map(c -> mapper.toMapDataView(c, user.getId())).toList();
     }
 
     @Transactional
@@ -59,6 +59,6 @@ public class FavorisServiceImpl implements FavorisService {
         }
         utilisateur.getFavCommunes().remove(commune);
         utilisateurService.updateUser(utilisateur);
-        return utilisateur.getFavCommunes().stream().map(c -> mapper.toDto(c, user.getId())).toList();
+        return utilisateur.getFavCommunes().stream().map(c -> mapper.toMapDataView(c, user.getId())).toList();
     }
 }

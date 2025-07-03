@@ -1,8 +1,8 @@
 package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.annotation.DoNotInstanciate;
-import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailMeteo;
-import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailQualiteAir;
+import fr.diginamic.qualiair.dto.carte.DetailAir;
+import fr.diginamic.qualiair.dto.carte.DetailMeteo;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.exception.ParsedDataException;
@@ -148,11 +148,12 @@ public class MesureUtils {
         mesure.setNature(nature.toString());
         switch (nature) {
             case HUMIDITY, CLOUD_COVERAGE -> mesure.setUnite("%");
-            case TEMPERATURE, TEMPERATURE_MAX, TEMPERATURE_FELT, TEMPERATURE_MIN -> mesure.setUnite("Celcius");
+            case TEMPERATURE, TEMPERATURE_MAX, TEMPERATURE_FELT, TEMPERATURE_MIN, WIND_ORIENTATION ->
+                    mesure.setUnite("°");
             case PRESSURE -> mesure.setUnite("hpa");
-            case VISIBILITY -> mesure.setUnite("km");
+            case VISIBILITY -> mesure.setUnite("m");
             case WIND_SPEED, WIND_SPEED_GUST -> mesure.setUnite("m/s");
-            case WIND_ORIENTATION -> mesure.setUnite("degre");
+            case RAIN_1H, RAIN_3H, SNOW_1H, SNOW_3H -> mesure.setUnite("mm/h");
             default -> mesure.setUnite("tbd");
         }
     }
@@ -189,7 +190,7 @@ public class MesureUtils {
      * @param latestPrevisions liste des mesures
      * @param detailMeteo      DTO à compléter
      */
-    public static void setDetailMeteo(List<MesurePrevision> latestPrevisions, InfoCarteCommuneDetailMeteo detailMeteo) {
+    public static void setDetailMeteo(List<MesurePrevision> latestPrevisions, DetailMeteo detailMeteo) {
         if (!latestPrevisions.isEmpty()) {
             for (MesurePrevision mp : latestPrevisions) {
                 try {
@@ -209,14 +210,24 @@ public class MesureUtils {
      * @param latestAirs mesures d'air
      * @param detailAir  DTO à compléter
      */
-    public static void setDetailAir(List<MesureAir> latestAirs, InfoCarteCommuneDetailQualiteAir detailAir) {
+    public static void setDetailAir(List<MesureAir> latestAirs, DetailAir detailAir) {
         if (!latestAirs.isEmpty()) {
             for (MesureAir ma : latestAirs) {
                 try {
-                    AirPolluant polluant = AirPolluant.valueOf(ma.getCodeElement().toUpperCase());
-                    detailAir.addIndice(polluant, ma.getIndice());
-                } catch (IllegalArgumentException e) {
-                    // Code inconnu
+                    String codeElement = ma.getCodeElement().toUpperCase();
+                    AirPolluant polluant = AirPolluant.valueOf(codeElement);
+
+                    if (polluant == AirPolluant.ATMO) {
+                        detailAir.addIndice(polluant, ma.getIndice());
+                    } else {
+                        detailAir.addValue(codeElement, ma.getValeur());
+                        detailAir.addUnit(codeElement, ma.getUnite());
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    if ("PM2.5".equals(ma.getCodeElement())) {
+                        detailAir.addValue("PM2.5", ma.getValeur());
+                        detailAir.addUnit("PM2.5", ma.getUnite());
+                    }
                 }
             }
         }
@@ -240,5 +251,23 @@ public class MesureUtils {
         mesure.setDateReleve(dateReleve);
         mesure.setDateEnregistrement(timeStamp);
         return mesure;
+    }
+
+    public static MesureAir createMesureAirWithValue(String codeElement, String unite, double valeur, LocalDateTime dateReleveTime, LocalDateTime timestamp) {
+        MesureAir mAir = new MesureAir();
+        mAir.setTypeMesure(TypeMesure.RELEVE_AIR);
+        mAir.setCodeElement(codeElement);
+        mAir.setUnite(unite);
+        mAir.setValeur(valeur);
+        mAir.setDateReleve(dateReleveTime);
+        mAir.setDateEnregistrement(timestamp);
+        //todo calc indice based on valeur
+        return mAir;
+    }
+
+    public static void throwIfExists(boolean exists, LocalDateTime timeStamp, LocalDateTime endDate) throws UnnecessaryApiRequestException {
+        if (exists) {
+            throw new UnnecessaryApiRequestException(String.format("Air Forecast already exists this hour %s", DateUtils.toStringCompletePattern(timeStamp)));
+        }
     }
 }

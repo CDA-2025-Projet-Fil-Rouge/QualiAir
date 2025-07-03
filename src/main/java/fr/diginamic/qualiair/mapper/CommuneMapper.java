@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.mapper;
 
+import fr.diginamic.qualiair.dto.carte.FiveDaysForecastView;
 import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.dto.insertion.CommuneCoordDto;
@@ -14,7 +15,11 @@ public interface CommuneMapper {
      */
     Commune toEntityFromCommuneCoordDto(CommuneCoordDto dto);
 
-    InfoCarteCommune toDto(Commune commune);
+    InfoCarteCommune toMapDataView(Commune commune);
 
-    InfoFavorite toDto(Commune commune, Long userId);
+    InfoFavorite toMapDataView(Commune commune, Long userId);
+
+    FiveDaysForecastView toForecastView(Commune commune);
+
+    Object toDto(Commune commune);
 }

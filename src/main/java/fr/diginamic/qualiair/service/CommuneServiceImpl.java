@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dao.CommuneDao;
 import fr.diginamic.qualiair.dto.CommuneDto;
+import fr.diginamic.qualiair.dto.carte.FiveDaysForecastView;
 import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
@@ -12,7 +13,6 @@ import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,36 +43,38 @@ public class CommuneServiceImpl implements CommuneService {
 
     @Override
     public void updateByName(Commune commune) {
-
+        // TODO: Implement this method
+        throw new UnsupportedOperationException("Method not implemented yet");
     }
 
     @Override
     public Commune findOrCreate(Commune commune) {
-
-        String key = commune.getCodeInsee();
-        Commune existing = cacheService.findInCommuneCache(key);
-
+        String cacheKey = commune.getCodeInsee();
+        Commune existing = cacheService.findInCommuneCache(cacheKey);
         if (existing != null) {
             return existing;
         }
+
         communeValidator.validate(commune);
         Commune saved = dao.save(commune);
-        cacheService.putInCommuneCache(key, saved);
+        cacheService.putInCommuneCache(cacheKey, saved);
+
         return saved;
     }
 
     @Override
-    public Commune getFromCache(String communeName) {
-
-        return cacheService.findInCommuneCache(communeName);
+    public Commune getFromCache(String cacheKey) {
+        return cacheService.findInCommuneCache(cacheKey);
     }
 
     @Override
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
-        List<Commune> communes = communeRepository.findTopByMesurePopulationWithCurrentForecastWithAllReleveRelations(nbHabitant);
-        List<InfoCarteCommune> dto = new ArrayList<>();
-        communes.forEach(commune -> dto.add(mapper.toDto(commune)));
-        return dto;
+        List<Long> communeIds = communeRepository.findCommuneIdsByPopulation(nbHabitant);
+        List<Commune> communes = communeRepository.findWithMesuresById(communeIds);
+
+        return communes.stream()
+                .map(mapper::toMapDataView)
+                .toList();
     }
 
     @Override
@@ -87,22 +89,64 @@ public class CommuneServiceImpl implements CommuneService {
 
     @Override
     public List<CommuneDto> matchTop10ByName(String containing) throws RouteParamException {
-        if (containing.length() < 3) {
-            throw new RouteParamException("Route params must contain at least 3 characters");
+        if (containing == null || containing.length() < 3) {
+            throw new RouteParamException("Search term must contain at least 3 characters");
         }
-        return null;
+        // TODO: Implement the actual search logic
+        throw new UnsupportedOperationException("not supported yet");
+//        return communeRepository.findTop10ByNomSimpleContainingIgnoreCase(containing)
+//                .stream()
+//                .map(mapper::toDto)
+//                .toList();
     }
 
     @Override
     public List<Commune> getAllFavoritesByUserId(Long userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("User ID cannot be null");
+        }
         return communeRepository.findAllFavoritesByUserId(userId);
     }
 
     @Override
     public Commune getCommuneById(Long communeId) throws DataNotFoundException {
+        if (communeId == null) {
+            throw new IllegalArgumentException("Commune ID cannot be null");
+        }
+
         Commune commune = communeRepository.getCommuneById(communeId);
         if (commune == null) {
-            throw new DataNotFoundException("Commune non trouvée pour l'id" + communeId);
+            throw new DataNotFoundException("Commune not found for ID: " + communeId);
+        }
+        return commune;
+    }
+
+    @Override
+    public InfoCarteCommune getCommuneDtoByCodeInsee(String codeInsee) throws DataNotFoundException {
+        Commune commune = findCommuneByCodeInseeWithRelations(codeInsee);
+        return mapper.toMapDataView(commune);
+    }
+
+    @Override
+    public FiveDaysForecastView getCommuneForecastByCodeInsee(String codeInsee) throws DataNotFoundException {
+        Commune commune = findCommuneByCodeInseeWithRelations(codeInsee);
+        return mapper.toForecastView(commune);
+    }
+
+
+    private Commune findCommuneByCodeInseeWithRelations(String codeInsee) throws DataNotFoundException {
+        if (codeInsee == null || codeInsee.trim().isEmpty()) {
+            throw new IllegalArgumentException("Code INSEE cannot be null or empty");
+        }
+
+        Long communeId = communeRepository.findCommuneIdByCodeInsee(codeInsee);
+        if (communeId == null) {
+            throw new DataNotFoundException("Commune not found for code INSEE: " + codeInsee);
+        }
+
+        Commune commune = communeRepository.findWithMesuresById(communeId);
+        if (commune == null) {
+            throw new DataNotFoundException("Commune data not found for code INSEE: " + codeInsee);
         }
         return commune;
     }

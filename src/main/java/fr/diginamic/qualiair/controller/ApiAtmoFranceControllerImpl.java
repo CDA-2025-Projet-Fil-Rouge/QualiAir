@@ -20,6 +20,7 @@ import static fr.diginamic.qualiair.utils.DateUtils.getTimeStamp;
  */
 @RestController
 @RequestMapping({"/external/api/atmo-france"})
+@Deprecated
 public class ApiAtmoFranceControllerImpl implements ApiAtmoFranceController {
 
     @Autowired
@@ -27,6 +28,7 @@ public class ApiAtmoFranceControllerImpl implements ApiAtmoFranceController {
 
     @PostMapping("/air-quality/national-data/date/{date}")
     @Override
+
     public ResponseEntity<String> loadDailyFranceAirQualityData(@PathVariable String date) throws ExternalApiResponseException, UnnecessaryApiRequestException {
         LocalDateTime timeStamp = getTimeStamp();
         apiAtmoFranceService.saveDailyFranceAirQualityData(date, timeStamp);

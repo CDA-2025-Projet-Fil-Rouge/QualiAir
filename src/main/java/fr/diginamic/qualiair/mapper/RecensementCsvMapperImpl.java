@@ -22,8 +22,8 @@ public class RecensementCsvMapperImpl implements RecensementCsvMapper {
         dto.setNomCommuneReel(tokens[4]);
         dto.setCodePostal(tokens[5]);
         dto.setCodeCommuneINSEE(tokens[6]);
-        dto.setLatitude(tokens[8]);
-        dto.setLongitude(tokens[9]);
+        dto.setLongitude(tokens[8]);
+        dto.setLatitude(tokens[9]);
 
         return dto;
     }

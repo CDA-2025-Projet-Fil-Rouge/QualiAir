@@ -28,7 +28,7 @@ public class BrevoEmailRequest {
      *
      * @param sender sets value
      */
-    public void setSender(Sender sender) {
+    void setSender(Sender sender) {
         this.sender = sender;
     }
 
@@ -46,7 +46,7 @@ public class BrevoEmailRequest {
      *
      * @param receivers sets value
      */
-    public void setReceivers(List<Receiver> receivers) {
+    void setReceivers(List<Receiver> receivers) {
         this.receivers = receivers;
     }
 
@@ -64,7 +64,7 @@ public class BrevoEmailRequest {
      *
      * @param subject sets value
      */
-    public void setSubject(String subject) {
+    void setSubject(String subject) {
         this.subject = subject;
     }
 
@@ -83,7 +83,7 @@ public class BrevoEmailRequest {
      *
      * @param htmlContent sets value
      */
-    public void setHtmlContent(String htmlContent) {
+    void setHtmlContent(String htmlContent) {
         this.htmlContent = htmlContent;
     }
 }

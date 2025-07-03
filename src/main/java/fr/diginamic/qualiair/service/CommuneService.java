@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.CommuneDto;
+import fr.diginamic.qualiair.dto.carte.FiveDaysForecastView;
 import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
@@ -81,4 +82,8 @@ public interface CommuneService {
      * @throws DataNotFoundException si aucune commune ne correspond à l'id
      */
     Commune getCommuneById(Long communeId) throws DataNotFoundException;
+
+    InfoCarteCommune getCommuneDtoByCodeInsee(String codeInsee) throws DataNotFoundException;
+
+    FiveDaysForecastView getCommuneForecastByCodeInsee(String codeInsee) throws DataNotFoundException;
 }

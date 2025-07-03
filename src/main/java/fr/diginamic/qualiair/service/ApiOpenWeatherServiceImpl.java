@@ -1,14 +1,12 @@
 package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.openweather.*;
-import fr.diginamic.qualiair.entity.Commune;
-import fr.diginamic.qualiair.entity.Coordonnee;
-import fr.diginamic.qualiair.entity.MesurePrevision;
-import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.entity.api.ApiOpenWeather;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
+import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.utils.MesureUtils;
 import fr.diginamic.qualiair.validator.HttpResponseValidator;
 import org.slf4j.Logger;
@@ -24,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.throwIfExists;
@@ -42,11 +41,15 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     @Autowired
     private HttpResponseValidator responseValidator;
     @Autowired
-    private MesurePrevisionService service;
+    private MesurePrevisionService mesurePrevisionService;
     @Autowired
     private MesurePrevisionFactory factory;
     @Autowired
     private CommuneService communeService;
+    @Autowired
+    private MesureAirService mesureAirService;
+    @Autowired
+    private MesureAirMapper mesureAirMapper;
 
     /**
      * Methode générique pour les appels vers l'api OpenWeather
@@ -62,11 +65,10 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
         responseValidator.validate(response);
 
         T dto = response.getBody();
-
         List<MesurePrevision> mesures = factory.getInstanceList(dto, timeStamp);
 
         mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
-        service.saveMesurePrevision(mesures);
+        mesurePrevisionService.saveMesurePrevision(mesures);
 
         return mesures;
     }
@@ -81,7 +83,7 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
         LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
         TypeReleve typeReleve = TypeReleve.ACTUEL;
 
-        boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, typeReleve, codeInsee);
+        boolean exists = mesurePrevisionService.existsByHourAndCodeInsee(timeStamp, endDate, typeReleve, codeInsee);
 
         MesureUtils.throwIfExists(exists, timeStamp, endDate, typeReleve);
         Coordonnee coordonnee = commune.getCoordonnee();
@@ -94,14 +96,12 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     @Transactional
     @Override
     public List<MesurePrevision> requestFiveDayForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
-
         String codeInsee = commune.getCodeInsee();
-        LocalDateTime endDate = timeStamp.plusDays(1);
+        LocalDateTime dateExpiration = timeStamp.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
-        boolean exists = service.existsForTodayByTypeReleveAndCodeInsee(timeStamp, TypeReleve.PREVISION_5J, codeInsee);
+        boolean exists = mesurePrevisionService.existsForTodayByTypeReleveAndCodeInsee(dateExpiration, TypeReleve.PREVISION_5J, codeInsee);
         throwIfExists(exists, timeStamp, typeReleve);
-
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriWeather5Days(), coordonnee.getLatitude(), coordonnee.getLongitude());
@@ -117,7 +117,7 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
 
         LocalDateTime endDate = timeStamp.plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_16J;
-        boolean exists = service.existsByHourAndCodeInsee(timeStamp, endDate, TypeReleve.PREVISION_16J, codeInsee);
+        boolean exists = mesurePrevisionService.existsByHourAndCodeInsee(timeStamp, endDate, TypeReleve.PREVISION_16J, codeInsee);
         MesureUtils.throwIfExists(exists, timeStamp, endDate, typeReleve);
 
         Coordonnee coordonnee = commune.getCoordonnee();
@@ -128,13 +128,24 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     }
 
 
-    @Transactional
     @Override
-    public LocalAirQualityDto requestLocalAirQuality(double latitude, double longitude) throws ExternalApiResponseException { //todo a voir si on implemente
-        URI fullUri = getFullUri(api.getUriLocalAirData(), latitude, longitude);
+    public List<MesureAir> requestLocalAirQuality(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
+        LocalDateTime endDate = timeStamp.plusHours(1).minusNanos(1);
+        String codeInsee = commune.getCodeInsee();
+        boolean exists = mesureAirService.existsByHour(codeInsee, timeStamp, endDate);
+        MesureUtils.throwIfExists(exists, timeStamp, endDate);
+
+        Coordonnee coordonnee = commune.getCoordonnee();
+        URI fullUri = getFullUri(api.getUriLocalAirData(), coordonnee.getLatitude(), coordonnee.getLongitude());
         ResponseEntity<LocalAirQualityDto> response = restTemplate.getForEntity(fullUri, LocalAirQualityDto.class);
         responseValidator.validate(response);
-        return response.getBody();
+
+        LocalAirQualityDto dto = response.getBody();
+
+        List<MesureAir> mesures = mesureAirMapper.toEntityList(dto, coordonnee, timeStamp);
+
+        mesureAirService.saveMesureList(mesures);
+        return mesures;
     }
 
     /**

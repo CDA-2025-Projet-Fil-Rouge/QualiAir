@@ -33,12 +33,12 @@ public interface MesurePrevisionService {
     /**
      * Vérifie si une {@link MesurePrevision} existe pour la date du jour, pour un code INSEE et un type de relevé donnés.
      *
-     * @param timeStamp  date et heure du jour (utilisé pour déterminer la date cible)
-     * @param typeReleve type de relevé ({@link TypeReleve})
-     * @param codeInsee  code INSEE de la commune
+     * @param dateExpiration date et heure du jour (utilisé pour déterminer la date cible)
+     * @param typeReleve     type de relevé ({@link TypeReleve})
+     * @param codeInsee      code INSEE de la commune
      * @return true si une mesure existe pour aujourd’hui, false sinon
      */
-    boolean existsForTodayByTypeReleveAndCodeInsee(LocalDateTime timeStamp, TypeReleve typeReleve, String codeInsee);
+    boolean existsForTodayByTypeReleveAndCodeInsee(LocalDateTime dateExpiration, TypeReleve typeReleve, String codeInsee);
 
     /**
      * Récupère les {@link MesurePrevision} d'une commune entre deux dates, pour une nature spécifique,

@@ -9,7 +9,8 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ForecastFiveDayDto extends OpenWeatherForecastDto {
-    List<CurrentForecastDto> currentForecastDtos;
+    List<CurrentForecastDto> list;
+    private String cnt;
 
     public ForecastFiveDayDto() {
     }
@@ -19,16 +20,34 @@ public class ForecastFiveDayDto extends OpenWeatherForecastDto {
      *
      * @return currentForecastDtos
      */
-    public List<CurrentForecastDto> getCurrentForecastDtos() {
-        return currentForecastDtos;
+    public List<CurrentForecastDto> getList() {
+        return list;
     }
 
     /**
      * Setter
      *
-     * @param currentForecastDtos sets value
+     * @param list sets value
      */
-    public void setCurrentForecastDtos(List<CurrentForecastDto> currentForecastDtos) {
-        this.currentForecastDtos = currentForecastDtos;
+    public void setList(List<CurrentForecastDto> list) {
+        this.list = list;
+    }
+
+    /**
+     * Getter
+     *
+     * @return cnt
+     */
+    public String getCnt() {
+        return cnt;
+    }
+
+    /**
+     * Setter
+     *
+     * @param cnt sets value
+     */
+    public void setCnt(String cnt) {
+        this.cnt = cnt;
     }
 }

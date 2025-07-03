@@ -27,8 +27,8 @@ public interface MesurePrevisionRepository extends JpaRepository<MesurePrevision
             FROM MesurePrevision m
             WHERE m.typeReleve = :typeReleve
             AND m.coordonnee.commune.codeInsee = :codeInsee
-            AND m.dateReleve >= :timeStamp""")
-    boolean existByCodeInseeAndTypeReleveAndDate(@Param("typeReleve") TypeReleve typeReleve, @Param("codeInsee") String codeInsee, @Param("timeStamp") LocalDateTime timeStamp);
+            AND m.dateEnregistrement >= :dateExpiration""")
+    boolean existByCodeInseeAndTypeReleveAndDate(@Param("typeReleve") TypeReleve typeReleve, @Param("codeInsee") String codeInsee, @Param("dateExpiration") LocalDateTime dateExpiration);
 
 
     @Query("""

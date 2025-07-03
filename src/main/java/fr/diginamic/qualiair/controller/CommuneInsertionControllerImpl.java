@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.controller;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.service.RecensementParserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ public class CommuneInsertionControllerImpl implements CommuneInsertionControlle
     @Autowired
     private RecensementParserService recensementParserService;
 
+    @CrossOrigin
     @PostMapping({"/insertion/load-from-server-hosted-files"})
     @Override
     public String initializeLoadingFromLocalFiles() throws FileNotFoundException, IOException {
