@@ -17,7 +17,6 @@ public class CarteControllerImpl implements CarteController {
     @Autowired
     private CommuneService communeService;
 
-    @CrossOrigin
     @GetMapping("/commune/get-all-thumbnail-data")
     @Override
     public ResponseEntity<List<InfoCarteCommune>> getThumbnailData(@RequestParam int nbHabitant) {
@@ -25,14 +24,12 @@ public class CarteControllerImpl implements CarteController {
     }
 
     @Override
-    @CrossOrigin
     @GetMapping("/commune/get-thumbnail-data/{codeInsee}")
     public ResponseEntity<InfoCarteCommune> getThumbnailDataByCodeInsee(@PathVariable String codeInsee) throws DataNotFoundException {
         return ResponseEntity.ok().body(communeService.getCommuneDtoByCodeInsee(codeInsee));
     }
 
     @Override
-    @CrossOrigin
     @GetMapping("/commune/get-forecast/five-days/{codeInsee}")
     public ResponseEntity<FiveDaysForecastView> getFiveDaysForecast(@PathVariable String codeInsee) throws DataNotFoundException {
         return ResponseEntity.ok().body(communeService.getCommuneForecastByCodeInsee(codeInsee));
