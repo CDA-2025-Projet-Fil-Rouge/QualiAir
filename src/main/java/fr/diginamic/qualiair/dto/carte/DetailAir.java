@@ -5,12 +5,12 @@ import fr.diginamic.qualiair.enumeration.AirPolluant;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InfoCarteCommuneDetailQualiteAir {
+public class DetailAir {
     private Map<AirPolluant, Integer> indices = new HashMap<>();
     private Map<String, Double> values = new HashMap<>();
     private Map<String, String> units = new HashMap<>();
 
-    public InfoCarteCommuneDetailQualiteAir() {
+    public DetailAir() {
     }
 
     public Map<AirPolluant, Integer> getIndices() {

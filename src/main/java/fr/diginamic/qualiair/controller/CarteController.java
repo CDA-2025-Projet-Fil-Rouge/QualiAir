@@ -1,6 +1,8 @@
 package fr.diginamic.qualiair.controller;
 
+import fr.diginamic.qualiair.dto.carte.FiveDaysForecastView;
 import fr.diginamic.qualiair.dto.carte.InfoCarteCommune;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -65,5 +67,8 @@ public interface CarteController {
     ResponseEntity<List<InfoCarteCommune>> getThumbnailData(@RequestParam int nbHabitant);
 
     @GetMapping("/commune/get-thumbnail-data/{codeInsee}")
-    ResponseEntity<InfoCarteCommune> getThumbnailDataByCodeInsee(@PathVariable String codeInsee);
+    ResponseEntity<InfoCarteCommune> getThumbnailDataByCodeInsee(@PathVariable String codeInsee) throws DataNotFoundException;
+
+    @GetMapping("/commune/get-forecast/five-days/{codeInsee}")
+    ResponseEntity<FiveDaysForecastView> getFiveDaysForecast(@PathVariable String codeInsee) throws DataNotFoundException;
 }

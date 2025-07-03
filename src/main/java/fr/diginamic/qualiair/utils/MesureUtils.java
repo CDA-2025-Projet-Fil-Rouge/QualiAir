@@ -1,8 +1,8 @@
 package fr.diginamic.qualiair.utils;
 
 import fr.diginamic.qualiair.annotation.DoNotInstanciate;
-import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailMeteo;
-import fr.diginamic.qualiair.dto.carte.InfoCarteCommuneDetailQualiteAir;
+import fr.diginamic.qualiair.dto.carte.DetailAir;
+import fr.diginamic.qualiair.dto.carte.DetailMeteo;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.exception.ParsedDataException;
@@ -190,7 +190,7 @@ public class MesureUtils {
      * @param latestPrevisions liste des mesures
      * @param detailMeteo      DTO à compléter
      */
-    public static void setDetailMeteo(List<MesurePrevision> latestPrevisions, InfoCarteCommuneDetailMeteo detailMeteo) {
+    public static void setDetailMeteo(List<MesurePrevision> latestPrevisions, DetailMeteo detailMeteo) {
         if (!latestPrevisions.isEmpty()) {
             for (MesurePrevision mp : latestPrevisions) {
                 try {
@@ -210,7 +210,7 @@ public class MesureUtils {
      * @param latestAirs mesures d'air
      * @param detailAir  DTO à compléter
      */
-    public static void setDetailAir(List<MesureAir> latestAirs, InfoCarteCommuneDetailQualiteAir detailAir) {
+    public static void setDetailAir(List<MesureAir> latestAirs, DetailAir detailAir) {
         if (!latestAirs.isEmpty()) {
             for (MesureAir ma : latestAirs) {
                 try {
@@ -224,6 +224,10 @@ public class MesureUtils {
                         detailAir.addUnit(codeElement, ma.getUnite());
                     }
                 } catch (IllegalArgumentException ignored) {
+                    if ("PM2.5".equals(ma.getCodeElement())) {
+                        detailAir.addValue("PM2.5", ma.getValeur());
+                        detailAir.addUnit("PM2.5", ma.getUnite());
+                    }
                 }
             }
         }

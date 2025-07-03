@@ -22,6 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.throwIfExists;
@@ -64,7 +65,6 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
         responseValidator.validate(response);
 
         T dto = response.getBody();
-
         List<MesurePrevision> mesures = factory.getInstanceList(dto, timeStamp);
 
         mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
@@ -96,14 +96,12 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     @Transactional
     @Override
     public List<MesurePrevision> requestFiveDayForecast(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException {
-
         String codeInsee = commune.getCodeInsee();
-        LocalDateTime endDate = timeStamp.plusDays(1);
+        LocalDateTime dateExpiration = timeStamp.truncatedTo(ChronoUnit.DAYS).plusDays(1);
         TypeReleve typeReleve = TypeReleve.PREVISION_5J;
 
-        boolean exists = mesurePrevisionService.existsForTodayByTypeReleveAndCodeInsee(timeStamp, TypeReleve.PREVISION_5J, codeInsee);
+        boolean exists = mesurePrevisionService.existsForTodayByTypeReleveAndCodeInsee(dateExpiration, TypeReleve.PREVISION_5J, codeInsee);
         throwIfExists(exists, timeStamp, typeReleve);
-
         Coordonnee coordonnee = commune.getCoordonnee();
 
         URI uri = getFullUri(api.getUriWeather5Days(), coordonnee.getLatitude(), coordonnee.getLongitude());

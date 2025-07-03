@@ -7,11 +7,11 @@ public class InfoCarteCommune {
     private String codeInsee;
     private String nomVille;
     private int indiceQualiteAir;
-    private InfoCarteCommuneDetailQualiteAir detailQualiteAir;
+    private DetailAir detailQualiteAir;
     private double latitude;
     private double longitude;
     private DescriptionMeteo descriptionMeteo;
-    private InfoCarteCommuneDetailMeteo detailMeteo;
+    private DetailMeteo detailMeteo;
 
     public InfoCarteCommune(String nomVille, int indiceQualiteAir, double latitude, double longitude, DescriptionMeteo descriptionMeteo) {
         this.nomVille = nomVille;
@@ -65,7 +65,7 @@ public class InfoCarteCommune {
      *
      * @return detailQualiteAir
      */
-    public InfoCarteCommuneDetailQualiteAir getDetailQualiteAir() {
+    public DetailAir getDetailQualiteAir() {
         return detailQualiteAir;
     }
 
@@ -74,7 +74,7 @@ public class InfoCarteCommune {
      *
      * @param detailQualiteAir sets value
      */
-    public void setDetailQualiteAir(InfoCarteCommuneDetailQualiteAir detailQualiteAir) {
+    public void setDetailQualiteAir(DetailAir detailQualiteAir) {
         this.detailQualiteAir = detailQualiteAir;
     }
 
@@ -137,7 +137,7 @@ public class InfoCarteCommune {
      *
      * @return detailMeteo
      */
-    public InfoCarteCommuneDetailMeteo getDetailMeteo() {
+    public DetailMeteo getDetailMeteo() {
         return detailMeteo;
     }
 
@@ -146,7 +146,7 @@ public class InfoCarteCommune {
      *
      * @param detailMeteo sets value
      */
-    public void setDetailMeteo(InfoCarteCommuneDetailMeteo detailMeteo) {
+    public void setDetailMeteo(DetailMeteo detailMeteo) {
         this.detailMeteo = detailMeteo;
     }
 

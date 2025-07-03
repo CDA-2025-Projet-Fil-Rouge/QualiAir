@@ -5,10 +5,10 @@ import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InfoCarteCommuneDetailMeteo {
+public class DetailMeteo {
     private Map<NatureMesurePrevision, Map<Double, String>> meteo = new HashMap<>();
 
-    public InfoCarteCommuneDetailMeteo() {
+    public DetailMeteo() {
     }
 
     /**

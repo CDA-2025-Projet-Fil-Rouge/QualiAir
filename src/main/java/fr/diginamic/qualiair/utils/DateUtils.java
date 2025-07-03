@@ -109,11 +109,11 @@ public class DateUtils {
     }
 
     /**
-     * Retourne la date et l’heure actuelle, tronquée à l’heure (minutes et secondes mises à zéro).
+     * Retourne la date et l’heure actuelle, tronquée à la minute (secondes mises à zéro).
      *
      * @return un objet {@link LocalDateTime} avec l'heure actuelle tronquée
      */
     public static LocalDateTime getTimeStamp() {
-        return LocalDateTime.now().truncatedTo(ChronoUnit.HOURS);
+        return LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
     }
 }

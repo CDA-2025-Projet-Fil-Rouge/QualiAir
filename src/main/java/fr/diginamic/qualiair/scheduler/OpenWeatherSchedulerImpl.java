@@ -64,7 +64,7 @@ public class OpenWeatherSchedulerImpl implements OpenWeatherScheduler {
         logger.info("Scheduled task finished at {} for : Requesting and persistence of weather 5 days forecast for cities above {} inhabitants", LocalDateTime.now(), HAB);
     }
 
-    @Scheduled(cron = "10 5 6-22 * * *")
+    @Scheduled(cron = "${ow.schedule.cron.meteo.air}")
     @Override
     public void fetchLocalAirDataForTopCitiesEveryHour() {
         List<Commune> communes = service.getCommunesByNbHab(HAB);

@@ -10,8 +10,11 @@ import java.time.LocalDateTime;
         @Index(name = "idx_mesure_coordonnee_date_desc",
                 columnList = "id_coordonnee, date_releve DESC"),
         @Index(name = "idx_date_releve_desc",
-                columnList = "date_releve DESC")
+                columnList = "date_releve DESC"),
+        @Index(name = "idx_mesure_coordonne_type_date", columnList = "id_coordonnee, type_mesure, date_releve DESC"),
+        @Index(name = "idx_mesure_type_date", columnList = "type_mesure, date_releve DESC")
 })
+
 public class Mesure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

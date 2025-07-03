@@ -55,8 +55,8 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
     }
 
     @Override
-    public boolean existsForTodayByTypeReleveAndCodeInsee(LocalDateTime timeStamp, TypeReleve typeReleve, String codeInsee) {
-        return repository.existByCodeInseeAndTypeReleveAndDate(typeReleve, codeInsee, timeStamp);
+    public boolean existsForTodayByTypeReleveAndCodeInsee(LocalDateTime dateExpiration, TypeReleve typeReleve, String codeInsee) {
+        return repository.existByCodeInseeAndTypeReleveAndDate(typeReleve, codeInsee, dateExpiration);
     }
 
     @Override
