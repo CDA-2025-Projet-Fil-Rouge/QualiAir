@@ -7,11 +7,13 @@ import fr.diginamic.qualiair.entity.TypeReleve;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
+import fr.diginamic.qualiair.repository.MesureRepository;
 import fr.diginamic.qualiair.validator.MesureValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -34,6 +36,8 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
     private MesureValidator validator;
     @Autowired
     private MesurePrevisionMapper mapper;
+    @Autowired
+    private MesureRepository mesureRepository;
 
     @Override
     public List<MesurePrevision> saveMesurePrevision(List<MesurePrevision> mesures) {
@@ -64,6 +68,15 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
         List<MesurePrevision> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(nature, codeInsee, dateStart, dateEnd);
 
         return mapper.toHistoricalDto(nature, mesures);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByTypeReleve(TypeReleve typeReleve) {
+        List<Long> idsToDelete = repository.findIdsByTypeReleve(typeReleve);
+        repository.deleteAllByTypeReleve(typeReleve);
+        mesureRepository.deleteAllByIdInBatch(idsToDelete);
+        logger.info("Deleted {} forecast records and their parent mesure records", idsToDelete.size());
     }
 
 }

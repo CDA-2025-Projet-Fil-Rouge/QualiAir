@@ -13,6 +13,8 @@ import fr.diginamic.qualiair.validator.CommuneValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 /**
@@ -129,10 +131,29 @@ public class CommuneServiceImpl implements CommuneService {
 
     @Override
     public FiveDaysForecastView getCommuneForecastByCodeInsee(String codeInsee) throws DataNotFoundException {
-        Commune commune = findCommuneByCodeInseeWithRelations(codeInsee);
+        Commune commune = findCommuneByCodeInseeWithForecastRelations(codeInsee);
         return mapper.toForecastView(commune);
     }
 
+    private Commune findCommuneByCodeInseeWithForecastRelations(String codeInsee) throws DataNotFoundException {
+        if (codeInsee == null || codeInsee.trim().isEmpty()) {
+            throw new IllegalArgumentException("Code INSEE cannot be null or empty");
+        }
+
+        Long communeId = communeRepository.findCommuneIdByCodeInsee(codeInsee);
+        if (communeId == null) {
+            throw new DataNotFoundException("Commune not found for code INSEE: " + codeInsee);
+        }
+
+        LocalDateTime startDate = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+        LocalDateTime endDate = startDate.plusDays(5);
+
+        Commune commune = communeRepository.findWithForecastMesuresById(communeId, startDate, endDate);
+        if (commune == null) {
+            throw new DataNotFoundException("Commune forecast data not found for code INSEE: " + codeInsee);
+        }
+        return commune;
+    }
 
     private Commune findCommuneByCodeInseeWithRelations(String codeInsee) throws DataNotFoundException {
         if (codeInsee == null || codeInsee.trim().isEmpty()) {

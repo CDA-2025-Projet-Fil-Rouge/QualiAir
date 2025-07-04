@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,9 +62,11 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
                   WHERE mp.coordonnee = c.coordonnee
                     AND mp.valeur >= :nbHab
                     AND mp.dateReleve = (
-                        SELECT MAX(mp2.dateReleve)
+                        SELECT mp2.dateReleve
                         FROM MesurePopulation mp2
                         WHERE mp2.coordonnee = c.coordonnee
+                        ORDER BY mp2.dateReleve DESC
+                        LIMIT 1
                     )
               )
             """)
@@ -79,21 +82,27 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
               AND c.codeInsee NOT LIKE '97%'
               AND (
                   (m.typeMesure = 'RELEVE_AIR' AND m.dateReleve = (
-                      SELECT MAX(m2.dateReleve)
-                      FROM Mesure m2
-                      WHERE m2.typeMesure = 'RELEVE_AIR' AND m2.coordonnee = cd
+                      SELECT m2.dateReleve
+                      FROM MesureAir m2
+                      WHERE m2.coordonnee = cd
+                      ORDER BY m2.dateReleve DESC
+                      LIMIT 1
                   ))
                   OR
                   (m.typeMesure = 'RELEVE_METEO' AND m.dateReleve = (
-                      SELECT MAX(m3.dateReleve)
-                      FROM Mesure m3
-                      WHERE m3.typeMesure = 'RELEVE_METEO' AND m3.coordonnee = cd
+                      SELECT m3.dateReleve
+                      FROM MesurePrevision m3
+                      WHERE m3.typeReleve = 'ACTUEL' AND m3.coordonnee = cd
+                      ORDER BY m3.dateReleve DESC
+                      LIMIT 1
                   ))
                   OR
                   (m.typeMesure = 'RELEVE_POPULATION' AND m.dateReleve = (
-                      SELECT MAX(m4.dateReleve)
-                      FROM Mesure m4
-                      WHERE m4.typeMesure = 'RELEVE_POPULATION' AND m4.coordonnee = cd
+                      SELECT m4.dateReleve
+                      FROM MesurePopulation m4
+                      WHERE m4.coordonnee = cd
+                      ORDER BY m4.dateReleve DESC
+                      LIMIT 1
                   ))
               )
             """)
@@ -144,4 +153,26 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Commune findWithMesuresById(@Param("id") Long id);
 
     List<Commune> findTop10ByNomSimpleContainingIgnoreCase(String attr0);
+
+    @Query("""
+            SELECT c FROM Commune c
+            JOIN FETCH c.coordonnee cd
+            JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH c.departement d
+            LEFT JOIN FETCH d.region r
+            WHERE c.id = :id
+            AND m.typeMesure = 'RELEVE_METEO'
+            AND m IN (
+                SELECT mp FROM MesurePrevision mp 
+                WHERE mp.typeReleve = 'PREVISION_5J'
+                AND mp.coordonnee = cd
+                AND mp.dateReleve <= :endDate
+                AND mp.dateReleve >= :startDate
+            
+            )
+            ORDER BY m.dateReleve
+            """)
+    Commune findWithForecastMesuresById(@Param("id") Long id,
+                                        @Param("startDate") LocalDateTime startDate,
+                                        @Param("endDate") LocalDateTime endDate);
 }
