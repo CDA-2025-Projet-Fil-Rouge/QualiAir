@@ -39,6 +39,8 @@ public class CommuneMapperImpl implements CommuneMapper {
 
     public FiveDaysForecastView toForecastView(Commune commune) {
         FiveDaysForecastView view = new FiveDaysForecastView();
+        view.setId(commune.getId());
+        view.setCodeInsee(commune.getCodeInsee());
         List<MesurePrevision> mPrev = getMesurePrevision(commune.getCoordonnee().getMesures());
 
         Map<LocalDateTime, List<MesurePrevision>> threeHoursIncrementMprev = mPrev.stream()

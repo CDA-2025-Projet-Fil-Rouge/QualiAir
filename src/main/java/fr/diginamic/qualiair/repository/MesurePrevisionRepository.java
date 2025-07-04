@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -36,4 +37,11 @@ public interface MesurePrevisionRepository extends JpaRepository<MesurePrevision
             WHERE m.coordonnee.commune.codeInsee = :codeInsee AND m.nature = :nature AND m.dateReleve BETWEEN :dateStart AND :dateEnd
             """)
     List<MesurePrevision> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+
+    @Query("SELECT mp.id FROM MesurePrevision mp WHERE mp.typeReleve = :typeReleve")
+    List<Long> findIdsByTypeReleve(@Param("typeReleve") TypeReleve typeReleve);
+
+
+    @Modifying
+    void deleteAllByTypeReleve(TypeReleve typeReleve);
 }

@@ -86,4 +86,5 @@ public interface CommuneService {
     InfoCarteCommune getCommuneDtoByCodeInsee(String codeInsee) throws DataNotFoundException;
 
     FiveDaysForecastView getCommuneForecastByCodeInsee(String codeInsee) throws DataNotFoundException;
+
 }

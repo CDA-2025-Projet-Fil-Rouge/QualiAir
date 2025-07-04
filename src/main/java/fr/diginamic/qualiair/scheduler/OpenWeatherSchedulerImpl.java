@@ -50,10 +50,16 @@ public class OpenWeatherSchedulerImpl implements OpenWeatherScheduler {
 
     @Scheduled(cron = "${ow.schedule.cron.meteo.fivedays}")
     @Override
-    public void fetchFiveDayForecastEveryMorning() throws UnnecessaryApiRequestException {
-        List<Commune> communes = service.getCommunesByNbHab(HAB);
-        logger.info("Scheduled task running at {}", LocalDateTime.now());
+    public void fetchFiveDayForecastEveryMorning() throws UnnecessaryApiRequestException, FunctionnalException {
         LocalDateTime timeStamp = getTimeStamp();
+
+        logger.info("Scheduled task running at {} : Fetching 5 days forecasts", timeStamp);
+        logger.info("Cleaning up old forecasts..");
+        service.deleteOldForecasts(timeStamp);
+        logger.info("Deletion completed");
+
+        List<Commune> communes = service.getCommunesByNbHab(HAB);
+
         for (Commune commune : communes) {
             try {
                 service.requestFiveDayForecast(commune, timeStamp);
