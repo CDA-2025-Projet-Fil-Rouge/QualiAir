@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 /**
@@ -42,28 +43,35 @@ public class HistoriqueServiceImpl implements HistoriqueService {
 
     @Override
     public HistoriquePrevision executePrevision(GeographicalScope scope, String scopedCode, NatureMesurePrevision nature, LocalDate dateStart, LocalDate dateEnd) {
+        LocalDateTime start = dateStart.atStartOfDay();
+        LocalDateTime end = dateEnd.atTime(23, 59, 59);
+
         return scopeResolver(scope, scopedCode, nature, dateStart, dateEnd,
-                (code) -> prevService.getAllByNatureAndCodeInseeBetweenDates(scope, nature, code, dateStart, dateEnd),
-                (code) -> prevService.getAllByNatureAndCodeRegionBetweenDates(scope, nature, code, dateStart, dateEnd),
-                (code) -> prevService.getAllByNatureAndCodeDepartementBetweenDates(scope, nature, code, dateStart, dateEnd)
+                (code) -> prevService.getAllByNatureAndCodeInseeBetweenDates(scope, nature, code, start, end),
+                (code) -> prevService.getAllByNatureAndCodeRegionBetweenDates(scope, nature, code, start, end),
+                (code) -> prevService.getAllByNatureAndCodeDepartementBetweenDates(scope, nature, code, start, end)
         );
     }
 
     @Override
     public HistoriqueAirQuality executeAirQuality(GeographicalScope scope, String scopedCode, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+        LocalDateTime start = dateStart.atStartOfDay();
+        LocalDateTime end = dateEnd.atTime(23, 59, 59);
         return scopeResolver(scope, scopedCode, polluant, dateStart, dateEnd,
-                (code) -> airService.getAllByPolluantAndCodeInseeBetweenDates(scope, code, polluant, dateStart, dateEnd),
-                (code) -> airService.getAllByPolluantAndCodeRegionBetweenDates(scope, code, polluant, dateStart, dateEnd),
-                (code) -> airService.getAllByPolluantAndCodeDepartementBetweenDates(scope, code, polluant, dateStart, dateEnd)
+                (code) -> airService.getAllByPolluantAndCodeInseeBetweenDates(scope, code, polluant, start, end),
+                (code) -> airService.getAllByPolluantAndCodeRegionBetweenDates(scope, code, polluant, start, end),
+                (code) -> airService.getAllByPolluantAndCodeDepartementBetweenDates(scope, code, polluant, start, end)
         );
     }
 
     @Override
     public HistoriquePopulation executePopulation(GeographicalScope scope, String scopedCode, LocalDate dateStart, LocalDate dateEnd) {
+        LocalDateTime start = dateStart.atStartOfDay();
+        LocalDateTime end = dateEnd.atTime(23, 59, 59);
         return scopeResolver(scope, scopedCode, null, dateStart, dateEnd,
-                (code) -> popService.getAllByCodeInseeBetwenDates(scope, code, dateStart, dateEnd),
-                (code) -> popService.getAllByCodeRegionBetweenDates(scope, code, dateStart, dateEnd),
-                (code) -> popService.getAllByCodeDepartementBetweenDates(scope, code, dateStart, dateEnd)
+                (code) -> popService.getAllByCodeInseeBetwenDates(scope, code, start, end),
+                (code) -> popService.getAllByCodeRegionBetweenDates(scope, code, start, end),
+                (code) -> popService.getAllByCodeDepartementBetweenDates(scope, code, start, end)
         );
     }
 
@@ -75,12 +83,15 @@ public class HistoriqueServiceImpl implements HistoriqueService {
 
     @Override
     public void executeAirQualityCsv(HttpServletResponse response, GeographicalScope scope, String scopedCode, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) throws IOException, ExportException {
+
+
         HistoriqueAirQuality historique = executeAirQuality(scope, scopedCode, polluant, dateStart, dateEnd);
         csvService.buildCsv(response, historique);  // TODO handle List of scopedCode instead of a single one (to return all displayed)
     }
 
     @Override
     public void executePopulationCsv(HttpServletResponse response, GeographicalScope scope, String scopedCode, LocalDate dateStart, LocalDate dateEnd) throws IOException, ExportException {
+
         HistoriquePopulation historique = executePopulation(scope, scopedCode, dateStart, dateEnd);
         csvService.buildCsv(response, historique);  // TODO handle List of scopedCode instead of a single one (to return all displayed)
     }

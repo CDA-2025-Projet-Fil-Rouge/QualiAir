@@ -12,13 +12,13 @@ public class HistoriqueAirQuality {
     /**
      * DateReleve, Valeur
      */
-    private Map<LocalDateTime, Integer> historique = new HashMap<>();
+    private Map<LocalDateTime, Double> historique = new HashMap<>();
 
     public HistoriqueAirQuality() {
     }
 
-    public void addIndex(LocalDateTime dateReleve, int indice) {
-        this.historique.put(dateReleve, indice);
+    public void addIndex(LocalDateTime dateReleve, double value) {
+        this.historique.put(dateReleve, value);
     }
 
     /**
@@ -44,7 +44,7 @@ public class HistoriqueAirQuality {
      *
      * @return historique
      */
-    public Map<LocalDateTime, Integer> getHistorique() {
+    public Map<LocalDateTime, Double> getHistorique() {
         return historique;
     }
 
@@ -53,7 +53,7 @@ public class HistoriqueAirQuality {
      *
      * @param historique sets value
      */
-    public void setHistorique(Map<LocalDateTime, Integer> historique) {
+    public void setHistorique(Map<LocalDateTime, Double> historique) {
         this.historique = historique;
     }
 

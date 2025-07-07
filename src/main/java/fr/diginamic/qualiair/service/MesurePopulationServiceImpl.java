@@ -50,19 +50,19 @@ public class MesurePopulationServiceImpl implements MesurePopulationService {
     }
 
     @Override
-    public HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd) {
         List<MesurePopulation> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(codeInsee, dateStart, dateEnd);
 
         return mapper.toHistoricalDto(scope, codeInsee, mesures);
     }
 
     @Override
-    public HistoriquePopulation getAllByCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriquePopulation getAllByCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, LocalDateTime dateStart, LocalDateTime dateEnd) {
         throw new UnsupportedOperationException("Not supported yet");//todo
     }
 
     @Override
-    public HistoriquePopulation getAllByCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriquePopulation getAllByCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, LocalDateTime dateStart, LocalDateTime dateEnd) {
         throw new UnsupportedOperationException("Not supported yet");//todo
     }
 

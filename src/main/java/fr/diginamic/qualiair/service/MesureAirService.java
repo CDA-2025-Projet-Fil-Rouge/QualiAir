@@ -39,7 +39,7 @@ public interface MesureAirService {
      * @param dateEnd   date de fin
      * @return dto {@link HistoriquePopulation}
      */
-    HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd);
+    HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
 
     /**
      * Recupère toutes les {@link MesureAir} pour un polluant donné ayant un indice supérieur à la variable maxIndice. La requete est paginée afin de limiter l'impact en base.
@@ -58,8 +58,8 @@ public interface MesureAirService {
     boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate);
 
     //todo doc
-    HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd);
+    HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
 
     //todo doc
-    HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd);
+    HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,5 +23,5 @@ public interface MesurePopulationRepository extends JpaRepository<MesurePopulati
             SELECT m FROM MesurePrevision m
             WHERE m.coordonnee.commune.codeInsee = :codeInsee AND m.dateReleve BETWEEN :dateStart AND :dateEnd
             """)
-    List<MesurePopulation> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    List<MesurePopulation> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

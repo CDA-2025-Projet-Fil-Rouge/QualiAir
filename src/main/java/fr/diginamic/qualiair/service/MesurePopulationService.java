@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.entity.MesurePopulation;
 import fr.diginamic.qualiair.enumeration.GeographicalScope;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MesurePopulationService {
@@ -49,9 +50,9 @@ public interface MesurePopulationService {
      * @param dateEnd   date de fin
      * @return dto {@link HistoriquePopulation}
      */
-    HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 
-    HistoriquePopulation getAllByCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, LocalDate dateStart, LocalDate dateEnd);
+    HistoriquePopulation getAllByCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, LocalDateTime dateStart, LocalDateTime dateEnd);
 
-    HistoriquePopulation getAllByCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, LocalDate dateStart, LocalDate dateEnd);
+    HistoriquePopulation getAllByCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

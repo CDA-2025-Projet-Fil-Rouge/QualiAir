@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.carte.DetailAir;
 import fr.diginamic.qualiair.dto.carte.DetailMeteo;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import org.slf4j.Logger;
@@ -15,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static fr.diginamic.qualiair.utils.AirPolluantUtils.calculateIndice;
 
 /**
  * Classe utilitaire regroupant différentes méthodes de manipulation,
@@ -261,9 +264,16 @@ public class MesureUtils {
         mAir.setValeur(valeur);
         mAir.setDateReleve(dateReleveTime);
         mAir.setDateEnregistrement(timestamp);
-        //todo calc indice based on valeur
+        try {
+            int indice = calculateIndice(codeElement, valeur);
+            mAir.setIndice(indice);
+        } catch (FunctionnalException e) {
+            logger.debug(e.getMessage());
+            mAir.setIndice(0);
+        }
         return mAir;
     }
+
 
     public static void throwIfExists(boolean exists, LocalDateTime timeStamp, LocalDateTime endDate) throws UnnecessaryApiRequestException {
         if (exists) {

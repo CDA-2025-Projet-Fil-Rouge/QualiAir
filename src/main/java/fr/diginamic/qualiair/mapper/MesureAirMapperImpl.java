@@ -72,7 +72,11 @@ public class MesureAirMapperImpl implements MesureAirMapper {
         HistoriqueAirQuality dto = new HistoriqueAirQuality();
         dto.setCodeElement(polluant.toString());
         for (MesureAir m : mesures) {
-            dto.addIndex(m.getDateReleve(), m.getIndice());
+            if (polluant.toString().equalsIgnoreCase("atmo")) {
+                dto.addIndex(m.getDateReleve(), m.getIndice());
+            } else {
+                dto.addIndex(m.getDateReleve(), m.getValeur());
+            }
         }
         return dto;
     }

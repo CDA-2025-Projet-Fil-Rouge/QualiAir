@@ -45,7 +45,7 @@ public class MesureAirServiceImpl implements MesureAirService {
 
     @Override
     public Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(AirPolluant polluant, int maxIndice, Pageable pageable) {
-        return repository.findWithDetailsByTypeAndIndiceLessThan(polluant, maxIndice, pageable);
+        return repository.findWithDetailsByTypeAndIndiceLessThan(polluant.toString(), maxIndice, pageable);
     }
 
     @Override
@@ -71,20 +71,26 @@ public class MesureAirServiceImpl implements MesureAirService {
     }
 
     @Override
-    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
-        List<MesureAir> mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant, codeInsee, dateStart, dateEnd);
+    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        String elem = polluant.toString();
+        List<MesureAir> mesures;
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates("PM2.5", codeInsee, dateStart, dateEnd);
+        } else {
+            mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant.toString(), codeInsee, dateStart, dateEnd);
+        }
 
         return mapper.toHistoriqueDto(scope, codeInsee, polluant, mesures);
     }
 
     @Override
-    public HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
         throw new UnsupportedOperationException("Not supported yet");//todo
 
     }
 
     @Override
-    public HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
         throw new UnsupportedOperationException("Not supported yet");//todo
 
     }
