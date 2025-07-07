@@ -8,7 +8,7 @@ target/
 # Ignore application.properties
 src/main/resources/application.properties
 *.properties
-
+*.sql
 ### STS ###
 .apt_generated
 .classpath
@@ -36,3 +36,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/data/

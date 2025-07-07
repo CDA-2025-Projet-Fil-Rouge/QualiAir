@@ -11,6 +11,7 @@ modifier erd avec nom rubrique
 ## Mesures
 
 - Type de stratégie héritage, single/joined ? pour le moment joined
+- mesure proba inutile
 
 ## Localités
 
@@ -25,3 +26,7 @@ mappage many to one coord <- commune
 ## META
 
 ajout des nullables et indexes
+
+## Utilisateur
+
+Modification erd pour ajouter motDePasse

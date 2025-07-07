@@ -1,290 +1,373 @@
 package fr.diginamic.qualiair.entity;
 
+import fr.diginamic.qualiair.entity.forum.Message;
+import fr.diginamic.qualiair.entity.forum.ReactionMessage;
+import fr.diginamic.qualiair.entity.forum.Rubrique;
+import fr.diginamic.qualiair.entity.forum.Topic;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "utilisateur")
-public class Utilisateur
-{
+public class Utilisateur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Column(nullable = false)
     private String prenom;
+    @Column(nullable = false)
     private String nom;
     @Column(name = "date_naissance")
     private LocalDate dateNaissance;
     @Column(name = "date_inscription")
     private LocalDateTime dateInscription;
+    @Column(unique = true, nullable = false)
     private String email;
-    private RoleUtilisateur role;
-    
-    @ManyToOne
-    @JoinColumn(name = "id_adresse")
+    @Column(name = "mot_de_passe", nullable = false)
+    private String motDePasse;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleUtilisateur role = RoleUtilisateur.UTILISATEUR;
+
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_adresse", nullable = false)
     private Adresse adresse;
-    
+
     @OneToMany(mappedBy = "createur")
-    private Set<Message> messages;
+    private Set<Message> messages = new HashSet<>();
     @OneToMany(mappedBy = "createur")
-    private Set<Topic> topics;
+    private Set<Topic> topics = new HashSet<>();
     @OneToMany(mappedBy = "createur")
-    private Set<Rubrique> rubriques;
-    
+    private Set<Rubrique> rubriques = new HashSet<>();
+
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Message> messagesModifies = new HashSet<>();
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Topic> topicsModifies = new HashSet<>();
+    @OneToMany(mappedBy = "modificateur")
+    private Set<Rubrique> rubriquesModifiees = new HashSet<>();
     @OneToMany(mappedBy = "utilisateur")
-    private Set<MessageModification> messageModifications;
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<TopicModification> topicModifications;
-    @OneToMany(mappedBy = "utilisateur")
-    private Set<RubriqueModification> rubriqueModifications;
-    
-    public Utilisateur()
-    {
+    private Set<ReactionMessage> reactions = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "favoris_utilisateur_commune",
+            joinColumns = @JoinColumn(name = "id_utilisateur", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "id_commune", referencedColumnName = "id_commune"))
+    private Set<Commune> favCommunes;
+
+    public Utilisateur() {
+
     }
-    
+
     /**
      * Getter
+     *
      * @return id
      */
-    public Long getId()
-    {
+    public Long getId() {
         return id;
     }
-    
+
+    /**
+     * Setter
+     *
+     * @param id sets value
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     /**
      * Getter
+     *
      * @return prenom
      */
-    public String getPrenom()
-    {
+    public String getPrenom() {
         return prenom;
     }
-    
+
     /**
      * Setter
+     *
      * @param prenom sets value
      */
-    public void setPrenom(String prenom)
-    {
+    public void setPrenom(String prenom) {
         this.prenom = prenom;
     }
-    
+
     /**
      * Getter
+     *
      * @return nom
      */
-    public String getNom()
-    {
+    public String getNom() {
         return nom;
     }
-    
+
     /**
      * Setter
+     *
      * @param nom sets value
      */
-    public void setNom(String nom)
-    {
+    public void setNom(String nom) {
         this.nom = nom;
     }
-    
+
     /**
      * Getter
+     *
      * @return dateNaissance
      */
-    public LocalDate getDateNaissance()
-    {
+    public LocalDate getDateNaissance() {
         return dateNaissance;
     }
-    
+
     /**
      * Setter
+     *
      * @param dateNaissance sets value
      */
-    public void setDateNaissance(LocalDate dateNaissance)
-    {
+    public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
     }
-    
+
     /**
      * Getter
+     *
      * @return dateInscription
      */
-    public LocalDateTime getDateInscription()
-    {
+    public LocalDateTime getDateInscription() {
         return dateInscription;
     }
-    
+
     /**
      * Setter
+     *
      * @param dateInscription sets value
      */
-    public void setDateInscription(LocalDateTime dateInscription)
-    {
+    public void setDateInscription(LocalDateTime dateInscription) {
         this.dateInscription = dateInscription;
     }
-    
+
     /**
      * Getter
+     *
      * @return email
      */
-    public String getEmail()
-    {
+    public String getEmail() {
         return email;
     }
-    
+
     /**
      * Setter
+     *
      * @param email sets value
      */
-    public void setEmail(String email)
-    {
+    public void setEmail(String email) {
         this.email = email;
     }
-    
+
     /**
      * Getter
+     *
+     * @return motDePasse
+     */
+    public String getMotDePasse() {
+        return motDePasse;
+    }
+
+    /**
+     * Setter
+     *
+     * @param motDePasse sets value
+     */
+    public void setMotDePasse(String motDePasse) {
+        this.motDePasse = motDePasse;
+    }
+
+    /**
+     * Getter
+     *
      * @return role
      */
-    public RoleUtilisateur getRole()
-    {
+    public RoleUtilisateur getRole() {
         return role;
     }
-    
+
     /**
      * Setter
+     *
      * @param role sets value
      */
-    public void setRole(RoleUtilisateur role)
-    {
+    public void setRole(RoleUtilisateur role) {
         this.role = role;
     }
-    
+
     /**
      * Getter
+     *
      * @return adresse
      */
-    public Adresse getAdresse()
-    {
+    public Adresse getAdresse() {
         return adresse;
     }
-    
+
     /**
      * Setter
+     *
      * @param adresse sets value
      */
-    public void setAdresse(Adresse adresse)
-    {
+    public void setAdresse(Adresse adresse) {
         this.adresse = adresse;
     }
-    
+
     /**
      * Getter
+     *
      * @return messages
      */
-    public Set<Message> getMessages()
-    {
+    public Set<Message> getMessages() {
         return messages;
     }
-    
+
     /**
      * Setter
+     *
      * @param messages sets value
      */
-    public void setMessages(Set<Message> messages)
-    {
+    public void setMessages(Set<Message> messages) {
         this.messages = messages;
     }
-    
+
     /**
      * Getter
+     *
      * @return topics
      */
-    public Set<Topic> getTopics()
-    {
+    public Set<Topic> getTopics() {
         return topics;
     }
-    
+
     /**
      * Setter
+     *
      * @param topics sets value
      */
-    public void setTopics(Set<Topic> topics)
-    {
+    public void setTopics(Set<Topic> topics) {
         this.topics = topics;
     }
-    
+
     /**
      * Getter
+     *
      * @return rubriques
      */
-    public Set<Rubrique> getRubriques()
-    {
+    public Set<Rubrique> getRubriques() {
         return rubriques;
     }
-    
+
     /**
      * Setter
+     *
      * @param rubriques sets value
      */
-    public void setRubriques(Set<Rubrique> rubriques)
-    {
+    public void setRubriques(Set<Rubrique> rubriques) {
         this.rubriques = rubriques;
     }
-    
+
     /**
      * Getter
-     * @return messageModifications
+     *
+     * @return messagesModifies
      */
-    public Set<MessageModification> getMessageModifications()
-    {
-        return messageModifications;
+    public Set<Message> getMessagesModifies() {
+        return messagesModifies;
     }
-    
+
     /**
      * Setter
-     * @param messageModifications sets value
+     *
+     * @param messagesModifies sets value
      */
-    public void setMessageModifications(Set<MessageModification> messageModifications)
-    {
-        this.messageModifications = messageModifications;
+    public void setMessagesModifies(Set<Message> messagesModifies) {
+        this.messagesModifies = messagesModifies;
     }
-    
+
     /**
      * Getter
-     * @return topicModifications
+     *
+     * @return topicsModifies
      */
-    public Set<TopicModification> getTopicModifications()
-    {
-        return topicModifications;
+    public Set<Topic> getTopicsModifies() {
+        return topicsModifies;
     }
-    
+
     /**
      * Setter
-     * @param topicModifications sets value
+     *
+     * @param topicsModifies sets value
      */
-    public void setTopicModifications(Set<TopicModification> topicModifications)
-    {
-        this.topicModifications = topicModifications;
+    public void setTopicsModifies(Set<Topic> topicsModifies) {
+        this.topicsModifies = topicsModifies;
     }
-    
+
     /**
      * Getter
-     * @return rubriqueModifications
+     *
+     * @return rubriquesModifiees
      */
-    public Set<RubriqueModification> getRubriqueModifications()
-    {
-        return rubriqueModifications;
+    public Set<Rubrique> getRubriquesModifiees() {
+        return rubriquesModifiees;
     }
-    
+
     /**
      * Setter
-     * @param rubriqueModifications sets value
+     *
+     * @param rubriquesModifiees sets value
      */
-    public void setRubriqueModifications(Set<RubriqueModification> rubriqueModifications)
-    {
-        this.rubriqueModifications = rubriqueModifications;
+    public void setRubriquesModifiees(Set<Rubrique> rubriquesModifiees) {
+        this.rubriquesModifiees = rubriquesModifiees;
+    }
+
+    /**
+     * Getter
+     *
+     * @return reactions
+     */
+    public Set<ReactionMessage> getReactions() {
+        return reactions;
+    }
+
+    /**
+     * Setter
+     *
+     * @param reactions sets value
+     */
+    public void setReactions(Set<ReactionMessage> reactions) {
+        this.reactions = reactions;
+    }
+
+    /**
+     * Getter
+     *
+     * @return favCommunes
+     */
+    public Set<Commune> getFavCommunes() {
+        return favCommunes;
+    }
+
+    /**
+     * Setter
+     *
+     * @param favCommunes sets value
+     */
+    public void setFavCommunes(Set<Commune> favCommunes) {
+        this.favCommunes = favCommunes;
     }
 }
