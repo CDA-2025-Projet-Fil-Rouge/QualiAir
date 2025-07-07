@@ -6,6 +6,8 @@ import java.util.Map;
 
 public class HistoriqueAirQuality {
 
+    private String scope;
+    private String code;
     private String codeElement;
     /**
      * DateReleve, Valeur
@@ -53,5 +55,41 @@ public class HistoriqueAirQuality {
      */
     public void setHistorique(Map<LocalDateTime, Integer> historique) {
         this.historique = historique;
+    }
+
+    /**
+     * Getter
+     *
+     * @return scope
+     */
+    public String getScope() {
+        return scope;
+    }
+
+    /**
+     * Setter
+     *
+     * @param scope sets value
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Getter
+     *
+     * @return code
+     */
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * Setter
+     *
+     * @param code sets value
+     */
+    public void setCode(String code) {
+        this.code = code;
     }
 }

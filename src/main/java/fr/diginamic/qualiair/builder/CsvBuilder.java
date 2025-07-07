@@ -72,7 +72,7 @@ public class CsvBuilder {
         writer.println("nature,unite,date,valeur");
 
         for (Map.Entry<LocalDateTime, Integer> entry : historique.getHistorique().entrySet()) {
-            String nomVille = historique.getNomVille();
+            String nomVille = historique.getNom();
             String date = entry.getKey().toString();
             int valeur = entry.getValue();
 

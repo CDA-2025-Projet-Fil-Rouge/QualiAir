@@ -7,6 +7,7 @@ import fr.diginamic.qualiair.dto.openweather.ForecastSixteenDays;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,5 +47,5 @@ public interface MesurePrevisionMapper {
      */
     List<MesurePrevision> toEntityListFromSixteenDaysForecast(ForecastSixteenDays dto, LocalDateTime timeStamp);
 
-    HistoriquePrevision toHistoricalDto(NatureMesurePrevision nature, List<MesurePrevision> mesures);
+    HistoriquePrevision toHistoricalDto(GeographicalScope scope, String scopedCode, NatureMesurePrevision nature, List<MesurePrevision> mesures);
 }

@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class HistoriquePrevision {
 
+    private String scope;
+    private String code;
     private String nature;
     private String unite;
     /**
@@ -74,5 +76,41 @@ public class HistoriquePrevision {
      */
     public void setValeurs(Map<LocalDateTime, Double> valeurs) {
         this.valeurs = valeurs;
+    }
+
+    /**
+     * Getter
+     *
+     * @return scope
+     */
+    public String getScope() {
+        return scope;
+    }
+
+    /**
+     * Setter
+     *
+     * @param scope sets value
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Getter
+     *
+     * @return code
+     */
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * Setter
+     *
+     * @param code sets value
+     */
+    public void setCode(String code) {
+        this.code = code;
     }
 }

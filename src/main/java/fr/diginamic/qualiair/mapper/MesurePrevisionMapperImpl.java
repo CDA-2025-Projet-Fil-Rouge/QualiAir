@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.openweather.*;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.utils.DateUtils;
 import org.springframework.stereotype.Component;
 
@@ -83,8 +84,10 @@ public class MesurePrevisionMapperImpl implements MesurePrevisionMapper {
 
 
     @Override
-    public HistoriquePrevision toHistoricalDto(NatureMesurePrevision nature, List<MesurePrevision> mesures) {
+    public HistoriquePrevision toHistoricalDto(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures) {
         HistoriquePrevision dto = new HistoriquePrevision();
+        dto.setScope(scope.toString());
+        dto.setCode(code);
         dto.setNature(nature.toString());
         dto.setUnite(mesures.getFirst().getUnite());
         for (MesurePrevision m : mesures) {

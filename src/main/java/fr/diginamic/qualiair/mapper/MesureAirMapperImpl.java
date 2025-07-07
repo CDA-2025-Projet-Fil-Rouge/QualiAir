@@ -11,6 +11,7 @@ import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.utils.MesureUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +68,7 @@ public class MesureAirMapperImpl implements MesureAirMapper {
 
 
     @Override
-    public HistoriqueAirQuality toDto(AirPolluant polluant, List<MesureAir> mesures) {
+    public HistoriqueAirQuality toHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures) {
         HistoriqueAirQuality dto = new HistoriqueAirQuality();
         dto.setCodeElement(polluant.toString());
         for (MesureAir m : mesures) {
@@ -77,7 +78,7 @@ public class MesureAirMapperImpl implements MesureAirMapper {
     }
 
     @Override
-    public AlerteInfo toDto(MesureAir mesure) {
+    public AlerteInfo toAlerteDto(MesureAir mesure) {
         AlerteInfo dto = new AlerteInfo();
         Coordonnee coordonnee = mesure.getCoordonnee();
         Commune commune = coordonnee.getCommune();

@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
@@ -64,10 +65,10 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
     }
 
     @Override
-    public HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
+    public HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
         List<MesurePrevision> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(nature, codeInsee, dateStart, dateEnd);
 
-        return mapper.toHistoricalDto(nature, mesures);
+        return mapper.toHistoricalDto(scope, codeInsee, nature, mesures);
     }
 
     @Override
@@ -77,6 +78,18 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
         repository.deleteAllByTypeReleve(typeReleve);
         mesureRepository.deleteAllByIdInBatch(idsToDelete);
         logger.info("Deleted {} forecast records and their parent mesure records", idsToDelete.size());
+    }
+
+    @Override
+    public HistoriquePrevision getAllByNatureAndCodeRegionBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDate dateStart, LocalDate dateEnd) {
+        throw new UnsupportedOperationException("Not supported yet");//todo
+
+    }
+
+    @Override
+    public HistoriquePrevision getAllByNatureAndCodeDepartementBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDate dateStart, LocalDate dateEnd) {
+        throw new UnsupportedOperationException("Not supported yet");//todo
+
     }
 
 }

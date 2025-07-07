@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
 import fr.diginamic.qualiair.entity.MesurePopulation;
 import fr.diginamic.qualiair.entity.TypeMesure;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.springframework.stereotype.Component;
 
@@ -29,10 +30,10 @@ public class MesurePopulationMapperImpl implements MesurePopulationMapper {
     }
 
     @Override
-    public HistoriquePopulation toHistoricalDto(List<MesurePopulation> mesures) {
+    public HistoriquePopulation toHistoricalDto(GeographicalScope scope, String code, List<MesurePopulation> mesures) {
         HistoriquePopulation dto = new HistoriquePopulation();
         MesurePopulation mpop = mesures.getFirst();
-        dto.setNomVille(mpop.getCoordonnee().getCommune().getNomSimple());
+        dto.setNom(mpop.getCoordonnee().getCommune().getNomSimple());
         for (MesurePopulation m : mesures) {
             dto.addIndex(m.getDateEnregistrement(), m.getValeur());
         }

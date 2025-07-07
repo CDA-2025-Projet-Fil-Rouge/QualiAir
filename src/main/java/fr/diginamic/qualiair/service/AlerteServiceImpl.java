@@ -42,7 +42,7 @@ public class AlerteServiceImpl implements AlerteService {
         Pageable pageable = PageRequest.of(page, size, Sort.by("dateReleve").descending());
         Page<MesureAir> mesures = mesureAirService.findWithDetailsByTypeAndIndiceLessThan(polluant, maxIndice, pageable);
 
-        return mesures.map(m -> mapper.toDto(m));
+        return mesures.map(m -> mapper.toAlerteDto(m));
     }
 
     @Override

@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.repository.MesureAirRepository;
 import org.slf4j.Logger;
@@ -41,12 +42,6 @@ public class MesureAirServiceImpl implements MesureAirService {
         return repository.existsMesureAirByDateReleve(date.atStartOfDay());
     }
 
-    @Override
-    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
-        List<MesureAir> mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant, codeInsee, dateStart, dateEnd);
-
-        return mapper.toDto(polluant, mesures);
-    }
 
     @Override
     public Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(AirPolluant polluant, int maxIndice, Pageable pageable) {
@@ -68,10 +63,31 @@ public class MesureAirServiceImpl implements MesureAirService {
         return saved;
     }
 
+    @Override
     public boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate) {
         LocalDateTime start = timeStamp.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime end = timeStamp.truncatedTo(ChronoUnit.HOURS).plusHours(1).minusNanos(1);
         return repository.existsMesureAirByCodeInseeAndDateReleveBetween(codeInsee, start, end);
     }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+        List<MesureAir> mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant, codeInsee, dateStart, dateEnd);
+
+        return mapper.toHistoriqueDto(scope, codeInsee, polluant, mesures);
+    }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+        throw new UnsupportedOperationException("Not supported yet");//todo
+
+    }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd) {
+        throw new UnsupportedOperationException("Not supported yet");//todo
+
+    }
+
 
 }
