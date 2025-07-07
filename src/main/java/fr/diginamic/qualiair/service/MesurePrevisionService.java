@@ -51,4 +51,6 @@ public interface MesurePrevisionService {
      * @return objet {@link HistoriquePrevision} contenant les mesures agrégées
      */
     HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+
+    void deleteByTypeReleve(TypeReleve typeReleve);
 }

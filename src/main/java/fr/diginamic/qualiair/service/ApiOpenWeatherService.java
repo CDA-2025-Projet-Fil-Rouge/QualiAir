@@ -49,4 +49,6 @@ public interface ApiOpenWeatherService {
     List<MesureAir> requestLocalAirQuality(Commune commune, LocalDateTime timeStamp) throws ExternalApiResponseException, UnnecessaryApiRequestException;
 
     List<Commune> getCommunesByNbHab(int hab);
+
+    void deleteOldForecasts(LocalDateTime timeStamp) throws FunctionnalException;
 }

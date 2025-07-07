@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.openweather.*;
 import fr.diginamic.qualiair.entity.*;
 import fr.diginamic.qualiair.entity.api.ApiOpenWeather;
 import fr.diginamic.qualiair.exception.ExternalApiResponseException;
+import fr.diginamic.qualiair.exception.FunctionnalException;
 import fr.diginamic.qualiair.exception.UnnecessaryApiRequestException;
 import fr.diginamic.qualiair.factory.MesurePrevisionFactory;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
@@ -170,5 +171,11 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
     @Override
     public List<Commune> getCommunesByNbHab(int hab) {
         return communeService.getListTopCommunesByPopulation(hab);
+    }
+
+    @Override
+    public void deleteOldForecasts(LocalDateTime timeStamp) throws FunctionnalException {
+        mesurePrevisionService.deleteByTypeReleve(TypeReleve.PREVISION_5J);
+        logger.info("Deleted old forecast data at {}", timeStamp);
     }
 }

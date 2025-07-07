@@ -53,7 +53,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/swagger-ui/index.html/api-docs"
                         ).permitAll()
                         .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
                                 "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
