@@ -20,8 +20,8 @@ public interface MesurePopulationRepository extends JpaRepository<MesurePopulati
     boolean existsMesurePopulationByMesure_DateReleve(LocalDateTime dateReleve);
 
     @Query("""
-            SELECT m FROM MesurePrevision m
+            SELECT m FROM MesurePopulation m
             WHERE m.mesure.coordonnee.commune.codeInsee = :codeInsee AND m.mesure.dateReleve BETWEEN :dateStart AND :dateEnd
             """)
-    List<MesurePopulation> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
+    List<MesurePopulation> getAllByMesure_Coordonnee_Commune_CodeInseeAndMesureDateReleveBetween(String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

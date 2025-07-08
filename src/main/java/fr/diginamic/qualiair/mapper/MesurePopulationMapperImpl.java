@@ -33,6 +33,9 @@ public class MesurePopulationMapperImpl implements MesurePopulationMapper {
     @Override
     public HistoriquePopulation toHistoricalDto(GeographicalScope scope, String code, List<MesurePopulation> mesures) {
         HistoriquePopulation dto = new HistoriquePopulation();
+        if (mesures.isEmpty()) {
+            return dto;
+        }
         MesurePopulation mpop = mesures.getFirst();
         dto.setNom(mpop.getMesure().getCoordonnee().getCommune().getNomSimple());
         for (MesurePopulation m : mesures) {

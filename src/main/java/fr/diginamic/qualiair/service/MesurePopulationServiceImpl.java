@@ -51,7 +51,7 @@ public class MesurePopulationServiceImpl implements MesurePopulationService {
 
     @Override
     public HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        List<MesurePopulation> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(codeInsee, dateStart, dateEnd);
+        List<MesurePopulation> mesures = repository.getAllByMesure_Coordonnee_Commune_CodeInseeAndMesureDateReleveBetween(codeInsee, dateStart, dateEnd);
 
         return mapper.toHistoricalDto(scope, codeInsee, mesures);
     }
