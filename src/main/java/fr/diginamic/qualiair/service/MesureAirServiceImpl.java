@@ -39,7 +39,7 @@ public class MesureAirServiceImpl implements MesureAirService {
     @Override
     public boolean existsByDateReleve(LocalDate date) {
 
-        return repository.existsMesureAirByDateReleve(date.atStartOfDay());
+        return repository.existsMesureAirByMesure_DateReleve(date.atStartOfDay());
     }
 
 

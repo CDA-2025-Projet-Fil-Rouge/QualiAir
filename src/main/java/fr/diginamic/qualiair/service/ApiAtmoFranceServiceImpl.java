@@ -50,9 +50,7 @@ public class ApiAtmoFranceServiceImpl implements ApiAtmoFranceService {
     @Autowired
     private AtmoFranceTokenValidator validator;
     @Autowired
-    private CacheService cacheService;
-    @Autowired
-    private MesureAirMapper mesureMapper;
+    private MesureAirMapper mesureAirMapper;
     @Autowired
     private MesureAirService mesureAirService;
     @Autowired
@@ -104,12 +102,9 @@ public class ApiAtmoFranceServiceImpl implements ApiAtmoFranceService {
             }
             Coordonnee savedCoordonnee = commune.getCoordonnee();
 
-            List<MesureAir> mesureAir = mesureMapper.toEntityList(feature, timeStamp);
+            List<MesureAir> mesureAir = mesureAirMapper.toEntityListFromAtmoFranceApi(feature, timeStamp, savedCoordonnee);
 
-            mesureAir.forEach(mesure -> {
-                mesure.setCoordonnee(savedCoordonnee);
-                mesureAirService.save(mesure);
-            });
+            mesureAirService.saveMesureList(mesureAir);
         }
     }
 

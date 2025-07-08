@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.factory;
 
 import fr.diginamic.qualiair.dto.openweather.OpenWeatherForecastDto;
+import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 
 import java.time.LocalDateTime;
@@ -13,5 +14,5 @@ public interface MesurePrevisionFactory {
      * @param dto dto réponse OpenWeather
      * @return Liste de mesures prevision
      */
-    List<MesurePrevision> getInstanceList(OpenWeatherForecastDto dto, LocalDateTime timeStamp);
+    List<MesurePrevision> getInstanceList(OpenWeatherForecastDto dto, LocalDateTime timeStamp, Coordonnee coordonnee);
 }

@@ -14,14 +14,14 @@ import java.util.List;
 @Repository
 public interface MesurePopulationRepository extends JpaRepository<MesurePopulation, Long> {
 
-    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM MesureAir m WHERE m.dateEnregistrement >= :startOfDay AND m.dateEnregistrement < :startOfNextDay")
+    @Query("SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END FROM MesureAir m WHERE m.mesure.dateEnregistrement >= :startOfDay AND m.mesure.dateEnregistrement < :startOfNextDay")
     boolean existsByDate(LocalDateTime startOfDay, LocalDateTime startOfNextDay);
 
-    boolean existsMesurePopulationByDateReleve(LocalDateTime dateReleve);
+    boolean existsMesurePopulationByMesure_DateReleve(LocalDateTime dateReleve);
 
     @Query("""
             SELECT m FROM MesurePrevision m
-            WHERE m.coordonnee.commune.codeInsee = :codeInsee AND m.dateReleve BETWEEN :dateStart AND :dateEnd
+            WHERE m.mesure.coordonnee.commune.codeInsee = :codeInsee AND m.mesure.dateReleve BETWEEN :dateStart AND :dateEnd
             """)
     List<MesurePopulation> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

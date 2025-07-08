@@ -46,7 +46,7 @@ public class MesurePopulationServiceImpl implements MesurePopulationService {
 
     @Override
     public boolean existByDateReleve(LocalDate dateReleve) {
-        return repository.existsMesurePopulationByDateReleve(dateReleve.atStartOfDay());
+        return repository.existsMesurePopulationByMesure_DateReleve(dateReleve.atStartOfDay());
     }
 
     @Override

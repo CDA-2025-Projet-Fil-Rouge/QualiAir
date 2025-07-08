@@ -17,22 +17,22 @@ public interface MesurePrevisionRepository extends JpaRepository<MesurePrevision
             SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END
             FROM MesurePrevision m
             WHERE m.typeReleve = :typeReleve
-            AND m.coordonnee.commune.codeInsee = :codeInsee
-            AND m.dateReleve BETWEEN :startDate AND :endDate""")
+            AND m.mesure.coordonnee.commune.codeInsee = :codeInsee
+            AND m.mesure.dateReleve BETWEEN :startDate AND :endDate""")
     boolean existsByCodeInseeAndTypeReleveAndDateReleveBetween(@Param("codeInsee") String codeInsee, @Param("typeReleve") TypeReleve typeReleve, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
 
     @Query("""
             SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END
             FROM MesurePrevision m
             WHERE m.typeReleve = :typeReleve
-            AND m.coordonnee.commune.codeInsee = :codeInsee
-            AND m.dateEnregistrement >= :dateExpiration""")
+            AND m.mesure.coordonnee.commune.codeInsee = :codeInsee
+            AND m.mesure.dateEnregistrement >= :dateExpiration""")
     boolean existByCodeInseeAndTypeReleveAndDate(@Param("typeReleve") TypeReleve typeReleve, @Param("codeInsee") String codeInsee, @Param("dateExpiration") LocalDateTime dateExpiration);
 
 
     @Query("""
             SELECT m FROM MesurePrevision m
-            WHERE m.coordonnee.commune.codeInsee = :codeInsee AND m.nature = :nature AND m.dateReleve BETWEEN :dateStart AND :dateEnd
+            WHERE m.mesure.coordonnee.commune.codeInsee = :codeInsee AND m.nature = :nature AND m.mesure.dateReleve BETWEEN :dateStart AND :dateEnd
             """)
     List<MesurePrevision> getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(String nature, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 

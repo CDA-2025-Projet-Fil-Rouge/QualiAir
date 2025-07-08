@@ -17,11 +17,11 @@ public interface MesureAirMapper {
      * @param feature objet réponse de l'api Atmo-France
      * @return Liste de mesures Air
      */
-    List<MesureAir> toEntityList(AirDataFeatureDto feature, LocalDateTime timeStamp);
+    List<MesureAir> toEntityListFromAtmoFranceApi(AirDataFeatureDto feature, LocalDateTime timeStamp, Coordonnee coordonnee);
 
     HistoriqueAirQuality toHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures);
 
     AlerteInfo toAlerteDto(MesureAir mesure);
 
-    List<MesureAir> toEntityList(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
+    List<MesureAir> toEntityListFromOpenWeatherApi(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
 }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -230,18 +231,15 @@ public class RecensementParserServiceImpl implements RecensementParserService {
             String codeInsee = dto.getCodeInsee();
             Commune commune = communeService.getFromCache(codeInsee);
             if (commune == null) {
-//                logger.debug("Commune not present for code {}", codeInsee);
                 continue;
             }
             MesurePopulation mesurePopulation;
             try {
-                mesurePopulation = mesurePopulationMapper.toEntity(dto, date.atStartOfDay());
+                mesurePopulation = mesurePopulationMapper.toEntityFromCsv(dto, date.atStartOfDay(), LocalDateTime.now(), commune.getCoordonnee());
             } catch (ParsedDataException e) {
                 logger.debug("Skipping mesure for {}, couldn't parse value {} \n{}", commune.getNomSimple(), dto.getPopulationMunicipale(), e.getMessage());
                 continue;
             }
-            mesurePopulation.setCoordonnee(commune.getCoordonnee());
-
             mesurePopulationService.save(mesurePopulation);
         }
     }

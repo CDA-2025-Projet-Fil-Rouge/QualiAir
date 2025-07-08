@@ -66,9 +66,8 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
         responseValidator.validate(response);
 
         T dto = response.getBody();
-        List<MesurePrevision> mesures = factory.getInstanceList(dto, timeStamp);
+        List<MesurePrevision> mesures = factory.getInstanceList(dto, timeStamp, coordonnee);
 
-        mesures.forEach(mesure -> mesure.setCoordonnee(coordonnee));
         mesurePrevisionService.saveMesurePrevision(mesures);
 
         return mesures;
@@ -143,7 +142,7 @@ public class ApiOpenWeatherServiceImpl implements ApiOpenWeatherService {
 
         LocalAirQualityDto dto = response.getBody();
 
-        List<MesureAir> mesures = mesureAirMapper.toEntityList(dto, coordonnee, timeStamp);
+        List<MesureAir> mesures = mesureAirMapper.toEntityListFromOpenWeatherApi(dto, coordonnee, timeStamp);
 
         mesureAirService.saveMesureList(mesures);
         return mesures;
