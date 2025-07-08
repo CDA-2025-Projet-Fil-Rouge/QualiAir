@@ -105,4 +105,10 @@ public class GlobalExceptionHandler {
         logger.error("Uncaught exception: {}", e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
     }
+
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<String> handleGenericException(UnsupportedOperationException e) {
+        logger.error("Uncaught exception: {}", e.getMessage(), e);
+        return ResponseEntity.status(404).body("An unexpected error occurred: " + e.getMessage());
+    }
 }

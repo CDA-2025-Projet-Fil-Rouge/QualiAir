@@ -10,13 +10,17 @@ public class HistoriquePopulation {
     private String code;
     private String nom;
 
-    private Map<LocalDateTime, Integer> historique = new HashMap<>();
+    private Map<LocalDateTime, Double> historique = new HashMap<>();
 
     public HistoriquePopulation() {
     }
 
-    public void addIndex(LocalDateTime dateReleve, int population) {
+    public void addIndex(LocalDateTime dateReleve, Double population) {
         this.historique.put(dateReleve, population);
+    }
+
+    public void addIndex(LocalDateTime date, int valeur) {
+        this.historique.put(date, (double) valeur);
     }
 
     /**
@@ -42,7 +46,7 @@ public class HistoriquePopulation {
      *
      * @return historique
      */
-    public Map<LocalDateTime, Integer> getHistorique() {
+    public Map<LocalDateTime, Double> getHistorique() {
         return historique;
     }
 
@@ -51,7 +55,7 @@ public class HistoriquePopulation {
      *
      * @param historique sets value
      */
-    public void setHistorique(Map<LocalDateTime, Integer> historique) {
+    public void setHistorique(Map<LocalDateTime, Double> historique) {
         this.historique = historique;
     }
 
@@ -90,4 +94,6 @@ public class HistoriquePopulation {
     public void setCode(String code) {
         this.code = code;
     }
+
+
 }

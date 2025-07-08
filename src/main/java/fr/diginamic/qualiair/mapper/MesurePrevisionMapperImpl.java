@@ -11,8 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.toDouble;
 
@@ -97,13 +100,40 @@ public class MesurePrevisionMapperImpl implements MesurePrevisionMapper {
 
     @Override
     public HistoriquePrevision toHistoricalDto(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures) {
+        return createHistoriqueDto(scope, code, nature, mesures, false);
+    }
+
+    @Override
+    public HistoriquePrevision toHistoricalDtoFromRegion(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures) {
+        return createHistoriqueDto(scope, code, nature, mesures, true);
+    }
+
+    @Override
+    public HistoriquePrevision toHistoricalDtoFromDepartement(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures) {
+        return createHistoriqueDto(scope, code, nature, mesures, true);
+    }
+
+    private HistoriquePrevision createHistoriqueDto(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures, boolean shouldAverage) {
         HistoriquePrevision dto = new HistoriquePrevision();
         dto.setScope(scope.toString());
         dto.setCode(code);
         dto.setNature(nature.toString());
-        dto.setUnite(mesures.getFirst().getUnite());
-        for (MesurePrevision m : mesures) {
-            dto.addValeur(m.getMesure().getDateEnregistrement(), m.getValeur());
+
+        if (shouldAverage) {
+            Map<LocalDateTime, Double> averagesByHour = mesures.stream()
+                    .collect(Collectors.groupingBy(
+                            m -> m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS),
+                            Collectors.averagingDouble(MesurePrevision::getValeur)
+                    ));
+
+            averagesByHour.forEach(dto::addValeur);
+        } else {
+            for (MesurePrevision m : mesures) {
+                LocalDateTime hourTruncated = m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS);
+                double value = m.getValeur();
+
+                dto.addValeur(hourTruncated, value);
+            }
         }
         return dto;
     }

@@ -16,8 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static fr.diginamic.qualiair.utils.AirPolluantUtils.calculateIndice;
 import static fr.diginamic.qualiair.utils.DateUtils.fromDateString;
@@ -64,21 +67,6 @@ public class MesureAirMapperImpl implements MesureAirMapper {
         }
         mesures.forEach(mAir -> mAir.setMesure(base));
         return mesures;
-    }
-
-
-    @Override
-    public HistoriqueAirQuality toHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures) {
-        HistoriqueAirQuality dto = new HistoriqueAirQuality();
-        dto.setCodeElement(polluant.toString());
-        for (MesureAir m : mesures) {
-            if (polluant.toString().equalsIgnoreCase("atmo")) {
-                dto.addIndex(m.getMesure().getDateReleve(), m.getIndice());
-            } else {
-                dto.addIndex(m.getMesure().getDateReleve(), m.getValeur());
-            }
-        }
-        return dto;
     }
 
     @Override
@@ -136,6 +124,7 @@ public class MesureAirMapperImpl implements MesureAirMapper {
         return mesures;
     }
 
+
     /**
      * Crée une mesure d'air à partir de données brutes.
      *
@@ -166,5 +155,48 @@ public class MesureAirMapperImpl implements MesureAirMapper {
         }
         return mAir;
     }
+
+    @Override
+    public HistoriqueAirQuality toHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures) {
+        return createHistoriqueDto(scope, code, polluant, mesures, false);
+    }
+
+    @Override
+    public HistoriqueAirQuality toHistoriqueDtoFromDepartement(GeographicalScope scope, String codeDept, AirPolluant polluant, List<MesureAir> mAirs) {
+        return createHistoriqueDto(scope, codeDept, polluant, mAirs, true);
+    }
+
+    @Override
+    public HistoriqueAirQuality toHistoriqueDtoFromRegion(GeographicalScope scope, String codeRegion, AirPolluant polluant, List<MesureAir> mAirs) {
+        return createHistoriqueDto(scope, codeRegion, polluant, mAirs, true);
+    }
+
+    private HistoriqueAirQuality createHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures, boolean shouldAverage) {
+        HistoriqueAirQuality dto = new HistoriqueAirQuality();
+        dto.setScope(scope.toString());
+        dto.setCode(code);
+        dto.setCodeElement(polluant.toString());
+
+        boolean isAtmo = polluant.toString().equalsIgnoreCase("atmo");
+
+        if (shouldAverage) {
+            Map<LocalDateTime, Double> averagesByHour = mesures.stream()
+                    .collect(Collectors.groupingBy(
+                            m -> m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS),
+                            Collectors.averagingDouble(MesureAir::getIndice)
+                    ));
+
+            averagesByHour.forEach(dto::addIndex);
+        } else {
+            for (MesureAir m : mesures) {
+                LocalDateTime hourTruncated = m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS);
+                double value = m.getIndice();
+
+                dto.addIndex(hourTruncated, value);
+            }
+        }
+        return dto;
+    }
+
 
 }

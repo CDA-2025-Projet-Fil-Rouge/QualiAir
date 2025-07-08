@@ -26,8 +26,6 @@ public class AirPolluantUtils {
             default -> {
                 return 0;
             }
-
-
         }
     }
 

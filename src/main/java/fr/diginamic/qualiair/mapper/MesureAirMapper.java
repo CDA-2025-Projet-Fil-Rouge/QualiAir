@@ -24,4 +24,8 @@ public interface MesureAirMapper {
     AlerteInfo toAlerteDto(MesureAir mesure);
 
     List<MesureAir> toEntityListFromOpenWeatherApi(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
+
+    HistoriqueAirQuality toHistoriqueDtoFromDepartement(GeographicalScope scope, String codeDept, AirPolluant polluant, List<MesureAir> mAirs);
+
+    HistoriqueAirQuality toHistoriqueDtoFromRegion(GeographicalScope scope, String codeRegion, AirPolluant polluant, List<MesureAir> mAirs);
 }

@@ -20,4 +20,8 @@ public interface MesurePopulationMapper {
     MesurePopulation toEntityFromCsv(CommuneHabitantDto dto, LocalDateTime date, LocalDateTime timeStamp, Coordonnee coordonnee) throws ParsedDataException;
 
     HistoriquePopulation toHistoricalDto(GeographicalScope scope, String code, List<MesurePopulation> mesures);
+
+    HistoriquePopulation toHistoricalDtoFromRegion(GeographicalScope scope, String codeRegion, List<MesurePopulation> mesures);
+
+    HistoriquePopulation toHistoricalDtoFromDepartement(GeographicalScope scope, String codeDept, List<MesurePopulation> mesures);
 }

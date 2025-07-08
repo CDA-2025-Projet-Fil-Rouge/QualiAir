@@ -6,6 +6,7 @@ import fr.diginamic.qualiair.enumeration.AirPolluant;
 import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.repository.MesureAirRepository;
+import fr.diginamic.qualiair.repository.MesureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,10 @@ public class MesureAirServiceImpl implements MesureAirService {
     private MesureAirRepository repository;
     @Autowired
     private MesureAirMapper mapper;
+    @Autowired
+    private MesureRepository mesureRepository;
+    @Autowired
+    private MesureAirRepository mesureAirRepository;
 
     @Override
     public MesureAir save(MesureAir mesure) {
@@ -74,24 +79,36 @@ public class MesureAirServiceImpl implements MesureAirService {
     public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
         String elem = polluant.toString();
         List<MesureAir> mesures;
+
         if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
-            mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates("PM2.5", codeInsee, dateStart, dateEnd);
-        } else {
-            mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant.toString(), codeInsee, dateStart, dateEnd);
+            elem = "PM2.5";
         }
+        mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(elem, codeInsee, dateStart, dateEnd);
 
         return mapper.toHistoriqueDto(scope, codeInsee, polluant, mesures);
     }
 
     @Override
     public HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        throw new UnsupportedOperationException("Not supported yet");//todo
+        String elem = polluant.toString();
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            elem = "PM2.5";
+        }
+        List<MesureAir> mAirs = mesureAirRepository.findAllByRegionAndDateReleveBetween(elem, dateStart, dateEnd, Integer.parseInt(codeRegion));
+
+        return mapper.toHistoriqueDtoFromRegion(scope, codeRegion, polluant, mAirs);
 
     }
 
     @Override
     public HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
-        throw new UnsupportedOperationException("Not supported yet");//todo
+        String elem = polluant.toString();
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            elem = "PM2.5";
+        }
+        List<MesureAir> mAirs = mesureAirRepository.findAllByDepartementAndDateReleveBetween(elem, dateStart, dateEnd, codeDept);
+
+        return mapper.toHistoriqueDtoFromDepartement(scope, codeDept, polluant, mAirs);
 
     }
 

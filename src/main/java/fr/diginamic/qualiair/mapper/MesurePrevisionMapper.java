@@ -49,4 +49,8 @@ public interface MesurePrevisionMapper {
     List<MesurePrevision> toEntityListFromSixteenDaysForecast(ForecastSixteenDays dto, LocalDateTime timeStamp, Coordonnee coordonnee);
 
     HistoriquePrevision toHistoricalDto(GeographicalScope scope, String scopedCode, NatureMesurePrevision nature, List<MesurePrevision> mesures);
+
+    HistoriquePrevision toHistoricalDtoFromRegion(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures);
+
+    HistoriquePrevision toHistoricalDtoFromDepartement(GeographicalScope scope, String code, NatureMesurePrevision nature, List<MesurePrevision> mesures);
 }
