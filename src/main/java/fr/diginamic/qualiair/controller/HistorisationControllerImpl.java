@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.ExportException;
 import fr.diginamic.qualiair.service.HistoriqueService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,64 +24,78 @@ public class HistorisationControllerImpl implements HistorisationController {
     @Autowired
     private HistoriqueService service;
 
-    @GetMapping("/prevision/{nature}/for/{codeInsee}")
+    @GetMapping("/prevision/{nature}/for/{scopedCode}")
     @Override
-    public ResponseEntity<HistoriquePrevision> getPrevisionForCommune(
+    public ResponseEntity<HistoriquePrevision> getPrevisionsByNatureForScope(
             @PathVariable NatureMesurePrevision nature,
-            @PathVariable String codeInsee,
+            @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     ) {
-        return ResponseEntity.ok().body(service.executePrevisionForCommune(nature, codeInsee, dateStart, dateEnd));
+        HistoriquePrevision result = service.executePrevision(scope, scopedCode, nature, dateStart, dateEnd);
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/air/{polluant}/for/{codeInsee}")
+    @GetMapping("/air/{polluant}/for/{scopedCode}")
     @Override
-    public ResponseEntity<HistoriqueAirQuality> getAirQualityForCommune(
-            @PathVariable AirPolluant polluant, @PathVariable String codeInsee,
+    public ResponseEntity<HistoriqueAirQuality> getAirQualityByPolluantForScope(
+            @PathVariable AirPolluant polluant,
+            @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     ) {
-        return ResponseEntity.ok().body(service.executeAirQualityForCommune(polluant, codeInsee, dateStart, dateEnd));
+        HistoriqueAirQuality result = service.executeAirQuality(scope, scopedCode, polluant, dateStart, dateEnd);
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/population/for/{codeInsee}")
+    @GetMapping("/population/for/{scopedCode}")
     @Override
-    public ResponseEntity<HistoriquePopulation> getPopulationForCommune(
-            @PathVariable String codeInsee,
+    public ResponseEntity<HistoriquePopulation> getPopulationForScope(
+            @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     ) {
-        return ResponseEntity.ok().body(service.executePopulationForCommune(codeInsee, dateStart, dateEnd));
+        HistoriquePopulation result = service.executePopulation(scope, scopedCode, dateStart, dateEnd);
+        return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/prevision/{nature}/for/{codeInsee}/csv")
+    @GetMapping("/prevision/{nature}/for/{scopedCode}/csv")
     @Override
-    public void getPrevisionCsvForCommune(
-            @PathVariable NatureMesurePrevision nature, @PathVariable String codeInsee,
+    public void getPrevisionByNatureForScopeCsv(
+            @PathVariable NatureMesurePrevision nature,
+            @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd,
+            HttpServletResponse response
+    ) throws IOException, ExportException {
+        service.executePrevisionCsv(response, scope, scopedCode, nature, dateStart, dateEnd);
+    }
+
+    @GetMapping("/air/{polluant}/for/{scopedCode}/csv")
+    @Override
+    public void getAirQualityByPolluantForScopeCsv(
+            @PathVariable AirPolluant polluant, @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
     ) throws IOException, ExportException {
-        service.executePrevisionForCommuneCsv(response, nature, codeInsee, dateStart, dateEnd);
+
+        service.executeAirQualityCsv(response, scope, scopedCode, polluant, dateStart, dateEnd);
     }
 
-    @GetMapping("/air/{polluant}/for/{codeInsee}/csv")
+    @GetMapping("/population/for/{scopedCode}/csv")
     @Override
-    public void getAirQualityCsvForCommune(
-            @PathVariable AirPolluant polluant, @PathVariable String codeInsee,
+    public void getPopulationCsvForScope(
+            @PathVariable String scopedCode,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
     ) throws IOException, ExportException {
-        service.executeAirQualityForCommuneCsv(response, polluant, codeInsee, dateStart, dateEnd);
-    }
 
-    @GetMapping("/population/for/{codeInsee}/csv")
-    @Override
-    public void getPopulationForCommuneCsv(
-            @PathVariable String codeInsee,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
-    ) throws IOException, ExportException {
-        service.executePopulationForCommuneCsv(response, codeInsee, dateStart, dateEnd);
+        service.executePopulationCsv(response, scope, scopedCode, dateStart, dateEnd);
     }
 }

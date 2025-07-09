@@ -3,17 +3,10 @@ package fr.diginamic.qualiair.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "mesure", indexes = {
-        @Index(name = "idx_mesure_coordonnee_date_desc",
-                columnList = "id_coordonnee, date_releve DESC"),
-        @Index(name = "idx_date_releve_desc",
-                columnList = "date_releve DESC"),
-        @Index(name = "idx_mesure_coordonne_type_date", columnList = "id_coordonnee, type_mesure, date_releve DESC"),
-        @Index(name = "idx_mesure_type_date", columnList = "type_mesure, date_releve DESC")
-})
+@Table(name = "mesure")
 
 public class Mesure {
     @Id
@@ -23,16 +16,29 @@ public class Mesure {
 
     @Enumerated(EnumType.STRING)
     private TypeMesure typeMesure;
-    @Column(name = "date_releve")
-    private LocalDateTime dateReleve;
     @Column(name = "date_enregistrement")
     private LocalDateTime dateEnregistrement;
-
+    @Column(name = "date_releve")
+    private LocalDateTime dateReleve;
     @ManyToOne
     @JoinColumn(name = "id_coordonnee")
     private Coordonnee coordonnee;
 
+    @OneToMany(mappedBy = "mesure")
+    private Set<MesureAir> mesuresAir;
+    @OneToMany(mappedBy = "mesure")
+    private Set<MesurePrevision> mesuresPrev;
+    @OneToMany(mappedBy = "mesure")
+    private Set<MesurePopulation> mesuresPop;
+
     public Mesure() {
+    }
+
+    public Mesure(TypeMesure typeMesure, LocalDateTime dateEnregistrement, LocalDateTime dateReleve, Coordonnee coordonnee) {
+        this.typeMesure = typeMesure;
+        this.dateEnregistrement = dateEnregistrement;
+        this.dateReleve = dateReleve;
+        this.coordonnee = coordonnee;
     }
 
     /**
@@ -62,23 +68,6 @@ public class Mesure {
         this.typeMesure = typeMesure;
     }
 
-    /**
-     * Getter
-     *
-     * @return date
-     */
-    public LocalDateTime getDateReleve() {
-        return dateReleve;
-    }
-
-    /**
-     * Setter
-     *
-     * @param date sets value
-     */
-    public void setDateReleve(LocalDateTime date) {
-        this.dateReleve = date;
-    }
 
     /**
      * Getter
@@ -114,5 +103,50 @@ public class Mesure {
      */
     public void setCoordonnee(Coordonnee coordonnee) {
         this.coordonnee = coordonnee;
+    }
+
+    /**
+     * Getter
+     *
+     * @return mesuresAir
+     */
+    public Set<MesureAir> getMesuresAir() {
+        return mesuresAir;
+    }
+
+    /**
+     * Getter
+     *
+     * @return mesuresPrev
+     */
+    public Set<MesurePrevision> getMesuresPrev() {
+        return mesuresPrev;
+    }
+
+    /**
+     * Getter
+     *
+     * @return mesuresPop
+     */
+    public Set<MesurePopulation> getMesuresPop() {
+        return mesuresPop;
+    }
+
+    /**
+     * Getter
+     *
+     * @return dateReleve
+     */
+    public LocalDateTime getDateReleve() {
+        return dateReleve;
+    }
+
+    /**
+     * Setter
+     *
+     * @param dateReleve sets value
+     */
+    public void setDateReleve(LocalDateTime dateReleve) {
+        this.dateReleve = dateReleve;
     }
 }

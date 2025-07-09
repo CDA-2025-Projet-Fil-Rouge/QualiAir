@@ -38,14 +38,14 @@ public class CsvBuilder {
     public CsvBuilder toLines(HistoriqueAirQuality historique) throws IOException {
         PrintWriter writer = response.getWriter();
 
-        writer.println("codeElement,date,indice");
+        writer.println("codeElement,date,value");
 
-        for (Map.Entry<LocalDateTime, Integer> entry : historique.getHistorique().entrySet()) {
+        for (Map.Entry<LocalDateTime, Double> entry : historique.getHistorique().entrySet()) {
             String codeElement = historique.getCodeElement();
             String date = entry.getKey().toString();
-            int indice = entry.getValue();
+            double value = entry.getValue();
 
-            writer.printf("%s,%s,%d%n", codeElement, date, indice);
+            writer.printf("%s,%s,%f%n", codeElement, date, value);
         }
         return this;
     }
@@ -71,12 +71,12 @@ public class CsvBuilder {
 
         writer.println("nature,unite,date,valeur");
 
-        for (Map.Entry<LocalDateTime, Integer> entry : historique.getHistorique().entrySet()) {
-            String nomVille = historique.getNomVille();
+        for (Map.Entry<LocalDateTime, Double> entry : historique.getHistorique().entrySet()) {
+            String nomVille = historique.getNom();
             String date = entry.getKey().toString();
-            int valeur = entry.getValue();
+            double valeur = entry.getValue();
 
-            writer.printf("%s,%s,%d", nomVille, date, valeur);
+            writer.printf("%s,%s,%f", nomVille, date, valeur);
         }
         return this;
     }

@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
 import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,7 +39,7 @@ public interface MesureAirService {
      * @param dateEnd   date de fin
      * @return dto {@link HistoriquePopulation}
      */
-    HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
 
     /**
      * Recupère toutes les {@link MesureAir} pour un polluant donné ayant un indice supérieur à la variable maxIndice. La requete est paginée afin de limiter l'impact en base.
@@ -53,6 +54,12 @@ public interface MesureAirService {
     @Transactional
     List<MesureAir> saveMesureList(List<MesureAir> mesures);
 
-
+    //todo doc
     boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate);
+
+    //todo doc
+    HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
+
+    //todo doc
+    HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd);
 }

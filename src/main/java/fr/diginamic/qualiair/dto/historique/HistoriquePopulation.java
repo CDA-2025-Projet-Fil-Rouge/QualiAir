@@ -6,15 +6,21 @@ import java.util.Map;
 
 public class HistoriquePopulation {
 
-    private String nomVille;
+    private String scope;
+    private String code;
+    private String nom;
 
-    private Map<LocalDateTime, Integer> historique = new HashMap<>();
+    private Map<LocalDateTime, Double> historique = new HashMap<>();
 
     public HistoriquePopulation() {
     }
 
-    public void addIndex(LocalDateTime dateReleve, int population) {
+    public void addIndex(LocalDateTime dateReleve, Double population) {
         this.historique.put(dateReleve, population);
+    }
+
+    public void addIndex(LocalDateTime date, int valeur) {
+        this.historique.put(date, (double) valeur);
     }
 
     /**
@@ -22,17 +28,17 @@ public class HistoriquePopulation {
      *
      * @return nomVille
      */
-    public String getNomVille() {
-        return nomVille;
+    public String getNom() {
+        return nom;
     }
 
     /**
      * Setter
      *
-     * @param nomVille sets value
+     * @param nom sets value
      */
-    public void setNomVille(String nomVille) {
-        this.nomVille = nomVille;
+    public void setNom(String nom) {
+        this.nom = nom;
     }
 
     /**
@@ -40,7 +46,7 @@ public class HistoriquePopulation {
      *
      * @return historique
      */
-    public Map<LocalDateTime, Integer> getHistorique() {
+    public Map<LocalDateTime, Double> getHistorique() {
         return historique;
     }
 
@@ -49,7 +55,45 @@ public class HistoriquePopulation {
      *
      * @param historique sets value
      */
-    public void setHistorique(Map<LocalDateTime, Integer> historique) {
+    public void setHistorique(Map<LocalDateTime, Double> historique) {
         this.historique = historique;
     }
+
+    /**
+     * Getter
+     *
+     * @return scope
+     */
+    public String getScope() {
+        return scope;
+    }
+
+    /**
+     * Setter
+     *
+     * @param scope sets value
+     */
+    public void setScope(String scope) {
+        this.scope = scope;
+    }
+
+    /**
+     * Getter
+     *
+     * @return code
+     */
+    public String getCode() {
+        return code;
+    }
+
+    /**
+     * Setter
+     *
+     * @param code sets value
+     */
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+
 }

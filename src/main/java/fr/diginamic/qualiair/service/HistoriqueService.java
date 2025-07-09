@@ -3,82 +3,116 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
 import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
-import fr.diginamic.qualiair.entity.*;
+import fr.diginamic.qualiair.entity.MesureAir;
+import fr.diginamic.qualiair.entity.MesurePopulation;
+import fr.diginamic.qualiair.entity.MesurePrevision;
+import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.ExportException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
 
+/**
+ * Service pour la gestion des données historiques avec support des différents scopes géographiques.
+ * <p>
+ * Ce service permet de récupérer les données historiques pour les mesures de prévision,
+ * la qualité de l'air et la population selon différents niveaux géographiques
+ * (commune, région, département).
+ * </p>
+ */
 public interface HistoriqueService {
-    /**
-     * Récupère l'historique de {@link MesurePopulation} pour une {@link Commune} entre deux dates.
-     *
-     * @param codeInsee code INSEE de la {@link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @return {@link HistoriquePopulation}
-     */
-    HistoriquePopulation executePopulationForCommune(String codeInsee, LocalDate dateStart, LocalDate dateEnd);
 
     /**
-     * Récupère l'historique de {@link MesureAir} pour une {@link Commune} et un polluant({@link AirPolluant}) donné.
+     * Récupère l'historique de {@link MesurePrevision} selon le scope géographique spécifié.
      *
-     * @param polluant  polluant concerné
-     * @param codeInsee code INSEE de la {@link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @return {@link HistoriqueAirQuality}
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param nature     la nature de la mesure de prévision
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @return {@link HistoriquePrevision} contenant les données historiques
+     * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    HistoriqueAirQuality executeAirQualityForCommune(AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    HistoriquePrevision executePrevision(GeographicalScope scope, String scopedCode,
+                                         NatureMesurePrevision nature, LocalDate dateStart, LocalDate dateEnd);
 
     /**
-     * Récupère l'historique {@link MesurePrevision} pour une {@link Commune}, une nature de mesure et une période.
+     * Récupère l'historique de {@link MesureAir} selon le scope géographique spécifié.
      *
-     * @param nature    nature de la mesure de prévision
-     * @param codeInsee code INSEE de la {@link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @return {@link HistoriquePrevision}
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param polluant   le polluant concerné
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @return {@link HistoriqueAirQuality} contenant les données historiques de qualité de l'air
+     * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    HistoriquePrevision executePrevisionForCommune(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    HistoriqueAirQuality executeAirQuality(GeographicalScope scope, String scopedCode,
+                                           AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd);
 
     /**
-     * Génère un export CSV de l'historique {@link MesurePrevision} pour une {@link Commune}.
+     * Récupère l'historique de {@link MesurePopulation} selon le scope géographique spécifié.
      *
-     * @param response  réponse HTTP où écrire le CSV
-     * @param nature    nature de la mesure de prévision
-     * @param codeInsee code INSEE de la {@link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @throws IOException     en cas d'erreur d'écriture
-     * @throws ExportException en cas d'erreur durant l'export
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @return {@link HistoriquePopulation} contenant les données historiques de population
+     * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    void executePrevisionForCommuneCsv(HttpServletResponse response, NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd) throws IOException, ExportException;
+    HistoriquePopulation executePopulation(GeographicalScope scope, String scopedCode,
+                                           LocalDate dateStart, LocalDate dateEnd);
 
     /**
-     * Génère un export CSV de l'historique qualité de l'air pour une {@link Commune}.
+     * Génère un export CSV de l'historique de {@link MesurePrevision} selon le scope géographique.
      *
-     * @param response  réponse HTTP où écrire le CSV
-     * @param polluant  polluant concerné
-     * @param codeInsee code INSEE de la {link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @throws IOException     en cas d'erreur d'écriture
-     * @throws ExportException en cas d'erreur durant l'export
+     * @param response   la réponse HTTP où écrire le fichier CSV
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param nature     la nature de la mesure de prévision
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @throws IOException              en cas d'erreur d'écriture dans la réponse HTTP
+     * @throws ExportException          en cas d'erreur durant la génération du CSV
+     * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    void executeAirQualityForCommuneCsv(HttpServletResponse response, AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd) throws IOException, ExportException;
+    void executePrevisionCsv(HttpServletResponse response, GeographicalScope scope, String scopedCode,
+                             NatureMesurePrevision nature, LocalDate dateStart, LocalDate dateEnd)
+            throws IOException, ExportException;
 
     /**
-     * Génère un export CSV de l'historique population pour une {link Commune}.
+     * Génère un export CSV de l'historique de {@link MesureAir} selon le scope géographique.
      *
-     * @param response  réponse HTTP où écrire le CSV
-     * @param codeInsee code INSEE de la {link Commune}
-     * @param dateStart date de début
-     * @param dateEnd   date de fin
-     * @throws IOException     en cas d'erreur d'écriture
-     * @throws ExportException en cas d'erreur durant l'export
+     * @param response   la réponse HTTP où écrire le fichier CSV
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param polluant   le polluant concerné
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @throws IOException              en cas d'erreur d'écriture dans la réponse HTTP
+     * @throws ExportException          en cas d'erreur durant la génération du CSV
+     * @throws IllegalArgumentException si les paramètres sont invalides
      */
-    void executePopulationForCommuneCsv(HttpServletResponse response, String codeInsee, LocalDate dateStart, LocalDate dateEnd) throws IOException, ExportException;
+    void executeAirQualityCsv(HttpServletResponse response, GeographicalScope scope, String scopedCode,
+                              AirPolluant polluant, LocalDate dateStart, LocalDate dateEnd)
+            throws IOException, ExportException;
+
+    /**
+     * Génère un export CSV de l'historique de {@link MesurePopulation} selon le scope géographique.
+     *
+     * @param response   la réponse HTTP où écrire le fichier CSV
+     * @param scope      le scope géographique (COMMUNE, REGION, DEPARTEMENT)
+     * @param scopedCode le code correspondant au scope (code INSEE, code région, code département)
+     * @param dateStart  la date de début de la période
+     * @param dateEnd    la date de fin de la période
+     * @throws IOException              en cas d'erreur d'écriture dans la réponse HTTP
+     * @throws ExportException          en cas d'erreur durant la génération du CSV
+     * @throws IllegalArgumentException si les paramètres sont invalides
+     */
+    void executePopulationCsv(HttpServletResponse response, GeographicalScope scope, String scopedCode,
+                              LocalDate dateStart, LocalDate dateEnd)
+            throws IOException, ExportException;
 }

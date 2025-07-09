@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * Mesure repository
  */
 public interface MesureRepository extends JpaRepository<Mesure, Long> {
+
+
 }

@@ -2,12 +2,19 @@ package fr.diginamic.qualiair.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "mesure_prevision",
-        indexes = {
-                @Index(name = "idx_mesure_prev_id_type", columnList = "id_mesure, type_releve")})
-public class MesurePrevision extends Mesure {
+@Table(name = "mesure_prevision")
+public class MesurePrevision {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mesure_prev")
+    private Long id;
+
+    @Column(name = "date_prevision")
+    private LocalDateTime datePrevision;
+
     private String nature;
     private double valeur;
     private String unite;
@@ -15,7 +22,38 @@ public class MesurePrevision extends Mesure {
     @Enumerated(EnumType.STRING)
     private TypeReleve typeReleve;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_mesure", referencedColumnName = "id_mesure")
+    private Mesure mesure;
+
     public MesurePrevision() {
+    }
+
+    /**
+     * Getter
+     *
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * Getter
+     *
+     * @return datePrevision
+     */
+    public LocalDateTime getDatePrevision() {
+        return datePrevision;
+    }
+
+    /**
+     * Setter
+     *
+     * @param datePrevision sets value
+     */
+    public void setDatePrevision(LocalDateTime datePrevision) {
+        this.datePrevision = datePrevision;
     }
 
     /**
@@ -70,6 +108,24 @@ public class MesurePrevision extends Mesure {
      */
     public void setUnite(String unite) {
         this.unite = unite;
+    }
+
+    /**
+     * Getter
+     *
+     * @return mesure
+     */
+    public Mesure getMesure() {
+        return mesure;
+    }
+
+    /**
+     * Setter
+     *
+     * @param mesure sets value
+     */
+    public void setMesure(Mesure mesure) {
+        this.mesure = mesure;
     }
 
     /**

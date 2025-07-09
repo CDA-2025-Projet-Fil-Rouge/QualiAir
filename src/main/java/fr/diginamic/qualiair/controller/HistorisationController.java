@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.ExportException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,45 +18,51 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 public interface HistorisationController {
-    @GetMapping("/prevision/{nature}/for/{codeInsee}")
-    ResponseEntity<HistoriquePrevision> getPrevisionForCommune(
+    @GetMapping("/prevision/{nature}/for/{code}")
+    ResponseEntity<HistoriquePrevision> getPrevisionsByNatureForScope(
             @PathVariable NatureMesurePrevision nature,
-            @PathVariable String codeInsee,
+            @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     );
 
-    @GetMapping("/air/{polluant}/for/{codeInsee}")
-    ResponseEntity<HistoriqueAirQuality> getAirQualityForCommune(
-            @PathVariable AirPolluant polluant, @PathVariable String codeInsee,
+    @GetMapping("/air/{polluant}/for/{code}")
+    ResponseEntity<HistoriqueAirQuality> getAirQualityByPolluantForScope(
+            @PathVariable AirPolluant polluant, @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     );
 
-    @GetMapping("/population/for/{codeInsee}")
-    ResponseEntity<HistoriquePopulation> getPopulationForCommune(
-            @PathVariable String codeInsee,
+    @GetMapping("/population/for/{code}")
+    ResponseEntity<HistoriquePopulation> getPopulationForScope(
+            @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd
     );
 
-    @GetMapping("/prevision/{nature}/for/{codeInsee}/csv")
-    void getPrevisionCsvForCommune(
-            @PathVariable NatureMesurePrevision nature, @PathVariable String codeInsee,
+    @GetMapping("/prevision/{nature}/for/{code}/csv")
+    void getPrevisionByNatureForScopeCsv(
+            @PathVariable NatureMesurePrevision nature, @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
     ) throws IOException, ExportException;
 
-    @GetMapping("/air/{polluant}/for/{codeInsee}/csv")
-    void getAirQualityCsvForCommune(
-            @PathVariable AirPolluant polluant, @PathVariable String codeInsee,
+    @GetMapping("/air/{polluant}/for/{code}/csv")
+    void getAirQualityByPolluantForScopeCsv(
+            @PathVariable AirPolluant polluant, @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
     ) throws IOException, ExportException;
 
-    @GetMapping("/population/for/{codeInsee}/csv")
-    void getPopulationForCommuneCsv(
-            @PathVariable String codeInsee,
+    @GetMapping("/population/for/{code}/csv")
+    void getPopulationCsvForScope(
+            @PathVariable String code,
+            @RequestParam GeographicalScope scope,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateStart,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateEnd, HttpServletResponse response
     ) throws IOException, ExportException;

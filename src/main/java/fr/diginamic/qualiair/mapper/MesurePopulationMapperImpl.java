@@ -2,13 +2,19 @@ package fr.diginamic.qualiair.mapper;
 
 import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.dto.insertion.CommuneHabitantDto;
+import fr.diginamic.qualiair.entity.Coordonnee;
+import fr.diginamic.qualiair.entity.Mesure;
 import fr.diginamic.qualiair.entity.MesurePopulation;
 import fr.diginamic.qualiair.entity.TypeMesure;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static fr.diginamic.qualiair.utils.MesureUtils.toInt;
 
@@ -19,22 +25,51 @@ import static fr.diginamic.qualiair.utils.MesureUtils.toInt;
 public class MesurePopulationMapperImpl implements MesurePopulationMapper {
 
     @Override
-    public MesurePopulation toEntity(CommuneHabitantDto dto, LocalDateTime date) throws ParsedDataException {
-        MesurePopulation mesure = new MesurePopulation();
-        mesure.setTypeMesure(TypeMesure.RELEVE_POPULATION);
-        mesure.setDateReleve(date);
-        mesure.setDateEnregistrement(date);
-        mesure.setValeur(toInt(dto.getPopulationMunicipale().trim()));
-        return mesure;
+    public MesurePopulation toEntityFromCsv(CommuneHabitantDto dto, LocalDateTime dateReleve, LocalDateTime timeStamp, Coordonnee coordonnee) throws ParsedDataException {
+        Mesure base = new Mesure(TypeMesure.RELEVE_POPULATION, timeStamp, dateReleve, coordonnee);
+        MesurePopulation mpop = new MesurePopulation();
+        mpop.setValeur(toInt(dto.getPopulationMunicipale().trim()));
+        mpop.setMesure(base);
+        return mpop;
     }
 
     @Override
-    public HistoriquePopulation toHistoricalDto(List<MesurePopulation> mesures) {
+    public HistoriquePopulation toHistoricalDto(GeographicalScope scope, String code, List<MesurePopulation> mesures) {
+        return createHistoriqueDto(scope, code, mesures, false);
+    }
+
+    @Override
+    public HistoriquePopulation toHistoricalDtoFromRegion(GeographicalScope scope, String codeRegion, List<MesurePopulation> mesures) {
+        return createHistoriqueDto(scope, codeRegion, mesures, true);
+
+    }
+
+    @Override
+    public HistoriquePopulation toHistoricalDtoFromDepartement(GeographicalScope scope, String codeDept, List<MesurePopulation> mesures) {
+        return createHistoriqueDto(scope, codeDept, mesures, true);
+    }
+
+    private HistoriquePopulation createHistoriqueDto(GeographicalScope scope, String code, List<MesurePopulation> mesures, boolean shouldAverage) {
         HistoriquePopulation dto = new HistoriquePopulation();
-        MesurePopulation mpop = mesures.getFirst();
-        dto.setNomVille(mpop.getCoordonnee().getCommune().getNomSimple());
-        for (MesurePopulation m : mesures) {
-            dto.addIndex(m.getDateEnregistrement(), m.getValeur());
+        dto.setScope(scope.toString());
+        dto.setCode(code);
+
+
+        if (shouldAverage) {
+            Map<LocalDateTime, Double> averagesByHour = mesures.stream()
+                    .collect(Collectors.groupingBy(
+                            m -> m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS),
+                            Collectors.averagingInt(MesurePopulation::getValeur)
+                    ));
+
+            averagesByHour.forEach(dto::addIndex);
+        } else {
+            for (MesurePopulation m : mesures) {
+                LocalDateTime hourTruncated = m.getMesure().getDateReleve().truncatedTo(ChronoUnit.HOURS);
+                int value = m.getValeur();
+
+                dto.addIndex(hourTruncated, value);
+            }
         }
         return dto;
     }

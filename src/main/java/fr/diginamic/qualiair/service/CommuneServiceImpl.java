@@ -72,6 +72,7 @@ public class CommuneServiceImpl implements CommuneService {
     @Override
     public List<InfoCarteCommune> getListCommunesDtoByPopulation(int nbHabitant) {
         List<Long> communeIds = communeRepository.findCommuneIdsByPopulation(nbHabitant);
+
         List<Commune> communes = communeRepository.findWithMesuresById(communeIds);
 
         return communes.stream()

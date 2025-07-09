@@ -4,6 +4,7 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.mapper.MesurePrevisionMapper;
 import fr.diginamic.qualiair.repository.MesurePrevisionRepository;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
     private static final Logger logger = LoggerFactory.getLogger(MesurePrevisionServiceImpl.class);
 
     @Autowired
-    private MesurePrevisionRepository repository;
+    private MesurePrevisionRepository mesurePrevisionRepository;
     @Autowired
     private MesureValidator validator;
     @Autowired
@@ -45,7 +45,7 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
         for (MesurePrevision mesure : mesures) {
             try {
                 validator.validate(mesure);
-                saved.add(repository.save(mesure));
+                saved.add(mesurePrevisionRepository.save(mesure));
             } catch (BusinessRuleException e) {
                 logger.error(e.getMessage());
             }
@@ -55,28 +55,39 @@ public class MesurePrevisionServiceImpl implements MesurePrevisionService {
 
     @Override
     public boolean existsByHourAndCodeInsee(LocalDateTime startDate, LocalDateTime endDate, TypeReleve typeReleve, String codeInsee) {
-        return repository.existsByCodeInseeAndTypeReleveAndDateReleveBetween(codeInsee, typeReleve, startDate, endDate);
+        return mesurePrevisionRepository.existsByCodeInseeAndTypeReleveAndDateReleveBetween(codeInsee, typeReleve, startDate, endDate);
     }
 
     @Override
     public boolean existsForTodayByTypeReleveAndCodeInsee(LocalDateTime dateExpiration, TypeReleve typeReleve, String codeInsee) {
-        return repository.existByCodeInseeAndTypeReleveAndDate(typeReleve, codeInsee, dateExpiration);
+        return mesurePrevisionRepository.existByCodeInseeAndTypeReleveAndDate(typeReleve, codeInsee, dateExpiration);
     }
 
     @Override
-    public HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
-        List<MesurePrevision> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(nature, codeInsee, dateStart, dateEnd);
+    public HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePrevision> mesures = mesurePrevisionRepository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(nature.toString(), codeInsee, dateStart, dateEnd);
 
-        return mapper.toHistoricalDto(nature, mesures);
+        return mapper.toHistoricalDto(scope, codeInsee, nature, mesures);
+    }
+
+    @Override
+    public HistoriquePrevision getAllByNatureAndCodeRegionBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePrevision> mesures = mesurePrevisionRepository.getAllByNatureAndMRegionCodeAndDateReleveBetween(nature.toString(), dateStart, dateEnd, Integer.parseInt(code));
+        return mapper.toHistoricalDtoFromRegion(scope, code, nature, mesures);
+    }
+
+    @Override
+    public HistoriquePrevision getAllByNatureAndCodeDepartementBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePrevision> mesures = mesurePrevisionRepository.getAllByNatureAndDepartementAndDateReleveBetween(nature.toString(), dateStart, dateEnd, code);
+        return mapper.toHistoricalDtoFromDepartement(scope, code, nature, mesures);
     }
 
     @Override
     @Transactional
     public void deleteByTypeReleve(TypeReleve typeReleve) {
-        List<Long> idsToDelete = repository.findIdsByTypeReleve(typeReleve);
-        repository.deleteAllByTypeReleve(typeReleve);
+        List<Long> idsToDelete = mesurePrevisionRepository.findIdsByTypeReleve(typeReleve);
+        mesurePrevisionRepository.deleteAllByTypeReleve(typeReleve);
         mesureRepository.deleteAllByIdInBatch(idsToDelete);
         logger.info("Deleted {} forecast records and their parent mesure records", idsToDelete.size());
     }
-
 }

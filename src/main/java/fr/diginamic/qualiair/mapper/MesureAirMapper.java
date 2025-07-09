@@ -7,6 +7,7 @@ import fr.diginamic.qualiair.dto.openweather.LocalAirQualityDto;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,11 +17,15 @@ public interface MesureAirMapper {
      * @param feature objet réponse de l'api Atmo-France
      * @return Liste de mesures Air
      */
-    List<MesureAir> toEntityList(AirDataFeatureDto feature, LocalDateTime timeStamp);
+    List<MesureAir> toEntityListFromAtmoFranceApi(AirDataFeatureDto feature, LocalDateTime timeStamp, Coordonnee coordonnee);
 
-    HistoriqueAirQuality toDto(AirPolluant polluant, List<MesureAir> mesures);
+    HistoriqueAirQuality toHistoriqueDto(GeographicalScope scope, String code, AirPolluant polluant, List<MesureAir> mesures);
 
-    AlerteInfo toDto(MesureAir mesure);
+    AlerteInfo toAlerteDto(MesureAir mesure);
 
-    List<MesureAir> toEntityList(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
+    List<MesureAir> toEntityListFromOpenWeatherApi(LocalAirQualityDto dto, Coordonnee coordonnee, LocalDateTime timestamp);
+
+    HistoriqueAirQuality toHistoriqueDtoFromDepartement(GeographicalScope scope, String codeDept, AirPolluant polluant, List<MesureAir> mAirs);
+
+    HistoriqueAirQuality toHistoriqueDtoFromRegion(GeographicalScope scope, String codeRegion, AirPolluant polluant, List<MesureAir> mAirs);
 }

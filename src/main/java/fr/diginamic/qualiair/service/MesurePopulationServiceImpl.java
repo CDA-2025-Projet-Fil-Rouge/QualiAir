@@ -2,6 +2,7 @@ package fr.diginamic.qualiair.service;
 
 import fr.diginamic.qualiair.dto.historique.HistoriquePopulation;
 import fr.diginamic.qualiair.entity.MesurePopulation;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.mapper.MesurePopulationMapper;
 import fr.diginamic.qualiair.repository.MesurePopulationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,13 +46,26 @@ public class MesurePopulationServiceImpl implements MesurePopulationService {
 
     @Override
     public boolean existByDateReleve(LocalDate dateReleve) {
-        return repository.existsMesurePopulationByDateReleve(dateReleve.atStartOfDay());
+        return repository.existsMesurePopulationByMesure_DateReleve(dateReleve.atStartOfDay());
     }
 
     @Override
-    public HistoriquePopulation getAllByCodeInseeBetwenDates(String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
-        List<MesurePopulation> mesures = repository.getAllByNatureAndCoordonnee_Commune_CodeInseeBetweenDates(codeInsee, dateStart, dateEnd);
+    public HistoriquePopulation getAllByCodeInseeBetwenDates(GeographicalScope scope, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePopulation> mesures = repository.findAllByMesureCodeInseeAndMesureDateReleveBetween(codeInsee, dateStart, dateEnd);
 
-        return mapper.toHistoricalDto(mesures);
+        return mapper.toHistoricalDto(scope, codeInsee, mesures);
     }
+
+    @Override
+    public HistoriquePopulation getAllByCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePopulation> mesures = repository.findAllByRegionAndDateReleveBetween(dateStart, dateEnd, Integer.parseInt(codeRegion));
+        return mapper.toHistoricalDtoFromRegion(scope, codeRegion, mesures);
+    }
+
+    @Override
+    public HistoriquePopulation getAllByCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        List<MesurePopulation> mesures = repository.findAllByDepartementAndDateReleveBetween(dateStart, dateEnd, codeDept);
+        return mapper.toHistoricalDtoFromDepartement(scope, codeDept, mesures);
+    }
+
 }

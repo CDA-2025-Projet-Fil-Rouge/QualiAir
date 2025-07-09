@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Classe utilitaire regroupant différentes méthodes de manipulation,
@@ -96,67 +95,6 @@ public class MesureUtils {
         }
     }
 
-    /**
-     * Ajoute une {@link MesurePrevision} à une liste si la valeur est non nulle.
-     *
-     * @param mesures liste cible
-     * @param valeur  valeur de la mesure
-     * @param type    type de relevé
-     * @param releve  date de relevé
-     * @param maj     date d'enregistrement
-     * @param nature  nature de la mesure
-     */
-    public static void addIfNotNull(List<MesurePrevision> mesures, String valeur, TypeReleve type, LocalDateTime releve, LocalDateTime maj, NatureMesurePrevision nature) {
-        try {
-            if (valeur != null) {
-                mesures.add(createMesurePrevision(type, releve, maj, valeur, nature));
-            }
-        } catch (ParsedDataException e) {
-            logger.debug("Couldn't convert value to double for {}, at {}", type, maj);
-        }
-    }
-
-    /**
-     * Crée une mesure de prévision météo.
-     *
-     * @param typeReleve type de relevé
-     * @param dateReleve date du relevé
-     * @param dateMaj    date d'enregistrement
-     * @param valeur     valeur brute
-     * @param nature     nature de la mesure
-     * @return la mesure construite
-     * @throws ParsedDataException si la valeur n'est pas convertible
-     */
-    public static MesurePrevision createMesurePrevision(TypeReleve typeReleve, LocalDateTime dateReleve, LocalDateTime dateMaj, String valeur, NatureMesurePrevision nature) throws ParsedDataException {
-        MesurePrevision mesure = new MesurePrevision();
-        mesure.setTypeMesure(TypeMesure.RELEVE_METEO);
-        mesure.setTypeReleve(typeReleve);
-        mesure.setDateReleve(dateReleve);
-        mesure.setDateEnregistrement(dateMaj);
-        mesure.setValeur(toDouble(valeur));
-        setNatureAndUnite(mesure, nature);
-        return mesure;
-    }
-
-    /**
-     * Définit la nature et l'unité en fonction de la nature de la mesure.
-     *
-     * @param mesure mesure à modifier
-     * @param nature nature de la mesure
-     */
-    public static void setNatureAndUnite(MesurePrevision mesure, NatureMesurePrevision nature) {
-        mesure.setNature(nature.toString());
-        switch (nature) {
-            case HUMIDITY, CLOUD_COVERAGE -> mesure.setUnite("%");
-            case TEMPERATURE, TEMPERATURE_MAX, TEMPERATURE_FELT, TEMPERATURE_MIN, WIND_ORIENTATION ->
-                    mesure.setUnite("°");
-            case PRESSURE -> mesure.setUnite("hpa");
-            case VISIBILITY -> mesure.setUnite("m");
-            case WIND_SPEED, WIND_SPEED_GUST -> mesure.setUnite("m/s");
-            case RAIN_1H, RAIN_3H, SNOW_1H, SNOW_3H -> mesure.setUnite("mm/h");
-            default -> mesure.setUnite("tbd");
-        }
-    }
 
     /**
      * Extrait les {@link MesureAir} d'un ensemble de mesures polymorphes.
@@ -166,9 +104,8 @@ public class MesureUtils {
      */
     public static List<MesureAir> getMesureAir(Collection<Mesure> mesures) {
         return mesures.stream()
-                .filter(m -> m instanceof MesureAir)
-                .map(m -> (MesureAir) m)
-                .collect(Collectors.toList());
+                .flatMap(m -> m.getMesuresAir().stream())
+                .toList();
     }
 
     /**
@@ -179,9 +116,8 @@ public class MesureUtils {
      */
     public static List<MesurePrevision> getMesurePrevision(Collection<Mesure> mesures) {
         return mesures.stream()
-                .filter(m -> m instanceof MesurePrevision)
-                .map(m -> (MesurePrevision) m)
-                .collect(Collectors.toList());
+                .flatMap(m -> m.getMesuresPrev().stream())
+                .toList();
     }
 
     /**
@@ -233,37 +169,6 @@ public class MesureUtils {
         }
     }
 
-    /**
-     * Crée une mesure d'air à partir de données brutes.
-     *
-     * @param codeElement code du polluant
-     * @param indice      indice calculé
-     * @param dateReleve  date du relevé
-     * @param timeStamp   date d'enregistrement
-     * @return instance de {@link MesureAir}
-     */
-    public static MesureAir createMesureAir(String codeElement, String indice,
-                                            LocalDateTime dateReleve, LocalDateTime timeStamp) {
-        MesureAir mesure = new MesureAir();
-        mesure.setTypeMesure(TypeMesure.RELEVE_AIR);
-        mesure.setCodeElement(cleanUpElementCode(codeElement));
-        mesure.setIndice(Integer.parseInt(indice));
-        mesure.setDateReleve(dateReleve);
-        mesure.setDateEnregistrement(timeStamp);
-        return mesure;
-    }
-
-    public static MesureAir createMesureAirWithValue(String codeElement, String unite, double valeur, LocalDateTime dateReleveTime, LocalDateTime timestamp) {
-        MesureAir mAir = new MesureAir();
-        mAir.setTypeMesure(TypeMesure.RELEVE_AIR);
-        mAir.setCodeElement(codeElement);
-        mAir.setUnite(unite);
-        mAir.setValeur(valeur);
-        mAir.setDateReleve(dateReleveTime);
-        mAir.setDateEnregistrement(timestamp);
-        //todo calc indice based on valeur
-        return mAir;
-    }
 
     public static void throwIfExists(boolean exists, LocalDateTime timeStamp, LocalDateTime endDate) throws UnnecessaryApiRequestException {
         if (exists) {

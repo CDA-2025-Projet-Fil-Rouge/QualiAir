@@ -3,8 +3,10 @@ package fr.diginamic.qualiair.service;
 import fr.diginamic.qualiair.dto.historique.HistoriqueAirQuality;
 import fr.diginamic.qualiair.entity.MesureAir;
 import fr.diginamic.qualiair.enumeration.AirPolluant;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 import fr.diginamic.qualiair.mapper.MesureAirMapper;
 import fr.diginamic.qualiair.repository.MesureAirRepository;
+import fr.diginamic.qualiair.repository.MesureRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +31,10 @@ public class MesureAirServiceImpl implements MesureAirService {
     private MesureAirRepository repository;
     @Autowired
     private MesureAirMapper mapper;
+    @Autowired
+    private MesureRepository mesureRepository;
+    @Autowired
+    private MesureAirRepository mesureAirRepository;
 
     @Override
     public MesureAir save(MesureAir mesure) {
@@ -38,19 +44,13 @@ public class MesureAirServiceImpl implements MesureAirService {
     @Override
     public boolean existsByDateReleve(LocalDate date) {
 
-        return repository.existsMesureAirByDateReleve(date.atStartOfDay());
+        return repository.existsMesureAirByMesure_DateReleve(date.atStartOfDay());
     }
 
-    @Override
-    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(AirPolluant polluant, String codeInsee, LocalDate dateStart, LocalDate dateEnd) {
-        List<MesureAir> mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(polluant, codeInsee, dateStart, dateEnd);
-
-        return mapper.toDto(polluant, mesures);
-    }
 
     @Override
     public Page<MesureAir> findWithDetailsByTypeAndIndiceLessThan(AirPolluant polluant, int maxIndice, Pageable pageable) {
-        return repository.findWithDetailsByTypeAndIndiceLessThan(polluant, maxIndice, pageable);
+        return repository.findWithDetailsByTypeAndIndiceLessThan(polluant.toString(), maxIndice, pageable);
     }
 
     @Override
@@ -68,10 +68,49 @@ public class MesureAirServiceImpl implements MesureAirService {
         return saved;
     }
 
+    @Override
     public boolean existsByHour(String codeInsee, LocalDateTime timeStamp, LocalDateTime endDate) {
         LocalDateTime start = timeStamp.truncatedTo(ChronoUnit.HOURS);
         LocalDateTime end = timeStamp.truncatedTo(ChronoUnit.HOURS).plusHours(1).minusNanos(1);
         return repository.existsMesureAirByCodeInseeAndDateReleveBetween(codeInsee, start, end);
     }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeInseeBetweenDates(GeographicalScope scope, String codeInsee, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        String elem = polluant.toString();
+        List<MesureAir> mesures;
+
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            elem = "PM2.5";
+        }
+        mesures = repository.getAllByPolluantAndCoordonnee_Commune_CodeInseeBetweenDates(elem, codeInsee, dateStart, dateEnd);
+
+        return mapper.toHistoriqueDto(scope, codeInsee, polluant, mesures);
+    }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeRegionBetweenDates(GeographicalScope scope, String codeRegion, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        String elem = polluant.toString();
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            elem = "PM2.5";
+        }
+        List<MesureAir> mAirs = mesureAirRepository.findAllByRegionAndDateReleveBetween(elem, dateStart, dateEnd, Integer.parseInt(codeRegion));
+
+        return mapper.toHistoriqueDtoFromRegion(scope, codeRegion, polluant, mAirs);
+
+    }
+
+    @Override
+    public HistoriqueAirQuality getAllByPolluantAndCodeDepartementBetweenDates(GeographicalScope scope, String codeDept, AirPolluant polluant, LocalDateTime dateStart, LocalDateTime dateEnd) {
+        String elem = polluant.toString();
+        if (elem.equalsIgnoreCase("pm2.5") || elem.equalsIgnoreCase("pm25")) {
+            elem = "PM2.5";
+        }
+        List<MesureAir> mAirs = mesureAirRepository.findAllByDepartementAndDateReleveBetween(elem, dateStart, dateEnd, codeDept);
+
+        return mapper.toHistoriqueDtoFromDepartement(scope, codeDept, polluant, mAirs);
+
+    }
+
 
 }

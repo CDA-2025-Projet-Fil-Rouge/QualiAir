@@ -44,12 +44,12 @@ public class CommuneMapperImpl implements CommuneMapper {
         List<MesurePrevision> mPrev = getMesurePrevision(commune.getCoordonnee().getMesures());
 
         Map<LocalDateTime, List<MesurePrevision>> threeHoursIncrementMprev = mPrev.stream()
-                .collect(Collectors.groupingBy(MesurePrevision::getDateReleve));
+                .collect(Collectors.groupingBy(MesurePrevision::getDatePrevision));
 
-        threeHoursIncrementMprev.forEach((dateReleve, mesurePrevisions) -> {
+        threeHoursIncrementMprev.forEach((datePrevision, mesurePrevisions) -> {
                     DetailMeteo foreCastInstance = new DetailMeteo();
                     setDetailMeteo(mesurePrevisions, foreCastInstance);
-                    view.addForecast(dateReleve, foreCastInstance);
+                    view.addForecast(datePrevision, foreCastInstance);
                 }
         );
 

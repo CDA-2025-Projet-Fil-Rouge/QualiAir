@@ -24,17 +24,15 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
             JOIN FETCH cd.mesures m
+            JOIN FETCH m.mesuresPop mp
             LEFT JOIN FETCH c.departement d
             LEFT JOIN FETCH d.region r
-            WHERE EXISTS (
-                SELECT 1 FROM MesurePopulation mp
-                WHERE mp.coordonnee = cd
-                  AND mp.valeur >= :nbHab
-                  AND mp.dateReleve = (
-                      SELECT MAX(mp2.dateReleve)
-                      FROM MesurePopulation mp2
-                      WHERE mp2.coordonnee = cd
-                  )
+            WHERE m.typeMesure = 'RELEVE_POPULATION'
+            AND mp.valeur >= :nbHab
+            AND mp.mesure.dateReleve = (
+                SELECT MAX(mp2.mesure.dateReleve)
+                FROM MesurePopulation mp2
+                WHERE mp2.mesure.coordonnee = cd
             )
             """)
     List<Commune> findTopByLastestMesurePopulation(@Param("nbHab") int nbHab);
@@ -54,19 +52,19 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
 
     Optional<Commune> findByNomReelAndCodePostal(String nomPostal, String codePostal);
 
-    @Query(value = """
+    @Query("""
             SELECT c.id FROM Commune c
             WHERE c.codeInsee NOT LIKE '97%'
               AND EXISTS (
                   SELECT 1 FROM MesurePopulation mp
-                  WHERE mp.coordonnee = c.coordonnee
+                  JOIN mp.mesure m
+                  WHERE m.coordonnee = c.coordonnee
+                    AND m.typeMesure = 'RELEVE_POPULATION'
                     AND mp.valeur >= :nbHab
-                    AND mp.dateReleve = (
-                        SELECT mp2.dateReleve
+                    AND mp.mesure.dateReleve = (
+                        SELECT MAX(mp2.mesure.dateReleve)
                         FROM MesurePopulation mp2
-                        WHERE mp2.coordonnee = c.coordonnee
-                        ORDER BY mp2.dateReleve DESC
-                        LIMIT 1
+                        WHERE mp2.mesure.coordonnee = c.coordonnee
                     )
               )
             """)
@@ -76,77 +74,87 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
             JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH m.mesuresAir ma
+            LEFT JOIN FETCH m.mesuresPrev mp
+            LEFT JOIN FETCH m.mesuresPop mpop
             LEFT JOIN FETCH c.departement d
             LEFT JOIN FETCH d.region r
             WHERE c.id IN :ids
               AND c.codeInsee NOT LIKE '97%'
               AND (
                   (m.typeMesure = 'RELEVE_AIR' AND m.dateReleve = (
-                      SELECT m2.dateReleve
-                      FROM MesureAir m2
+                      SELECT MAX(m2.dateReleve)
+                      FROM Mesure m2
                       WHERE m2.coordonnee = cd
-                      ORDER BY m2.dateReleve DESC
-                      LIMIT 1
+                        AND m2.typeMesure = 'RELEVE_AIR'
                   ))
                   OR
-                  (m.typeMesure = 'RELEVE_METEO' AND m.dateReleve = (
-                      SELECT m3.dateReleve
-                      FROM MesurePrevision m3
-                      WHERE m3.typeReleve = 'ACTUEL' AND m3.coordonnee = cd
-                      ORDER BY m3.dateReleve DESC
-                      LIMIT 1
+                  (m.typeMesure = 'RELEVE_METEO' AND EXISTS (
+                      SELECT 1 FROM m.mesuresPrev mp2
+                      WHERE mp2.typeReleve = 'ACTUEL'
+                  ) AND m.dateReleve = (
+                      SELECT MAX(m3.dateReleve)
+                      FROM Mesure m3
+                      JOIN m3.mesuresPrev mp3
+                      WHERE m3.coordonnee = cd
+                        AND m3.typeMesure = 'RELEVE_METEO'
+                        AND mp3.typeReleve = 'ACTUEL'
                   ))
                   OR
                   (m.typeMesure = 'RELEVE_POPULATION' AND m.dateReleve = (
-                      SELECT m4.dateReleve
-                      FROM MesurePopulation m4
+                      SELECT MAX(m4.dateReleve)
+                      FROM Mesure m4
                       WHERE m4.coordonnee = cd
-                      ORDER BY m4.dateReleve DESC
-                      LIMIT 1
+                        AND m4.typeMesure = 'RELEVE_POPULATION'
                   ))
               )
             """)
     List<Commune> findWithMesuresById(@Param("ids") List<Long> ids);
 
-    @Query(value = """
+    @Query("""
             SELECT c.id FROM Commune c
             WHERE c.codeInsee = :codeInsee
               AND EXISTS (
                   SELECT 1 FROM MesurePopulation mp
-                  WHERE mp.coordonnee = c.coordonnee
-                    AND mp.dateReleve = (
-                        SELECT MAX(mp2.dateReleve)
+                  JOIN mp.mesure m
+                  WHERE m.coordonnee = c.coordonnee
+                    AND m.typeMesure = 'RELEVE_POPULATION'
+                    AND mp.mesure.dateReleve = (
+                        SELECT MAX(mp2.mesure.dateReleve)
                         FROM MesurePopulation mp2
-                        WHERE mp2.coordonnee = c.coordonnee
+                        WHERE mp2.mesure.coordonnee = c.coordonnee
                     )
               )
             """)
     Long findCommuneIdByCodeInsee(@Param("codeInsee") String codeInsee);
 
     @Query("""
-            SELECT c FROM Commune c
+            SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
             JOIN FETCH cd.mesures m
+            LEFT JOIN FETCH m.mesuresAir ma
+            LEFT JOIN FETCH m.mesuresPrev mp
+            LEFT JOIN FETCH m.mesuresPop mpop
             LEFT JOIN FETCH c.departement d
             LEFT JOIN FETCH d.region r
             WHERE c.id = :id
             AND (
-                (m.typeMesure = 'RELEVE_AIR' AND m.dateReleve = (
-                    SELECT MAX(m2.dateReleve)
-                    FROM Mesure m2
-                    WHERE m2.typeMesure = 'RELEVE_AIR' AND m2.coordonnee = cd
+                (m.typeMesure = 'RELEVE_AIR' AND ma.mesure.dateReleve = (
+                    SELECT MAX(ma2.mesure.dateReleve)
+                    FROM MesureAir ma2
+                    WHERE ma2.mesure.coordonnee = cd
                 ))
                 OR
-                (m.typeMesure = 'RELEVE_METEO' AND m.dateReleve = (
-                    SELECT MAX(m3.dateReleve)
-                    FROM Mesure m3
-                    WHERE m3.typeMesure = 'RELEVE_METEO' AND m3.coordonnee = cd
+                (m.typeMesure = 'RELEVE_METEO' AND mp.mesure.dateReleve = (
+                    SELECT MAX(mp2.mesure.dateReleve)
+                    FROM MesurePrevision mp2
+                    WHERE mp2.mesure.coordonnee = cd
                 ))
                 OR
-                (m.typeMesure = 'RELEVE_POPULATION' AND m.dateReleve = (
-                    SELECT MAX(m4.dateReleve)
-                    FROM Mesure m4
-                    WHERE m4.typeMesure = 'RELEVE_POPULATION' AND m4.coordonnee = cd
+                (m.typeMesure = 'RELEVE_POPULATION' AND mpop.mesure.dateReleve = (
+                    SELECT MAX(mpop2.mesure.dateReleve)
+                    FROM MesurePopulation mpop2
+                    WHERE mpop2.mesure.coordonnee = cd
                 ))
             )
             """)
@@ -155,22 +163,18 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     List<Commune> findTop10ByNomSimpleContainingIgnoreCase(String attr0);
 
     @Query("""
-            SELECT c FROM Commune c
+            SELECT DISTINCT c FROM Commune c
             JOIN FETCH c.coordonnee cd
             JOIN FETCH cd.mesures m
+            JOIN FETCH m.mesuresPrev mp
             LEFT JOIN FETCH c.departement d
             LEFT JOIN FETCH d.region r
             WHERE c.id = :id
             AND m.typeMesure = 'RELEVE_METEO'
-            AND m IN (
-                SELECT mp FROM MesurePrevision mp 
-                WHERE mp.typeReleve = 'PREVISION_5J'
-                AND mp.coordonnee = cd
-                AND mp.dateReleve <= :endDate
-                AND mp.dateReleve >= :startDate
-            
-            )
-            ORDER BY m.dateReleve
+            AND mp.typeReleve = 'PREVISION_5J'
+            AND mp.datePrevision <= :endDate
+            AND mp.datePrevision >= :startDate
+            ORDER BY mp.datePrevision
             """)
     Commune findWithForecastMesuresById(@Param("id") Long id,
                                         @Param("startDate") LocalDateTime startDate,

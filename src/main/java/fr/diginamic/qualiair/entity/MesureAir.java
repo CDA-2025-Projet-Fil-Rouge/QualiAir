@@ -1,15 +1,24 @@
 package fr.diginamic.qualiair.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "mesure_air")
-public class MesureAir extends Mesure {
+public class MesureAir {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_mesure_air")
+    private Long id;
+
     private String codeElement;
     private int indice;
     private double valeur;
     private String unite;
+
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_mesure", referencedColumnName = "id_mesure")
+    private Mesure mesure;
 
     public MesureAir() {
     }
@@ -20,6 +29,16 @@ public class MesureAir extends Mesure {
         this.valeur = valeur;
         this.unite = unite;
     }
+
+    /**
+     * Getter
+     *
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
 
     /**
      * Getter
@@ -91,5 +110,23 @@ public class MesureAir extends Mesure {
      */
     public void setUnite(String unite) {
         this.unite = unite;
+    }
+
+    /**
+     * Getter
+     *
+     * @return mesure
+     */
+    public Mesure getMesure() {
+        return mesure;
+    }
+
+    /**
+     * Setter
+     *
+     * @param mesure sets value
+     */
+    public void setMesure(Mesure mesure) {
+        this.mesure = mesure;
     }
 }

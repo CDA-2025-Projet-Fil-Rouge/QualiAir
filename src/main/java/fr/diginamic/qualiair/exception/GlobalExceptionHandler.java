@@ -2,6 +2,8 @@ package fr.diginamic.qualiair.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -84,5 +86,29 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUpdateException(UpdateException e) {
         logger.error(e.getMessage(), e);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<String> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e) {
+        logger.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid data access: " + e.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        logger.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation: " + e.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception e) {
+        logger.error("Uncaught exception: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+    }
+
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<String> handleGenericException(UnsupportedOperationException e) {
+        logger.error("Uncaught exception: {}", e.getMessage(), e);
+        return ResponseEntity.status(404).body("An unexpected error occurred: " + e.getMessage());
     }
 }

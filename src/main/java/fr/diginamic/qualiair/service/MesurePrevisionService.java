@@ -4,8 +4,8 @@ import fr.diginamic.qualiair.dto.historique.HistoriquePrevision;
 import fr.diginamic.qualiair.entity.MesurePrevision;
 import fr.diginamic.qualiair.entity.NatureMesurePrevision;
 import fr.diginamic.qualiair.entity.TypeReleve;
+import fr.diginamic.qualiair.enumeration.GeographicalScope;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -50,7 +50,14 @@ public interface MesurePrevisionService {
      * @param dateEnd   date de fin de la période
      * @return objet {@link HistoriquePrevision} contenant les mesures agrégées
      */
-    HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(NatureMesurePrevision nature, String codeInsee, LocalDate dateStart, LocalDate dateEnd);
+    HistoriquePrevision getAllByNatureAndCodeInseeBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String codeInsee, LocalDateTime dateStart, LocalDateTime dateEnd);
 
+    //todo doc
     void deleteByTypeReleve(TypeReleve typeReleve);
+    //todo doc
+
+    HistoriquePrevision getAllByNatureAndCodeRegionBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDateTime dateStart, LocalDateTime dateEnd);
+    //todo doc
+
+    HistoriquePrevision getAllByNatureAndCodeDepartementBetweenDates(GeographicalScope scope, NatureMesurePrevision nature, String code, LocalDateTime dateStart, LocalDateTime dateEnd);
 }
