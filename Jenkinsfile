@@ -10,13 +10,6 @@ pipeline {
             }
         }
 
-        stage('Compile with maven') {
-            steps {
-                sh 'cd back-end'
-                sh 'mvn clean package'
-            }
-        }
-
         stage('Git Clone Repo front') {
             steps {
                 dir('front-end') {
@@ -27,5 +20,11 @@ pipeline {
             }
         }
 
+        stage('Compile with maven') {
+            steps {
+                sh 'cd back-end'
+                sh 'mvn clean package'
+            }
+        }
     }
 }
