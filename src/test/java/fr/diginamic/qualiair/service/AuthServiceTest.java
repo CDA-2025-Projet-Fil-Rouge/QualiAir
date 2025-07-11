@@ -114,7 +114,7 @@ public class AuthServiceTest {
         dto.setEmail("invalide@example.com");
 
         assertThrows(BadCredentialsException.class, () ->
-            authService.logUser(dto));
+                authService.logUser(dto));
     }
 
     @Test
@@ -129,7 +129,7 @@ public class AuthServiceTest {
 
     @Test
     void createUser_shouldSaveUserSuccessfully() throws Exception {
-        when(communeRepository.findByNomReelAndCodePostal("Paris", "75000"))
+        when(communeRepository.findByNomReelAndCodePostalContaining("Paris", "75000"))
                 .thenReturn(Optional.of(commune));
         when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
         when(utilisateurMapper.fromDto(dto, adresse, RoleUtilisateur.UTILISATEUR))
@@ -146,13 +146,13 @@ public class AuthServiceTest {
 
     @Test
     void createUser_shouldThrow_whenAdresseNotFound() {
-          assertThrows(FileNotFoundException.class,
+        assertThrows(FileNotFoundException.class,
                 () -> authService.createUser(dto, RoleUtilisateur.UTILISATEUR));
     }
 
     @Test
     void createUser_shouldThrow_whenCommuneNotFound() {
-        when(communeRepository.findByNomReelAndCodePostal("Paris", "75000"))
+        when(communeRepository.findByNomReelAndCodePostalContaining("Paris", "75000"))
                 .thenReturn(Optional.empty());
 
         assertThrows(FileNotFoundException.class,

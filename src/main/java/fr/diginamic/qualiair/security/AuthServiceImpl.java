@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService {
             throws FileNotFoundException, BusinessRuleException {
 
         AdresseDto adresseDto = userDto.getAdresseDto();
-        Commune commune = communeRepository.findByNomReelAndCodePostal(adresseDto.getNomCommune(), adresseDto.getCodePostal())
+        Commune commune = communeRepository.findByNomReelAndCodePostalContaining(adresseDto.getNomCommune(), adresseDto.getCodePostal())
                 .orElseThrow(() -> new FileNotFoundException("Commune non trouvée"));
 
         Adresse adresse = adresseMapper.fromDto(adresseDto, commune);

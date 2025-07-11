@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.service;
 
+import fr.diginamic.qualiair.dto.favoris.CodeInsee;
 import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.Utilisateur;
@@ -24,24 +25,24 @@ public interface FavorisService {
      * Ajoute une commune dans les favoris de {@link Utilisateur}.
      *
      * @param user      utilisateur courant
-     * @param communeId id de la commune à ajouter
+     * @param codeInsee id de la commune à ajouter
      * @return liste mise à jour des favoris au format {@link InfoFavorite}
      * @throws DataNotFoundException si {@link Utilisateur} ou la commune n'existe pas
      * @throws UpdateException       si la commune est déjà dans les favoris
      * @throws BusinessRuleException en cas de violation métier
      */
     @Transactional
-    List<InfoFavorite> addNewUserFavorite(CusomUserPrincipal user, Long communeId) throws DataNotFoundException, UpdateException, BusinessRuleException;
+    List<InfoFavorite> addNewUserFavorite(CusomUserPrincipal user, CodeInsee codeInsee) throws DataNotFoundException, UpdateException, BusinessRuleException;
 
     /**
      * Supprime une commune des favoris de l'utilisateur.
      *
      * @param user      utilisateur courant
-     * @param communeId id de la commune à retirer
+     * @param codeInsee id de la commune à retirer
      * @return liste mise à jour des favoris au format {@link InfoFavorite}
      * @throws DataNotFoundException si la commune n'est pas dans les favoris
      * @throws BusinessRuleException en cas de violation métier
      */
     @Transactional
-    List<InfoFavorite> removeUserFavorite(CusomUserPrincipal user, Long communeId) throws DataNotFoundException, BusinessRuleException;
+    List<InfoFavorite> removeUserFavorite(CusomUserPrincipal user, String codeInsee) throws DataNotFoundException, BusinessRuleException;
 }

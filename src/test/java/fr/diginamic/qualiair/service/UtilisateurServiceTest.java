@@ -207,7 +207,7 @@ class UtilisateurServiceTest {
         when(utilisateurRepository.existsByEmail("new@example.com")).thenReturn(false);
         when(bcrypt.matches("plainOldPassword", "encodedOldPassword")).thenReturn(true);
         when(bcrypt.encode("newPassword")).thenReturn("encodedNewPassword");
-        when(communeRepository.findByNomReelAndCodePostal("Testville", "12345"))
+        when(communeRepository.findByNomReelAndCodePostalContaining("Testville", "12345"))
                 .thenReturn(Optional.of(commune));
         when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
 
@@ -226,7 +226,7 @@ class UtilisateurServiceTest {
         when(utilisateurRepository.existsByEmail("new@example.com")).thenReturn(false);
         utilisateurUpdateDto.setAncienMotDePasse("wrongPassword");
         when(bcrypt.matches("wrongPassword", "encodedOldPassword")).thenReturn(false);
-        when(communeRepository.findByNomReelAndCodePostal("Testville", "12345"))
+        when(communeRepository.findByNomReelAndCodePostalContaining("Testville", "12345"))
                 .thenReturn(Optional.of(commune));
         when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
 

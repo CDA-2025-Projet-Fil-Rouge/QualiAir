@@ -92,10 +92,10 @@ public class CommuneMapperImpl implements CommuneMapper {
 
 
     @Override
-    public InfoFavorite toMapDataView(Commune commune, Long userId) {
+    public InfoFavorite toFavoritesView(Commune commune, Long userId) {
         InfoFavorite fav = new InfoFavorite();
-        fav.setFavID(userId, commune.getId());
-        fav.setInformations(toMapDataView(commune));
+        fav.setCodeInsee(commune.getCodeInsee());
+        fav.setUserId(userId);
         return fav;
     }
 

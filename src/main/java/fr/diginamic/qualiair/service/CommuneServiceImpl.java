@@ -136,6 +136,18 @@ public class CommuneServiceImpl implements CommuneService {
         return mapper.toForecastView(commune);
     }
 
+    @Override
+    public Commune getCommuneByCodeInsee(String codeInsee) throws DataNotFoundException {
+        if (codeInsee == null || codeInsee.isBlank() || codeInsee.length() > 7) {
+            throw new IllegalArgumentException("Invalid code Insee");
+        }
+        Commune commune = communeRepository.findCommunesByCodeInsee(codeInsee);
+        if (commune == null) {
+            throw new DataNotFoundException("Commune not found for code: " + codeInsee);
+        }
+        return commune;
+    }
+
     private Commune findCommuneByCodeInseeWithForecastRelations(String codeInsee) throws DataNotFoundException {
         if (codeInsee == null || codeInsee.trim().isEmpty()) {
             throw new IllegalArgumentException("Code INSEE cannot be null or empty");
