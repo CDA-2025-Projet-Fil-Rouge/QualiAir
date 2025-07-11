@@ -7,13 +7,13 @@ import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.AdresseMapper;
-import fr.diginamic.qualiair.mapper.UtilisateurMapper;
+import fr.diginamic.qualiair.mapper.AdresseMapperImpl;
+import fr.diginamic.qualiair.mapper.UtilisateurMapperImpl;
 import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
-import fr.diginamic.qualiair.security.AuthService;
-import fr.diginamic.qualiair.security.IJwtAuthentificationService;
+import fr.diginamic.qualiair.security.AuthServiceImpl;
+import fr.diginamic.qualiair.security.JwtAuthentificationService;
 import fr.diginamic.qualiair.validator.AdresseValidator;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,18 +38,18 @@ import static org.mockito.Mockito.when;
 public class AuthServiceTest {
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Mock
     private UtilisateurRepository utilisateurRepository;
     @Mock
     private AdresseRepository adresseRepository;
     @Mock
-    private UtilisateurMapper utilisateurMapper;
+    private UtilisateurMapperImpl utilisateurMapper;
     @Mock
-    private UtilisateurService utilisateurService;
+    private UtilisateurServiceImpl utilisateurService;
     @Mock
-    private IJwtAuthentificationService IJwtAuthentificationService;
+    private JwtAuthentificationService jwtAuthentificationService;
     @Mock
     private BCryptPasswordEncoder bcrypt;
     @Mock
@@ -57,7 +57,7 @@ public class AuthServiceTest {
     @Mock
     private CommuneRepository communeRepository;
     @Mock
-    private AdresseMapper adresseMapper;
+    private AdresseMapperImpl adresseMapper;
     @Mock
     private AdresseValidator adresseValidator;
 
@@ -98,13 +98,13 @@ public class AuthServiceTest {
         when(utilisateurService.getUser("test@example.com")).thenReturn(utilisateur);
         when(bcrypt.matches("password", utilisateur.getMotDePasse())).thenReturn(true);
         ResponseCookie fakeCookie = ResponseCookie.from("token", "dummyJwt").build();
-        when(IJwtAuthentificationService.generateToken(utilisateur)).thenReturn(fakeCookie);
+        when(jwtAuthentificationService.generateToken(utilisateur)).thenReturn(fakeCookie);
 
         ResponseCookie result = authService.logUser(dto);
 
         assertEquals("dummyJwt", result.getValue());
         verify(utilisateurService).getUser("test@example.com");
-        verify(IJwtAuthentificationService).generateToken(utilisateur);
+        verify(jwtAuthentificationService).generateToken(utilisateur);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class AuthServiceTest {
         dto.setEmail("invalide@example.com");
 
         assertThrows(BadCredentialsException.class, () ->
-            authService.logUser(dto));
+                authService.logUser(dto));
     }
 
     @Test
@@ -146,7 +146,7 @@ public class AuthServiceTest {
 
     @Test
     void createUser_shouldThrow_whenAdresseNotFound() {
-          assertThrows(FileNotFoundException.class,
+        assertThrows(FileNotFoundException.class,
                 () -> authService.createUser(dto, RoleUtilisateur.UTILISATEUR));
     }
 

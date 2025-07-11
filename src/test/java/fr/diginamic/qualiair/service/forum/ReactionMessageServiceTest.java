@@ -6,7 +6,7 @@ import fr.diginamic.qualiair.entity.forum.ReactionMessage;
 import fr.diginamic.qualiair.entity.forum.ReactionType;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.repository.ReactionMessageRepository;
-import fr.diginamic.qualiair.service.forumService.ReactionMessageService;
+import fr.diginamic.qualiair.service.forumService.ReactionMessageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +28,7 @@ class ReactionMessageServiceTest {
     private ReactionMessageRepository reactionRepository;
 
     @InjectMocks
-    private ReactionMessageService service;
+    private ReactionMessageServiceImpl service;
 
     private Utilisateur utilisateur;
     private Message message;

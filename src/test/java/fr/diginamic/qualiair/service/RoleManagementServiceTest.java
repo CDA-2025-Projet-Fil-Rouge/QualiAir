@@ -17,25 +17,23 @@ import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RoleManagementServiceTest {
 
-    @Mock
-    private UtilisateurRepository utilisateurRepository;
-
-    @InjectMocks
-    private RoleManagementService service;
-
-    private Utilisateur admin;
-    private Utilisateur utilisateur;
-
     private final String messageDesactive = "Utilisateur désactivé";
     private final String messageReactive = "Utilisateur réactivé";
     private final String messageBanni = "Utilisateur banni";
     private final String messageDebanni = "Utilisateur débanni";
+    @Mock
+    private UtilisateurRepository utilisateurRepository;
+    @InjectMocks
+    private RoleManagementServiceImpl service;
+    private Utilisateur admin;
+    private Utilisateur utilisateur;
 
     @BeforeEach
     void setup() {

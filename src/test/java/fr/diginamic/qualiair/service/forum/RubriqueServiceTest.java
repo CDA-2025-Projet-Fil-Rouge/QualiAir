@@ -7,10 +7,10 @@ import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.entity.forum.Rubrique;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapper;
+import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapperImpl;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.service.forumService.RubriqueService;
+import fr.diginamic.qualiair.service.forumService.RubriqueServiceImpl;
 import fr.diginamic.qualiair.validator.forumValidator.RubriqueValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,16 +36,16 @@ import static org.mockito.Mockito.when;
 public class RubriqueServiceTest {
 
     @InjectMocks
-    private RubriqueService rubriqueService;
+    private RubriqueServiceImpl rubriqueService;
 
     @Mock
     private RubriqueRepository rubriqueRepository;
     @Mock
     private TopicRepository topicRepository;
     @Mock
-    RubriqueMapper rubriqueMapper;
+    private RubriqueMapperImpl rubriqueMapper;
     @Mock
-    RubriqueValidator rubriqueValidator;
+    private RubriqueValidator rubriqueValidator;
 
     private Utilisateur utilisateur;
     private Utilisateur admin;

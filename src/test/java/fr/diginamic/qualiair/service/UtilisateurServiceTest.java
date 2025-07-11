@@ -9,8 +9,8 @@ import fr.diginamic.qualiair.entity.RoleUtilisateur;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.AdresseMapper;
-import fr.diginamic.qualiair.mapper.UtilisateurMapper;
+import fr.diginamic.qualiair.mapper.AdresseMapperImpl;
+import fr.diginamic.qualiair.mapper.UtilisateurMapperImpl;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import fr.diginamic.qualiair.validator.AdresseValidator;
@@ -40,7 +40,7 @@ import static org.mockito.Mockito.*;
 class UtilisateurServiceTest {
 
     @InjectMocks
-    private UtilisateurService service;
+    private UtilisateurServiceImpl service;
 
     @Mock
     private UtilisateurRepository utilisateurRepository;
@@ -49,10 +49,10 @@ class UtilisateurServiceTest {
     private CommuneRepository communeRepository;
 
     @Mock
-    private AdresseMapper adresseMapper;
+    private AdresseMapperImpl adresseMapper;
 
     @Mock
-    private UtilisateurMapper utilisateurMapper;
+    private UtilisateurMapperImpl utilisateurMapper;
 
     @Mock
     private UtilisateurValidator utilisateurValidator;
@@ -61,7 +61,7 @@ class UtilisateurServiceTest {
     private AdresseValidator adresseValidator;
 
     @Mock
-    private RoleManagementService roleManagementService;
+    private RoleManagementServiceImpl roleManagementService;
 
     @Mock
     private BCryptPasswordEncoder bcrypt;

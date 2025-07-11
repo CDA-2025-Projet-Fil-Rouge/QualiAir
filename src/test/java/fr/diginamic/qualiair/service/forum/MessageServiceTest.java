@@ -7,11 +7,11 @@ import fr.diginamic.qualiair.entity.forum.Message;
 import fr.diginamic.qualiair.entity.forum.ReactionType;
 import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
-import fr.diginamic.qualiair.mapper.forumMapper.MessageMapper;
+import fr.diginamic.qualiair.mapper.forumMapper.MessageMapperImpl;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.service.forumService.MessageService;
-import fr.diginamic.qualiair.service.forumService.ReactionMessageService;
+import fr.diginamic.qualiair.service.forumService.MessageServiceImpl;
+import fr.diginamic.qualiair.service.forumService.ReactionMessageServiceImpl;
 import fr.diginamic.qualiair.validator.forumValidator.MessageValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,18 +38,18 @@ import static org.mockito.Mockito.when;
 class MessageServiceTest {
 
     @InjectMocks
-    private MessageService messageService;
+    private MessageServiceImpl messageService;
 
     @Mock
     private MessageRepository messageRepository;
     @Mock
     private TopicRepository topicRepository;
     @Mock
-    private MessageMapper messageMapper;
+    private MessageMapperImpl messageMapper;
     @Mock
     private MessageValidator messageValidator;
     @Mock
-    private ReactionMessageService reactionService;
+    private ReactionMessageServiceImpl reactionService;
 
     private Utilisateur utilisateur;
     private Utilisateur utilisateur2;
@@ -220,7 +220,7 @@ class MessageServiceTest {
 
     @Test
     void deleteMessage_shouldThrow_whenUserIsNotAdminNorAuthor() {
-       when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
+        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
 
         assertThrows(AccessDeniedException.class, () ->
                 messageService.deleteMessage(10L, utilisateur2));
