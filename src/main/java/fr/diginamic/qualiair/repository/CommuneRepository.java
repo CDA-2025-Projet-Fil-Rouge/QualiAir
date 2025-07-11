@@ -50,7 +50,8 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
 
     Commune getCommuneById(Long id);
 
-    Optional<Commune> findByNomReelAndCodePostal(String nomPostal, String codePostal);
+    Optional<Commune> findByNomReelAndCodePostalContaining(String nomPostal, String codePostal);
+
 
     @Query("""
             SELECT c.id FROM Commune c
@@ -138,25 +139,34 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
             LEFT JOIN FETCH c.departement d
             LEFT JOIN FETCH d.region r
             WHERE c.id = :id
-            AND (
-                (m.typeMesure = 'RELEVE_AIR' AND ma.mesure.dateReleve = (
-                    SELECT MAX(ma2.mesure.dateReleve)
-                    FROM MesureAir ma2
-                    WHERE ma2.mesure.coordonnee = cd
-                ))
-                OR
-                (m.typeMesure = 'RELEVE_METEO' AND mp.mesure.dateReleve = (
-                    SELECT MAX(mp2.mesure.dateReleve)
-                    FROM MesurePrevision mp2
-                    WHERE mp2.mesure.coordonnee = cd
-                ))
-                OR
-                (m.typeMesure = 'RELEVE_POPULATION' AND mpop.mesure.dateReleve = (
-                    SELECT MAX(mpop2.mesure.dateReleve)
-                    FROM MesurePopulation mpop2
-                    WHERE mpop2.mesure.coordonnee = cd
-                ))
-            )
+              AND c.codeInsee NOT LIKE '97%'
+              AND (
+                  (m.typeMesure = 'RELEVE_AIR' AND m.dateReleve = (
+                      SELECT MAX(m2.dateReleve)
+                      FROM Mesure m2
+                      WHERE m2.coordonnee = cd
+                        AND m2.typeMesure = 'RELEVE_AIR'
+                  ))
+                  OR
+                  (m.typeMesure = 'RELEVE_METEO' AND EXISTS (
+                      SELECT 1 FROM m.mesuresPrev mp2
+                      WHERE mp2.typeReleve = 'ACTUEL'
+                  ) AND m.dateReleve = (
+                      SELECT MAX(m3.dateReleve)
+                      FROM Mesure m3
+                      JOIN m3.mesuresPrev mp3
+                      WHERE m3.coordonnee = cd
+                        AND m3.typeMesure = 'RELEVE_METEO'
+                        AND mp3.typeReleve = 'ACTUEL'
+                  ))
+                  OR
+                  (m.typeMesure = 'RELEVE_POPULATION' AND m.dateReleve = (
+                      SELECT MAX(m4.dateReleve)
+                      FROM Mesure m4
+                      WHERE m4.coordonnee = cd
+                        AND m4.typeMesure = 'RELEVE_POPULATION'
+                  ))
+              )
             """)
     Commune findWithMesuresById(@Param("id") Long id);
 
@@ -179,4 +189,6 @@ public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Commune findWithForecastMesuresById(@Param("id") Long id,
                                         @Param("startDate") LocalDateTime startDate,
                                         @Param("endDate") LocalDateTime endDate);
+
+    Commune findCommunesByCodeInsee(String codeInsee);
 }

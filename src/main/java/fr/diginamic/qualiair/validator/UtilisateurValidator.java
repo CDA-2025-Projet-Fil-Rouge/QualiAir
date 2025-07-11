@@ -38,4 +38,13 @@ public class UtilisateurValidator implements IUtilisateurValidator {
         return true;
     }
 
+    public boolean validateUpdate(Utilisateur user) throws BusinessRuleException {
+        isTrue(user.getEmail() != null && !user.getEmail().isBlank(), "L'email est obligatoire.");
+        isTrue(user.getMotDePasse() != null && !user.getMotDePasse().isBlank(), "Le mot de passe est obligatoire.");
+        isTrue(user.getPrenom() != null && !user.getPrenom().isBlank(), "Le prénom est obligatoire.");
+        isTrue(user.getNom() != null && !user.getNom().isBlank(), "Le nom est obligatoire.");
+        isTrue(user.getAdresse() != null, "L'adresse est obligatoire.");
+        return true;
+    }
+
 }

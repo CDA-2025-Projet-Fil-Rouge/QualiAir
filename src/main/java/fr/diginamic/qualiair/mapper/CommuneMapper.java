@@ -17,7 +17,7 @@ public interface CommuneMapper {
 
     InfoCarteCommune toMapDataView(Commune commune);
 
-    InfoFavorite toMapDataView(Commune commune, Long userId);
+    InfoFavorite toFavoritesView(Commune commune, Long userId);
 
     FiveDaysForecastView toForecastView(Commune commune);
 

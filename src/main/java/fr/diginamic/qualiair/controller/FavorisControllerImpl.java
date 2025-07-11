@@ -1,5 +1,6 @@
 package fr.diginamic.qualiair.controller;
 
+import fr.diginamic.qualiair.dto.favoris.CodeInsee;
 import fr.diginamic.qualiair.dto.favoris.InfoFavorite;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
 import fr.diginamic.qualiair.exception.DataNotFoundException;
@@ -32,14 +33,14 @@ public class FavorisControllerImpl implements FavorisController {
 
     @PostMapping("/add")
     @Override
-    public ResponseEntity<List<InfoFavorite>> addNew(@AuthenticationPrincipal CusomUserPrincipal user, @RequestBody Long communeId) throws DataNotFoundException, BusinessRuleException, UpdateException {
-        return ResponseEntity.ok().body(service.addNewUserFavorite(user, communeId));
+    public ResponseEntity<List<InfoFavorite>> addNew(@AuthenticationPrincipal CusomUserPrincipal user, @RequestBody CodeInsee codeInsee) throws DataNotFoundException, BusinessRuleException, UpdateException {
+        return ResponseEntity.ok().body(service.addNewUserFavorite(user, codeInsee));
     }
 
-    @DeleteMapping("delete/{communeId}")
+    @DeleteMapping("/delete/{codeInsee}")
     @Override
-    public ResponseEntity<List<InfoFavorite>> removeById(@AuthenticationPrincipal CusomUserPrincipal user, @PathVariable Long communeId) throws DataNotFoundException, BusinessRuleException {
-        return ResponseEntity.ok().body(service.removeUserFavorite(user, communeId));
+    public ResponseEntity<List<InfoFavorite>> removeById(@AuthenticationPrincipal CusomUserPrincipal user, @PathVariable String codeInsee) throws DataNotFoundException, BusinessRuleException {
+        return ResponseEntity.ok().body(service.removeUserFavorite(user, codeInsee));
     }
 
 }

@@ -75,8 +75,8 @@ public final class UtilisateurUtils {
 
     public static Commune findCommuneOrThrow(CommuneRepository repo,
                                              String nomCommune,
-                                             String codePostal ) throws FileNotFoundException {
-        return repo.findByNomReelAndCodePostal(nomCommune, codePostal)
+                                             String codePostal) throws FileNotFoundException {
+        return repo.findByNomReelAndCodePostalContaining(nomCommune, codePostal)
                 .orElseThrow(() -> new FileNotFoundException("Commune introuvable"));
     }
 

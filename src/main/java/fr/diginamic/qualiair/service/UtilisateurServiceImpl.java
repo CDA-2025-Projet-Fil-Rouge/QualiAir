@@ -68,7 +68,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     public Utilisateur updateUser(Utilisateur utilisateur) throws BusinessRuleException {
-        utilisateurValidator.validate(utilisateur);
+        utilisateurValidator.validateUpdate(utilisateur);
         return utilisateurRepository.save(utilisateur);
     }
 
