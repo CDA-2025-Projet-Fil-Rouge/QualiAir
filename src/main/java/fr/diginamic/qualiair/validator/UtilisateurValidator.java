@@ -33,8 +33,7 @@ public class UtilisateurValidator implements IUtilisateurValidator {
         isTrue(user.getPrenom() != null && !user.getPrenom().isBlank(), "Le prénom est obligatoire.");
         isTrue(user.getNom() != null && !user.getNom().isBlank(), "Le nom est obligatoire.");
         isTrue(user.getAdresse() != null, "L'adresse est obligatoire.");
-        isTrue(utilisateurRepository.findByEmail(user.getEmail()).isEmpty(),
-                "Un utilisateur avec cet email existe déjà.");
+
         return true;
     }
 
@@ -46,5 +45,4 @@ public class UtilisateurValidator implements IUtilisateurValidator {
         isTrue(user.getAdresse() != null, "L'adresse est obligatoire.");
         return true;
     }
-
 }

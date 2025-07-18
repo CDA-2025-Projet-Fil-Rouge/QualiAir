@@ -1,6 +1,7 @@
 package fr.diginamic.qualiair.mapper.forumMapper;
 
 import fr.diginamic.qualiair.dto.forumDto.MessageDto;
+import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.entity.forum.Message;
 
 public interface MessageMapper {
@@ -11,6 +12,8 @@ public interface MessageMapper {
      * @return le DTO correspondant
      */
     MessageDto toDto(Message message);
+
+    MessageDto toDto(Message message, Utilisateur utilisateur);
 
     /**
      * Convertit un MessageDto en entité Message.

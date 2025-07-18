@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.controller;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
 import fr.diginamic.qualiair.dto.entitesDto.UtilisateurUpdateDto;
 import fr.diginamic.qualiair.entity.Utilisateur;
+import fr.diginamic.qualiair.security.CusomUserPrincipal;
 import fr.diginamic.qualiair.service.UtilisateurService;
 import fr.diginamic.qualiair.utils.HttpRequestUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -42,6 +46,15 @@ public class UtilisateurControllerImpl implements UtilisateurController {
         return ResponseEntity.ok(utilisateurService.getAllUsers(pageable, demandeur));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<UtilisateurDto>> getAllUsersNonPaginated(
+            @AuthenticationPrincipal CusomUserPrincipal principal) {
+
+        Utilisateur demandeur = utilisateurService.getUser(principal.getUsername());
+        List<UtilisateurDto> users = utilisateurService.getAllUsers(demandeur);
+        return ResponseEntity.ok(users);
+    }
+
     @PutMapping("/update-personal-data")
     @Override
     public ResponseEntity<UtilisateurUpdateDto> updatePersonalData(
@@ -52,12 +65,11 @@ public class UtilisateurControllerImpl implements UtilisateurController {
         return ResponseEntity.ok(updated);
     }
 
-    @PostMapping("/toggle-admin/{id}")
+    @PutMapping("/toggle-admin/{id}")
     @Override
     public ResponseEntity<String> toggleAdminRole(
             @PathVariable("id") Long idUser,
             HttpServletRequest request) throws Exception {
-
         Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
         String message = utilisateurService.toggleAdminUser(idUser, demandeur);
         return ResponseEntity.ok(message);

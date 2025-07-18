@@ -9,13 +9,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
+import java.util.List;
+
 public interface RubriqueService {
+    /**
+     * Récupère toutes les rubriques existantes en base et les affiches de manière paginée.
+     *
+     * @return une liste de RubriqueDto représentant les rubriques disponibles.
+     */
+    Page<RubriqueDto> getAllRubriques(Pageable pageable);
+
     /**
      * Récupère toutes les rubriques existantes en base.
      *
      * @return une liste de RubriqueDto représentant les rubriques disponibles.
      */
-    Page<RubriqueDto> getAllRubriques(Pageable pageable);
+    List<RubriqueDto> getAllRubriquesUnpaged();
 
     /**
      * Crée une nouvelle rubrique, uniquement si l'utilisateur est administrateur.
@@ -42,6 +51,15 @@ public interface RubriqueService {
      */
     RubriqueDto updateRubrique(Long idRubrique, RubriqueDto dto, Utilisateur modificateur)
             throws BusinessRuleException, FileNotFoundException, TokenExpiredException;
+
+    /**
+     * Modifie le champ prioriteAffichageIndice d'une liste de rubriques
+     * pour permettre à un administrateur de réorganiser l'ordre d'affichages des rubriques
+     * @param rubriques liste de rubriques concernées par la modification
+     * @param demandeur utilisateur à l'origine de la requête pour vérifier son rôle
+     * @throws FileNotFoundException si une rubrique n'est pas trouvée
+     */
+    List<RubriqueDto> updatePriorities(List<RubriqueDto> rubriques, Utilisateur demandeur) throws FileNotFoundException;
 
     /**
      * Supprime une rubrique existante, à la condition que l'utilisateur soit admin et que la rubrique ne contienne pas de topic.

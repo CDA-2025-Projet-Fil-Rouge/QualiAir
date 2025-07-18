@@ -2,6 +2,8 @@ package fr.diginamic.qualiair.mapper.forumMapper;
 
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
 import fr.diginamic.qualiair.entity.forum.Topic;
+import fr.diginamic.qualiair.mapper.UtilisateurMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,16 +13,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class TopicMapperImpl implements TopicMapper {
 
+    @Autowired
+    UtilisateurMapper utilisateurMapper;
+
     @Override
     public TopicDto toDto(Topic topic) {
         TopicDto dto = new TopicDto();
         dto.setId(topic.getId());
         dto.setNom(topic.getNom());
         dto.setDateCreation(topic.getDateCreation());
-        dto.setIdCreateur(topic.getCreateur().getId());
+        dto.setCreateur(utilisateurMapper.toDto(topic.getCreateur()));
         dto.setIdRubrique(topic.getRubrique().getId());
         if (topic.getModificateur() != null) {
-            dto.setIdModificateur(topic.getModificateur().getId());
+            dto.setModificateur(utilisateurMapper.toDto(topic.getModificateur()));
             dto.setDateModification(topic.getDateModification());
         }
         return dto;

@@ -13,7 +13,6 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import fr.diginamic.qualiair.mapper.AdresseMapper;
 import fr.diginamic.qualiair.mapper.UtilisateurMapper;
-import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
 import fr.diginamic.qualiair.utils.CheckUtils;
@@ -23,6 +22,7 @@ import fr.diginamic.qualiair.validator.UtilisateurValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static fr.diginamic.qualiair.utils.RegionUtils.toInt;
+import static fr.diginamic.qualiair.utils.UtilisateurUtils.isAdmin;
 
 
 @Service
@@ -52,8 +53,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     private AdresseValidator adresseValidator;
     @Autowired
     private AdresseMapper adresseMapper;
-    @Autowired
-    private AdresseRepository adresseRepository;
 
     @Override
     public Utilisateur getUser(String email) {
@@ -81,8 +80,20 @@ public class UtilisateurServiceImpl implements UtilisateurService {
 
     @Override
     public Page<UtilisateurDto> getAllUsers(Pageable pageable, Utilisateur demandeur) {
-        UtilisateurUtils.isAdmin(demandeur);
+        if (!isAdmin(demandeur)) {
+            throw new AccessDeniedException("Fonction réservée aux administrateurs.");
+        }
         return utilisateurRepository.findAll(pageable).map(utilisateurMapper::toDto);
+    }
+
+    @Override
+    public List<UtilisateurDto> getAllUsers(Utilisateur demandeur) {
+        if (!isAdmin(demandeur)) {
+            throw new AccessDeniedException("Fonction réservée aux administrateurs.");
+        }
+        return utilisateurRepository.findAll().stream()
+                .map(utilisateurMapper::toDto)
+                .toList();
     }
 
     @Override
@@ -166,7 +177,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public String toggleAdminUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
-        UtilisateurUtils.isAdmin(demandeur);
         return roleManagementService.toggleUserRole(
                 demandeur, idCible,
                 RoleUtilisateur.ADMIN, RoleUtilisateur.UTILISATEUR,
@@ -178,7 +188,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public String toggleActivationUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
-        UtilisateurUtils.isAdmin(demandeur);
         return roleManagementService.toggleUserRole(
                 demandeur, idCible,
                 RoleUtilisateur.INACTIF, RoleUtilisateur.UTILISATEUR,
@@ -189,7 +198,6 @@ public class UtilisateurServiceImpl implements UtilisateurService {
     @Override
     public String toggleBanUser(Long idCible, Utilisateur demandeur)
             throws FileNotFoundException, BusinessRuleException {
-        UtilisateurUtils.isAdmin(demandeur);
         return roleManagementService.toggleUserRole(
                 demandeur, idCible,
                 RoleUtilisateur.BANNI, RoleUtilisateur.UTILISATEUR,
@@ -222,9 +230,7 @@ public class UtilisateurServiceImpl implements UtilisateurService {
             throw new DataNotFoundException("Aucun utilisateur trouvé dans cette commune: " + code);
         }
         return emails;
-
     }
-
 
     @Override
     public List<String> getAllEmails() throws DataNotFoundException {
