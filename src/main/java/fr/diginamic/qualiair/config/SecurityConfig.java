@@ -21,6 +21,9 @@ import java.util.Arrays;
 @Configuration
 public class SecurityConfig {
 
+    private static final String[] ROLES_ACTIFS = {"UTILISATEUR", "ADMIN", "SUPERADMIN"};
+    private static final String[] ROLES_ADMIN = {"ADMIN", "SUPERADMIN"};
+
     @Bean
     public static BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
@@ -30,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://92.88.240.121:4200"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -47,24 +50,32 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-
+                        //docs
+                        .requestMatchers("/swagger-ui/", "/v3/api-docs/**").permitAll()
+                        //auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**", "/historique/**", "/favoris/**", "/api-docs").permitAll()
+                        //carte
+                        .requestMatchers("/map/**").permitAll()
+                        //favoris
                         .requestMatchers("/favoris/**").permitAll()
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/index.html/api-docs"
-                        ).permitAll()
-                        .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
-                                "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/forum/**", "/historique/**", "/favoris/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
-
-                        .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/**",
-                                "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
-
+                        //remote data
                         .requestMatchers("/commune/recensement/insertion/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
+                        // forum en lecture
+                        .requestMatchers(HttpMethod.GET,"/forum/**").permitAll()
+
+                        //historique
+                        .requestMatchers("/historique/**").hasAnyRole(ROLES_ACTIFS)
+                        // forum: messages + topics
+                        .requestMatchers(HttpMethod.POST, "/forum/message/**", "/forum/topic/**").hasAnyRole(ROLES_ACTIFS)
+                        .requestMatchers(HttpMethod.PUT, "/forum/message/**", "/forum/topic/**").hasAnyRole(ROLES_ACTIFS)
+                        .requestMatchers(HttpMethod.DELETE, "/forum/message/**", "/forum/topic/**").hasAnyRole(ROLES_ACTIFS)
+
+                        // forum : rubriques
+                        .requestMatchers(HttpMethod.POST, "/forum/rubrique/**").hasAnyRole(ROLES_ADMIN)
+                        .requestMatchers(HttpMethod.PUT, "/forum/rubrique/**").hasAnyRole(ROLES_ADMIN)
+                        .requestMatchers(HttpMethod.DELETE, "/forum/rubrique/**").hasAnyRole(ROLES_ADMIN)
+                        // Admin : gestion des utilisateurs
+                        .requestMatchers("/user/get-all-paginated", "/user/get-all", "/user/toggle-admin/**", "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole(ROLES_ADMIN)
 
                         .anyRequest().authenticated()
                 )
