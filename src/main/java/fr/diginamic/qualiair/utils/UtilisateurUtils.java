@@ -27,25 +27,12 @@ public final class UtilisateurUtils {
      * @return true si admin ou superadmin, sinon AccessDeniedException
      */
     public static boolean isAdmin(Utilisateur user) {
-        if (user.getRole() == RoleUtilisateur.ADMIN || user.getRole() == RoleUtilisateur.SUPERADMIN) {
-            return true;
-        }
-        throw new AccessDeniedException("Fonction réservée aux administrateurs.");
+        return user != null && (
+                user.getRole() == RoleUtilisateur.ADMIN ||
+                        user.getRole() == RoleUtilisateur.SUPERADMIN
+        );
     }
 
-    /**
-     * Méthode statique pour vérifier si un utilisateur est superadmin
-     *
-     * @param user désigne l'utilisateur à vérifier
-     * @return true si superadmin, sinon AccessDeniedException
-     */
-    public static boolean isSuperadmin(Utilisateur user) {
-        if (user.getRole().equals(RoleUtilisateur.SUPERADMIN)) {
-            return true;
-        } else {
-            throw new AccessDeniedException("Cette fonction est réservée aux superadmins");
-        }
-    }
 
     /**
      * Méthode utilitaire dédiée au forum, lorsque l'autorisation est réservée à l'auteur du message ou à un admin

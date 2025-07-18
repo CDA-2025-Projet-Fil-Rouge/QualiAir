@@ -3,6 +3,7 @@ package fr.diginamic.qualiair.service.forumService;
 import fr.diginamic.qualiair.dto.forumDto.TopicDto;
 import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,14 @@ public interface TopicService {
      * @return la liste des topics associés à la rubrique indiquée
      */
     List<TopicDto> getTopicsByRubrique(Long idRubrique);
+
+    /**
+     * Récupère un topic avec son id
+     * @param idTopic désigne l'identifiant du topic à retrouver
+     * @return le topicDto du topic à retrouver
+     * @throws DataNotFoundException si le topic n'est pas retrouvé
+     */
+    TopicDto getTopicById(Long idTopic) throws DataNotFoundException;
 
     /**
      * Crée un nouveau topic dans une rubrique donnée.

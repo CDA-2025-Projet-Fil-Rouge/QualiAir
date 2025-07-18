@@ -2,6 +2,8 @@ package fr.diginamic.qualiair.mapper.forumMapper;
 
 import fr.diginamic.qualiair.dto.forumDto.RubriqueDto;
 import fr.diginamic.qualiair.entity.forum.Rubrique;
+import fr.diginamic.qualiair.mapper.UtilisateurMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class RubriqueMapperImpl implements RubriqueMapper {
 
+    @Autowired
+    UtilisateurMapper utilisateurMapper;
+
     @Override
     public RubriqueDto toDto(Rubrique rubrique) {
         RubriqueDto dto = new RubriqueDto();
@@ -19,9 +24,9 @@ public class RubriqueMapperImpl implements RubriqueMapper {
         dto.setDescription(rubrique.getDescription());
         dto.setPrioriteAffichageIndice(rubrique.getPrioriteAffichageIndice());
         dto.setDateCreation(rubrique.getDateCreation());
-        dto.setIdCreateur(rubrique.getCreateur().getId());
+        dto.setCreateur(utilisateurMapper.toDto(rubrique.getCreateur()));
         if (rubrique.getModificateur() != null) {
-            dto.setIdModificateur(rubrique.getModificateur().getId());
+            dto.setModificateur(utilisateurMapper.toDto(rubrique.getModificateur()));
             dto.setDateModification(rubrique.getDateModification());
         }
         return dto;

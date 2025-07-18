@@ -18,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -47,6 +48,12 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(rubriqueService.getAllRubriques(pageable));
     }
 
+    @GetMapping("rubrique/all")
+    @Override
+    public ResponseEntity<List<RubriqueDto>> getAllRubriquesUnpaged() {
+        return ResponseEntity.ok(rubriqueService.getAllRubriquesUnpaged());
+    }
+
     @GetMapping("/topic/get-all")
     @Override
     public ResponseEntity<Page<TopicDto>> getAllTopics(
@@ -63,6 +70,12 @@ public class ForumControllerImpl implements ForumController {
         return topicService.getTopicsByRubrique(idRubrique);
     }
 
+    @GetMapping("/topic/by-id/{id}")
+    @Override
+    public ResponseEntity<TopicDto> getTopicById(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(topicService.getTopicById(id));
+    }
+
     @GetMapping("/message/get-all")
     @Override
     public ResponseEntity<Page<MessageDto>> getAllMessages(
@@ -75,8 +88,11 @@ public class ForumControllerImpl implements ForumController {
 
     @GetMapping("/message/by-topic/{idTopic}")
     @Override
-    public List<MessageDto> getMessagesByTopic(@PathVariable Long idTopic) {
-        return messageService.getMessagesByTopic(idTopic);
+    public List<MessageDto> getMessagesByTopic(
+            @PathVariable Long idTopic,
+            HttpServletRequest request) throws Exception {
+        Utilisateur user = httpRequestUtils.getUtilisateurFromRequest(request);
+        return messageService.getMessagesByTopic(idTopic, user);
     }
 
     @PostMapping("/create-rubrique")
@@ -104,6 +120,8 @@ public class ForumControllerImpl implements ForumController {
     public ResponseEntity<MessageDto> createMessage(
             @RequestBody MessageDto dto,
             HttpServletRequest request) throws Exception {
+        Principal principal = request.getUserPrincipal();
+        System.out.println("PRINCIPAL = " + principal);
         Utilisateur createur = httpRequestUtils.getUtilisateurFromRequest(request);
         MessageDto created = messageService.createMessage(dto, createur);
         return ResponseEntity.ok(created);
@@ -151,6 +169,14 @@ public class ForumControllerImpl implements ForumController {
         Utilisateur modificateur = httpRequestUtils.getUtilisateurFromRequest(request);
         MessageDto updated = messageService.updateMessage(id, dto, modificateur);
         return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/rubriques/priorite")
+    public ResponseEntity<List<RubriqueDto>> updateRubriquePriorites(
+            @RequestBody List<RubriqueDto> rubriques,
+            HttpServletRequest request) throws Exception {
+        Utilisateur demandeur = httpRequestUtils.getUtilisateurFromRequest(request);
+        return ResponseEntity.ok(rubriqueService.updatePriorities(rubriques, demandeur));
     }
 
     @DeleteMapping("/delete-rubrique/{id}")

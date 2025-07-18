@@ -52,11 +52,10 @@ public interface UtilisateurController {
      * (autorisé uniquement à un admin ou superadmin)
      *
      * @param idUser  identifiant de l'utilisateur à activer/désactiver
-     * @param request la requête HTTP contenant le cookie JWT pour authentification
      * @return message de confirmation si le changement a réussi
      * @throws Exception si l'accès est interdit ou si des erreurs métier sont rencontrées
      */
-    @PostMapping("/toggle-admin/{id}")
+    @PutMapping("/toggle-admin/{id}")
     ResponseEntity<String> toggleAdminRole(
             @PathVariable("id") Long idUser,
             HttpServletRequest request) throws Exception;

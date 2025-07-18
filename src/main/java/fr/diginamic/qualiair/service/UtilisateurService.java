@@ -51,6 +51,8 @@ public interface UtilisateurService {
      */
     Page<UtilisateurDto> getAllUsers(Pageable pageable, Utilisateur demandeur);
 
+    List<UtilisateurDto> getAllUsers(Utilisateur demandeur);
+
     /**
      * Permet à un utilisateur connecté de modifier ses informations personnelles
      *

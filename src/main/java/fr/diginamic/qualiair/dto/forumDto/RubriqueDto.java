@@ -1,5 +1,7 @@
 package fr.diginamic.qualiair.dto.forumDto;
 
+import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
+
 import java.time.LocalDateTime;
 
 /**
@@ -12,8 +14,8 @@ public class RubriqueDto {
     private int prioriteAffichageIndice;
     private LocalDateTime dateCreation;
     private LocalDateTime dateModification;
-    private Long idCreateur;
-    private Long idModificateur;
+    private UtilisateurDto createur;
+    private UtilisateurDto modificateur;
 
     public RubriqueDto() {}
 
@@ -115,33 +117,37 @@ public class RubriqueDto {
 
     /**
      * Getter
-     * @return idCreateur
+     *
+     * @return createur
      */
-    public Long getIdCreateur() {
-        return idCreateur;
+    public UtilisateurDto getCreateur() {
+        return createur;
     }
 
     /**
      * Setter
-     * @param idCreateur sets value
+     *
+     * @param createur createur
      */
-    public void setIdCreateur(Long idCreateur) {
-        this.idCreateur = idCreateur;
+    public void setCreateur(UtilisateurDto createur) {
+        this.createur = createur;
     }
 
     /**
      * Getter
-     * @return idModificateur
+     *
+     * @return modificateur
      */
-    public Long getIdModificateur() {
-        return idModificateur;
+    public UtilisateurDto getModificateur() {
+        return modificateur;
     }
 
     /**
      * Setter
-     * @param idModificateur sets value
+     *
+     * @param modificateur modificateur
      */
-    public void setIdModificateur(Long idModificateur) {
-        this.idModificateur = idModificateur;
+    public void setModificateur(UtilisateurDto modificateur) {
+        this.modificateur = modificateur;
     }
 }

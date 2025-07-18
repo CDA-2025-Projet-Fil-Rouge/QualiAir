@@ -53,7 +53,7 @@ public final class ForumUtils {
      * @throws FileNotFoundException si aucun message n'est trouvé
      */
     public static Message findMessageOrThrow(MessageRepository repo, Long id) throws FileNotFoundException {
-        return repo.findById(id)
+        return repo.findWithReactionsById(id)
                 .orElseThrow(() -> new FileNotFoundException("Message introuvable"));
     }
 

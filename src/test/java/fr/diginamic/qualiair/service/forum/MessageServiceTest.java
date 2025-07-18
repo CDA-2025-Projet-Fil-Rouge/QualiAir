@@ -112,7 +112,7 @@ class MessageServiceTest {
         when(messageRepository.findByTopicId(100L)).thenReturn(List.of(message, message2));
         when(messageMapper.toDto(message)).thenReturn(messageDto);
 
-        List<MessageDto> result = messageService.getMessagesByTopic(100L);
+        List<MessageDto> result = messageService.getMessagesByTopic(100L, utilisateur);
 
         assertEquals(2, result.size());
         verify(messageRepository).findByTopicId(100L);

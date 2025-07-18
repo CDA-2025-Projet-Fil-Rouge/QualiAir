@@ -5,6 +5,7 @@ import fr.diginamic.qualiair.entity.Utilisateur;
 import fr.diginamic.qualiair.entity.forum.Rubrique;
 import fr.diginamic.qualiair.entity.forum.Topic;
 import fr.diginamic.qualiair.exception.BusinessRuleException;
+import fr.diginamic.qualiair.exception.DataNotFoundException;
 import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.exception.TokenExpiredException;
 import fr.diginamic.qualiair.mapper.forumMapper.TopicMapper;
@@ -18,10 +19,13 @@ import fr.diginamic.qualiair.validator.forumValidator.TopicValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static fr.diginamic.qualiair.utils.UtilisateurUtils.isAdmin;
 
 /**
  * Service de gestion des topics (sujets) du forum.
@@ -52,6 +56,14 @@ public class TopicServiceImpl implements TopicService {
                 .map(topicMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public TopicDto getTopicById(Long idTopic) throws DataNotFoundException {
+        Topic topic = topicRepository.findById(idTopic)
+                .orElseThrow(() -> new DataNotFoundException("Topic introuvable"));
+        return topicMapper.toDto(topic);
+    }
+
 
     @Override
     public TopicDto createTopic(TopicDto dto, Utilisateur createur)
@@ -88,7 +100,9 @@ public class TopicServiceImpl implements TopicService {
     @Override
     public void deleteTopic(Long idTopic, Utilisateur user) throws FileNotFoundException, BusinessRuleException {
         Topic topicASupprimer = ForumUtils.findTopicOrThrow(topicRepository, idTopic);
-        UtilisateurUtils.isAdmin(user);
+        if (!isAdmin(user)) {
+            throw new AccessDeniedException("Fonction réservée aux administrateurs.");
+        }
         ForumUtils.assertTopicIsEmpty(messageRepository, idTopic);
         topicRepository.delete(topicASupprimer);
     }
