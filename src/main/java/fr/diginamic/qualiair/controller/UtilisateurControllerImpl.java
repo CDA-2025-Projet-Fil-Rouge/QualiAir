@@ -35,7 +35,7 @@ public class UtilisateurControllerImpl implements UtilisateurController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/get-all")
+    @GetMapping("/get-all-paginated")
     @Override
     public ResponseEntity<Page<UtilisateurDto>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -46,7 +46,7 @@ public class UtilisateurControllerImpl implements UtilisateurController {
         return ResponseEntity.ok(utilisateurService.getAllUsers(pageable, demandeur));
     }
 
-    @GetMapping("/all")
+    @GetMapping("/get-all")
     public ResponseEntity<List<UtilisateurDto>> getAllUsersNonPaginated(
             @AuthenticationPrincipal CusomUserPrincipal principal) {
 
