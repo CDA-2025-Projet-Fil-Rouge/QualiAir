@@ -40,7 +40,7 @@ public class ForumControllerImpl implements ForumController {
     @Autowired
     private HttpRequestUtils httpRequestUtils;
 
-    @GetMapping("/rubrique/get-all")
+    @GetMapping("/rubrique/get-all-paginated")
     @Override
     public ResponseEntity<Page<RubriqueDto>> getAllRubriques(
             @RequestParam(defaultValue = "0") int page,
@@ -50,6 +50,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(rubriqueService.getAllRubriques(pageable));
     }
 
+
     //todo warning check front if still work added "/" at the star
     @GetMapping("/rubrique/all")
     @Override
@@ -57,7 +58,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(rubriqueService.getAllRubriquesUnpaged());
     }
 
-    @GetMapping("/topic/get-all")
+    @GetMapping("/topic/get-all-paginated")
     @Override
     public ResponseEntity<Page<TopicDto>> getAllTopics(
             @RequestParam(defaultValue = "0") int page,
@@ -79,7 +80,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(topicService.getTopicById(id));
     }
 
-    @GetMapping("/message/get-all")
+    @GetMapping("/message/get-all-paginated")
     @Override
     public ResponseEntity<Page<MessageDto>> getAllMessages(
             @RequestParam(defaultValue = "0") int page,
@@ -98,7 +99,7 @@ public class ForumControllerImpl implements ForumController {
         return messageService.getMessagesByTopic(idTopic, user);
     }
 
-    @PostMapping("/create-rubrique")
+    @PostMapping("/rubrique/create-rubrique")
     @Override
     public ResponseEntity<RubriqueDto> createRubrique(
             @RequestBody RubriqueDto dto,
@@ -108,7 +109,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(created);
     }
 
-    @PostMapping("/create-topic")
+    @PostMapping("/topic/create-topic")
     @Override
     public ResponseEntity<TopicDto> createTopic(
             @RequestBody TopicDto dto,
@@ -118,7 +119,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(created);
     }
 
-    @PostMapping("/create-message")
+    @PostMapping("/message/create-message")
     @Override
     public ResponseEntity<MessageDto> createMessage(
             @RequestBody MessageDto dto,
@@ -140,7 +141,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(messageService.reactToMessage(id, user, type));
     }
 
-    @PutMapping("/update-rubrique/{id}")
+    @PutMapping("/rubrique/update-rubrique/{id}")
     @Override
     public ResponseEntity<RubriqueDto> updateRubrique(
             @PathVariable Long id,
@@ -151,7 +152,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(updated);
     }
 
-    @PutMapping("/update-topic/{id}")
+    @PutMapping("/topic/update-topic/{id}")
     @Override
     public ResponseEntity<TopicDto> updateTopic(
             @PathVariable Long id,
@@ -163,7 +164,7 @@ public class ForumControllerImpl implements ForumController {
     }
 
 
-    @PutMapping("/update-message/{id}")
+    @PutMapping("/message/update-message/{id}")
     @Override
     public ResponseEntity<MessageDto> updateMessage(
             @PathVariable Long id,
@@ -174,7 +175,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(updated);
     }
 
-    @PutMapping("/rubriques/priorite")
+    @PutMapping("/rubrique/priorite")
     public ResponseEntity<List<RubriqueDto>> updateRubriquePriorites(
             @RequestBody List<RubriqueDto> rubriques,
             HttpServletRequest request) throws Exception {
@@ -182,7 +183,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(rubriqueService.updatePriorities(rubriques, demandeur));
     }
 
-    @DeleteMapping("/delete-rubrique/{id}")
+    @DeleteMapping("/rubrique/delete-rubrique/{id}")
     @Override
     public ResponseEntity<String> deleteRubrique(
             @PathVariable Long id,
@@ -192,7 +193,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok("Rubrique supprimée");
     }
 
-    @DeleteMapping("/delete-topic/{id}")
+    @DeleteMapping("/topic/delete-topic/{id}")
     @Override
     public ResponseEntity<String> deleteTopic(
             @PathVariable Long id,
@@ -202,7 +203,7 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok("Topic supprimé");
     }
 
-    @DeleteMapping("/delete-message/{id}")
+    @DeleteMapping("/message/delete-message/{id}")
     @Override
     public ResponseEntity<?> deleteMessage(
             @PathVariable Long id,
