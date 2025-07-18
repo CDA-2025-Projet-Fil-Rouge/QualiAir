@@ -29,6 +29,8 @@ import java.util.List;
 @RequestMapping("/forum")
 public class ForumControllerImpl implements ForumController {
 
+    //TODO Rediviser les routes par catégories /message/   /topic/  /rubrique/
+
     @Autowired
     private RubriqueService rubriqueService;
     @Autowired
@@ -48,7 +50,8 @@ public class ForumControllerImpl implements ForumController {
         return ResponseEntity.ok(rubriqueService.getAllRubriques(pageable));
     }
 
-    @GetMapping("rubrique/all")
+    //todo warning check front if still work added "/" at the star
+    @GetMapping("/rubrique/all")
     @Override
     public ResponseEntity<List<RubriqueDto>> getAllRubriquesUnpaged() {
         return ResponseEntity.ok(rubriqueService.getAllRubriquesUnpaged());

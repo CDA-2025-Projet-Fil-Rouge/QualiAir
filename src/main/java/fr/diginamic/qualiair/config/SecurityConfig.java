@@ -48,22 +48,28 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
 
+                        //docs
+                        .requestMatchers("/swagger-ui/", "/v3/api-docs/**").permitAll()
+                        //auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**", "/historique/**", "/favoris/**", "/api-docs").permitAll()
+                        //forum
+                        .requestMatchers(HttpMethod.GET, "/forum/**").permitAll()
+                        .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**", "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        //carte
+                        .requestMatchers("/map/**").permitAll()
+                        //historique
+                        .requestMatchers("/historique/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+
+                        //favoris
                         .requestMatchers("/favoris/**").permitAll()
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/index.html/api-docs"
-                        ).permitAll()
-                        .requestMatchers("/forum/create-rubrique", "/forum/update-rubrique/**", "/forum/delete-rubrique/**",
-                                "/forum/delete-topic/**").hasAnyRole("ADMIN", "SUPERADMIN")
-                        .requestMatchers("/forum/**", "/historique/**", "/favoris/**").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
 
-                        .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/**",
-                                "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
+                        .requestMatchers(HttpMethod.GET, "/forum/**", "/map/**", "/historique/**", "/favoris/**", "/api-docs").permitAll()
 
+                        .requestMatchers("/forum/**", "/forum/message/").hasAnyRole("UTILISATEUR", "ADMIN", "SUPERADMIN")
+
+                        .requestMatchers("/user/create-admin", "/user/get-all", "/user/toggle-admin/**", "/user/toggle-activation/**", "/user/toggle-ban/**").hasAnyRole("ADMIN", "SUPERADMIN")
+
+                        //remote data
                         .requestMatchers("/commune/recensement/insertion/load-from-server-hosted-files", "/external/api/atmo-france/air-quality/national-data/date/**").permitAll()
 
                         .anyRequest().authenticated()
