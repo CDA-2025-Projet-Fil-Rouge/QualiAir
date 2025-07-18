@@ -26,6 +26,13 @@ public interface ForumController {
     );
 
     /**
+     * Retourne toutes les rubriques existantes
+     * @return la liste dto correspondant aux rubriques
+     */
+    @GetMapping("rubrique/all")
+    ResponseEntity<List<RubriqueDto>> getAllRubriquesUnpaged();
+
+    /**
      * Retourne la liste paginée de tous les topics existants
      *
      * @param page numéro de la page (défaut : 0)
@@ -48,6 +55,15 @@ public interface ForumController {
     List<TopicDto> getTopicsByRubrique(@PathVariable Long idRubrique);
 
     /**
+     * Récupère un topic à partir de son id
+     * @param id désigne l'identifiant du topic à retrouver
+     * @return le topic concerné
+     * @throws Exception si le topic recherché n'est pas trouvé.
+     */
+    @GetMapping("/topic/by-id/{id}")
+    ResponseEntity<TopicDto> getTopicById(@PathVariable Long id) throws Exception;
+
+    /**
      * Retourne la liste paginée de tous les messages existants
      *
      * @param page numéro de la page (défaut : 0)
@@ -67,7 +83,9 @@ public interface ForumController {
      * @return la liste des messages associés au topic indiqué
      */
     @GetMapping("/message/by-topic/{idTopic}")
-    List<MessageDto> getMessagesByTopic(@PathVariable Long idTopic);
+    List<MessageDto> getMessagesByTopic(
+            @PathVariable Long idTopic,
+            HttpServletRequest request) throws Exception;
 
     /**
      * Crée une nouvelle rubrique à partir des données fournies dans le corps de la requête.

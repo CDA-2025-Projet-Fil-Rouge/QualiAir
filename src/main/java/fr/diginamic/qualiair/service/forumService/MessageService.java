@@ -25,9 +25,10 @@ public interface MessageService {
      * Récupère la liste de tous les messages associés à un topic
      *
      * @param idTopic désigne l'id du topic parent
+     * @param currentUser désigne l'utilisateur connecté pour charger ses réactions associées au message
      * @return la liste de tous les messages associés à ce topic
      */
-    List<MessageDto> getMessagesByTopic(Long idTopic);
+    List<MessageDto> getMessagesByTopic(Long idTopic, Utilisateur currentUser);
 
     /**
      * Crée un nouveau message dans un topic existant.

@@ -1,6 +1,10 @@
 package fr.diginamic.qualiair.dto.forumDto;
 
+import fr.diginamic.qualiair.dto.entitesDto.UtilisateurDto;
+import fr.diginamic.qualiair.entity.forum.ReactionType;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO représentant un message posté dans un topic du forum.
@@ -14,9 +18,10 @@ public class MessageDto {
     private int nbLike;
     private int nbDislike;
     private int nbSignalement;
-    private Long idCreateur;
-    private Long idModificateur;
+    private UtilisateurDto createur;
+    private UtilisateurDto modificateur;
     private Long idTopic;
+    private List<ReactionType> userReactions;
 
     public MessageDto() {
     }
@@ -135,34 +140,38 @@ public class MessageDto {
 
     /**
      * Getter
-     * @return idCreateur
+     *
+     * @return createur
      */
-    public Long getIdCreateur() {
-        return idCreateur;
+    public UtilisateurDto getCreateur() {
+        return createur;
     }
 
     /**
      * Setter
-     * @param idCreateur sets value
+     *
+     * @param createur createur
      */
-    public void setIdCreateur(Long idCreateur) {
-        this.idCreateur = idCreateur;
+    public void setCreateur(UtilisateurDto createur) {
+        this.createur = createur;
     }
 
     /**
      * Getter
-     * @return idModificateur
+     *
+     * @return modificateur
      */
-    public Long getIdModificateur() {
-        return idModificateur;
+    public UtilisateurDto getModificateur() {
+        return modificateur;
     }
 
     /**
      * Setter
-     * @param idModificateur sets value
+     *
+     * @param modificateur modificateur
      */
-    public void setIdModificateur(Long idModificateur) {
-        this.idModificateur = idModificateur;
+    public void setModificateur(UtilisateurDto modificateur) {
+        this.modificateur = modificateur;
     }
 
     /**
@@ -179,5 +188,23 @@ public class MessageDto {
      */
     public void setIdTopic(Long idTopic) {
         this.idTopic = idTopic;
+    }
+
+    /**
+     * Getter
+     *
+     * @return userReactions
+     */
+    public List<ReactionType> getUserReactions() {
+        return userReactions;
+    }
+
+    /**
+     * Setter
+     *
+     * @param userReactions userReactions
+     */
+    public void setUserReactions(List<ReactionType> userReactions) {
+        this.userReactions = userReactions;
     }
 }

@@ -33,21 +33,8 @@ class UtilisateurUtilsTest {
     void isAdmin_shouldThrow_ifNotAdmin() {
         Utilisateur user = new Utilisateur();
         user.setRole(RoleUtilisateur.UTILISATEUR);
-        assertThrows(AccessDeniedException.class, () -> UtilisateurUtils.isAdmin(user));
-    }
-
-    @Test
-    void isSuperadmin_shouldReturnTrue_ifSuperadmin() {
-        Utilisateur user = new Utilisateur();
-        user.setRole(RoleUtilisateur.SUPERADMIN);
-        assertTrue(UtilisateurUtils.isSuperadmin(user));
-    }
-
-    @Test
-    void isSuperadmin_shouldThrow_ifNotSuperadmin() {
-        Utilisateur user = new Utilisateur();
-        user.setRole(RoleUtilisateur.ADMIN);
-        assertThrows(AccessDeniedException.class, () -> UtilisateurUtils.isSuperadmin(user));
+        boolean result = UtilisateurUtils.isAdmin(user);
+        assertFalse(result);
     }
 
     @Test

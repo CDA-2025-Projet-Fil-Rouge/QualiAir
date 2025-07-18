@@ -49,9 +49,9 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageDto> getMessagesByTopic(Long idTopic) {
+    public List<MessageDto> getMessagesByTopic(Long idTopic, Utilisateur currentUser) {
         return messageRepository.findByTopicId(idTopic).stream()
-                .map(messageMapper::toDto)
+                .map(message -> messageMapper.toDto(message, currentUser))
                 .toList();
     }
 
@@ -105,7 +105,7 @@ public class MessageServiceImpl implements MessageService {
 
         updateReactionCounter(message, type, +1);
         messageRepository.save(message);
-        return messageMapper.toDto(message);
+        return messageMapper.toDto(message, user);
     }
 
     @Transactional
@@ -117,7 +117,7 @@ public class MessageServiceImpl implements MessageService {
 
         updateReactionCounter(message, type, -1);
         messageRepository.save(message);
-        return messageMapper.toDto(message);
+        return messageMapper.toDto(message, user);
     }
 
     /**
