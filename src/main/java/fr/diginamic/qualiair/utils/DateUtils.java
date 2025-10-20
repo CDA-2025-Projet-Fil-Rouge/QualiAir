@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -13,7 +13,7 @@ import java.time.temporal.ChronoUnit;
 /**
  * Classe utilitaire pour les opérations courantes de manipulation de dates et heures.
  */
-@DoNotInstanciate
+@DoNotInstantiate
 //TODO better error handling
 public class DateUtils {
     private static final String DATE_PATTERN = "yyyy-MM-dd";

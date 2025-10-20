@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.parser;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.utils.StringUtils;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.function.Function;
  * Cette classe ne doit pas être instanciée.
  * </p>
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class CsvParser {
 
     private CsvParser() {

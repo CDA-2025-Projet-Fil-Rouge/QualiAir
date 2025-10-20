@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Classe utilitaire pour la conversion de {@link List} en {@link Page}.
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class PageUtils {
 
     private PageUtils() {

@@ -1,0 +1,23 @@
+services:
+  mariadb:
+    image: mariadb:lts
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - digi-data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8083:80"
+
+volumes:
+  digi-data:

@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.entity.Coordonnee;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 
@@ -8,7 +8,7 @@ import fr.diginamic.qualiair.exception.ParsedDataException;
  * Classe utilisateur regroupant différentes méthodes de conversion dédiée à l'entité {@link Coordonnee}.
  * Cette class ne doit pas être instanciée.
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class CoordonneeUtils {
     private CoordonneeUtils() {
     }

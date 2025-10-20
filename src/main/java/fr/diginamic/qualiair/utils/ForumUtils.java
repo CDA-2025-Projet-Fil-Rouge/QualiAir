@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.entity.forum.Message;
 import fr.diginamic.qualiair.entity.forum.Rubrique;
 import fr.diginamic.qualiair.entity.forum.Topic;
@@ -15,7 +15,7 @@ import fr.diginamic.qualiair.repository.TopicRepository;
  * Concerne les entités Rubrique, Topic et Message
  * Recherche d'entité par Id grâce à leur repository, sinon FileNotFoundException
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public final class ForumUtils {
 
     private ForumUtils() {

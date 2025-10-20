@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.entity.Adresse;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.entity.RoleUtilisateur;
@@ -14,7 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 /**
  * Classe utilitaire de vérification de l'entité Utilisateur
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public final class UtilisateurUtils {
 
     private UtilisateurUtils() {
@@ -29,7 +29,7 @@ public final class UtilisateurUtils {
     public static boolean isAdmin(Utilisateur user) {
         return user != null && (
                 user.getRole() == RoleUtilisateur.ADMIN ||
-                        user.getRole() == RoleUtilisateur.SUPERADMIN
+                user.getRole() == RoleUtilisateur.SUPERADMIN
         );
     }
 

@@ -1,10 +1,10 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.enumeration.TypeAlerte;
 import fr.diginamic.qualiair.exception.RouteParamException;
 
-@DoNotInstanciate
+@DoNotInstantiate
 public class AlerteUtils {
     private AlerteUtils() {
     }

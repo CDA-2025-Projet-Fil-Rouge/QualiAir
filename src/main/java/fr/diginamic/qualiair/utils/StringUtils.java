@@ -1,11 +1,11 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 
 /**
  * Classe utilitaire regroupant des methodes de traitement de texte
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class StringUtils {
     private StringUtils() {
     }

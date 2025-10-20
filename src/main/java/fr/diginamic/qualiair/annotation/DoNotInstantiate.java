@@ -1,4 +1,4 @@
 package fr.diginamic.qualiair.annotation;
 
-public @interface DoNotInstanciate {
+public @interface DoNotInstantiate {
 }

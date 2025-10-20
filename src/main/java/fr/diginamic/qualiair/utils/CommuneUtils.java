@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.entity.Commune;
 import fr.diginamic.qualiair.exception.ParsedDataException;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +11,7 @@ import java.text.Normalizer;
  * Classe utilisateur regroupant différentes méthodes de conversion dédiée à l'entité {@link Commune}.
  * Cette class ne doit pas être instanciée.
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class CommuneUtils {
     public CommuneUtils() {
     }

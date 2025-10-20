@@ -1,6 +1,6 @@
 package fr.diginamic.qualiair.utils;
 
-import fr.diginamic.qualiair.annotation.DoNotInstanciate;
+import fr.diginamic.qualiair.annotation.DoNotInstantiate;
 import fr.diginamic.qualiair.dto.carte.DetailAir;
 import fr.diginamic.qualiair.dto.carte.DetailMeteo;
 import fr.diginamic.qualiair.entity.*;
@@ -21,7 +21,7 @@ import java.util.Map;
  * {@link MesurePrevision} ainsi qu'à leur traitement métier.
  * Cette classe ne doit pas être instanciée.
  */
-@DoNotInstanciate
+@DoNotInstantiate
 public class MesureUtils {
     private static final Logger logger = LoggerFactory.getLogger(MesureUtils.class);
 
