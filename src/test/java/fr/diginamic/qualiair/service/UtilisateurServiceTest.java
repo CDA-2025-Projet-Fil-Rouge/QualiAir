@@ -13,13 +13,17 @@ import fr.diginamic.qualiair.mapper.AdresseMapper;
 import fr.diginamic.qualiair.mapper.UtilisateurMapper;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
+import fr.diginamic.qualiair.utils.CheckUtils;
+import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.AdresseValidator;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,13 +38,14 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UtilisateurServiceTest {
 
     @InjectMocks
-    private UtilisateurService service;
+    private UtilisateurServiceImpl service;
 
     @Mock
     private UtilisateurRepository utilisateurRepository;
@@ -66,6 +71,9 @@ class UtilisateurServiceTest {
     @Mock
     private BCryptPasswordEncoder bcrypt;
 
+    private MockedStatic<CheckUtils> checkUtilsMock;
+    private MockedStatic<UtilisateurUtils> userUtilsMock;
+
     private Utilisateur utilisateur;
     private UtilisateurDto utilisateurDto;
     private UtilisateurUpdateDto utilisateurUpdateDto;
@@ -77,6 +85,8 @@ class UtilisateurServiceTest {
 
     @BeforeEach
     void setUp() {
+        checkUtilsMock = mockStatic(CheckUtils.class);
+        userUtilsMock = mockStatic(UtilisateurUtils.class);
 
         // Création de données communes aux tests
         utilisateur = new Utilisateur();
@@ -117,6 +127,12 @@ class UtilisateurServiceTest {
         utilisateurUpdateDto.setAdresseDto(adresseDto);
 
         commune = new Commune();
+    }
+
+    @AfterEach
+    void tearDown() {
+        checkUtilsMock.close();
+        userUtilsMock.close();
     }
 
     @Test
@@ -176,6 +192,7 @@ class UtilisateurServiceTest {
 
     @Test
     void getAllUsers_shouldReturnPage_whenRequesterIsAdmin() {
+        userUtilsMock.when(() -> UtilisateurUtils.isAdmin(admin)).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 2);
         Utilisateur user2 = new Utilisateur();
         Page<Utilisateur> page = new PageImpl<>(List.of(utilisateur, user2));
@@ -203,13 +220,16 @@ class UtilisateurServiceTest {
 
     @Test
     void updatePersonalData_shouldUpdateFields() throws BusinessRuleException, FileNotFoundException {
-        when(utilisateurMapper.toUpdateDto(utilisateur)).thenReturn(utilisateurUpdateDto);
-        when(utilisateurRepository.existsByEmail("new@example.com")).thenReturn(false);
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(1L, 1L)).thenAnswer(inv -> null);
+        checkUtilsMock.when(() -> CheckUtils.ensureUniqueEmail(eq(utilisateurRepository), eq("new@example.com")))
+                .thenAnswer(inv -> null);
+        userUtilsMock.when(() -> UtilisateurUtils.findCommuneOrThrow(eq(communeRepository), eq("Testville"), eq("12345")))
+                .thenReturn(commune);
+
+        when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
         when(bcrypt.matches("plainOldPassword", "encodedOldPassword")).thenReturn(true);
         when(bcrypt.encode("newPassword")).thenReturn("encodedNewPassword");
-        when(communeRepository.findByNomReelAndCodePostalContaining("Testville", "12345"))
-                .thenReturn(Optional.of(commune));
-        when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
+        when(utilisateurMapper.toUpdateDto(utilisateur)).thenReturn(utilisateurUpdateDto);
 
         UtilisateurUpdateDto result = service.updatePersonalData(utilisateur, utilisateurUpdateDto);
 
@@ -217,17 +237,21 @@ class UtilisateurServiceTest {
         assertEquals("Pierre", result.getPrenom());
         assertEquals("Martin", result.getNom());
         assertEquals("encodedNewPassword", utilisateur.getMotDePasse());
-
+        verify(adresseValidator).validate(any(Adresse.class));
+        verify(utilisateurValidator).validate(utilisateur);
         verify(utilisateurRepository).save(utilisateur);
     }
 
     @Test
     void updatePersonalData_shouldThrowException_whenOldPasswordIncorrect() {
-        when(utilisateurRepository.existsByEmail("new@example.com")).thenReturn(false);
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(1L, 1L)).thenAnswer(inv -> null);
+        checkUtilsMock.when(() -> CheckUtils.ensureUniqueEmail(eq(utilisateurRepository), eq("new@example.com")))
+                .thenAnswer(inv -> null);
+        userUtilsMock.when(() -> UtilisateurUtils.findCommuneOrThrow(eq(communeRepository), eq("Testville"), eq("12345")))
+                .thenReturn(commune);
+
         utilisateurUpdateDto.setAncienMotDePasse("wrongPassword");
         when(bcrypt.matches("wrongPassword", "encodedOldPassword")).thenReturn(false);
-        when(communeRepository.findByNomReelAndCodePostalContaining("Testville", "12345"))
-                .thenReturn(Optional.of(commune));
         when(adresseMapper.fromDto(adresseDto, commune)).thenReturn(adresse);
 
         assertThrows(BusinessRuleException.class, () ->
@@ -240,16 +264,22 @@ class UtilisateurServiceTest {
         dto.setId(1L);
         dto.setEmail("used@example.com");
 
-        when(utilisateurRepository.existsByEmail("used@example.com")).thenReturn(true);
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(1L, 1L)).thenAnswer(inv -> null);
+        checkUtilsMock.when(() -> CheckUtils.ensureUniqueEmail(eq(utilisateurRepository), eq("used@example.com")))
+                .thenThrow(new BusinessRuleException("Email déjà utilisé"));
 
         assertThrows(BusinessRuleException.class, () ->
                 service.updatePersonalData(utilisateur, dto));
+        verifyNoInteractions(adresseMapper, adresseValidator, bcrypt);
     }
 
     @Test
     void updatePersonalData_shouldThrowException_whenIdsMismatch() {
         UtilisateurUpdateDto dto = new UtilisateurUpdateDto();
         dto.setId(2L);
+
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(1L, 2L))
+                .thenThrow(new IllegalArgumentException("IDs mismatch"));
 
         assertThrows(IllegalArgumentException.class, () ->
                 service.updatePersonalData(utilisateur, dto));
@@ -334,12 +364,26 @@ class UtilisateurServiceTest {
     }
 
     @Test
-    void toggleBanUser_shouldThrowAccessDenied_whenUserIsNotAdmin() {
+    void toggleBanUser_shouldPropagateAccessDenied_whenRoleServiceRejects() throws FileNotFoundException, BusinessRuleException {
         Long idCible = 4L;
+        when(roleManagementService.toggleUserRole(
+                utilisateur,
+                idCible,
+                RoleUtilisateur.BANNI,
+                RoleUtilisateur.UTILISATEUR,
+                "Utilisateur banni",
+                "Utilisateur débanni"
+        )).thenThrow(new AccessDeniedException("forbidden"));
 
         assertThrows(AccessDeniedException.class, () ->
                 service.toggleBanUser(idCible, utilisateur));
-
-        verifyNoInteractions(roleManagementService);
+        verify(roleManagementService).toggleUserRole(
+                utilisateur,
+                idCible,
+                RoleUtilisateur.BANNI,
+                RoleUtilisateur.UTILISATEUR,
+                "Utilisateur banni",
+                "Utilisateur débanni"
+        );
     }
 }

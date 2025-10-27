@@ -77,7 +77,7 @@ class ForumUtilsTest {
     @Test
     void shouldReturnMessage_whenIdExists() throws Exception {
         Message message = new Message();
-        when(messageRepository.findById(3L)).thenReturn(Optional.of(message));
+        when(messageRepository.findWithReactionsById(3L)).thenReturn(Optional.of(message));
 
         Message result = ForumUtils.findMessageOrThrow(messageRepository, 3L);
         assertEquals(message, result);
@@ -85,7 +85,6 @@ class ForumUtilsTest {
 
     @Test
     void shouldThrow_whenMessageNotFound() {
-        when(messageRepository.findById(3L)).thenReturn(Optional.empty());
         assertThrows(FileNotFoundException.class,
                 () -> ForumUtils.findMessageOrThrow(messageRepository, 3L));
     }

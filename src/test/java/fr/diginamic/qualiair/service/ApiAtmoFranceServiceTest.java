@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ApiAtmoFranceServiceTest {
 
     @Autowired
-    private ApiAtmoFranceService apiAtmoFranceService;
+    private ApiAtmoFranceServiceImpl apiAtmoFranceService;
 
     @Test
     void requestToken() throws ExternalApiResponseException, BusinessRuleException, TokenExpiredException {

@@ -27,7 +27,7 @@ class RoleManagementServiceTest {
     private UtilisateurRepository utilisateurRepository;
 
     @InjectMocks
-    private RoleManagementService service;
+    private RoleManagementServiceImpl service;
 
     private Utilisateur admin;
     private Utilisateur utilisateur;

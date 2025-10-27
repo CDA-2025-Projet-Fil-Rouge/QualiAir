@@ -10,7 +10,7 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.mapper.forumMapper.RubriqueMapper;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.service.forumService.RubriqueService;
+import fr.diginamic.qualiair.service.forumService.RubriqueServiceImpl;
 import fr.diginamic.qualiair.validator.forumValidator.RubriqueValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 public class RubriqueServiceTest {
 
     @InjectMocks
-    private RubriqueService rubriqueService;
+    private RubriqueServiceImpl rubriqueService;
 
     @Mock
     private RubriqueRepository rubriqueRepository;

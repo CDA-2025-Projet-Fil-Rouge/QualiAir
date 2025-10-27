@@ -10,15 +10,19 @@ import fr.diginamic.qualiair.exception.FileNotFoundException;
 import fr.diginamic.qualiair.mapper.forumMapper.MessageMapper;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.service.forumService.MessageService;
+import fr.diginamic.qualiair.service.forumService.MessageServiceImpl;
 import fr.diginamic.qualiair.service.forumService.ReactionMessageService;
+import fr.diginamic.qualiair.utils.CheckUtils;
+import fr.diginamic.qualiair.utils.ForumUtils;
+import fr.diginamic.qualiair.utils.UtilisateurUtils;
 import fr.diginamic.qualiair.validator.forumValidator.MessageValidator;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockedStatic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -27,18 +31,17 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(org.mockito.junit.jupiter.MockitoExtension.class)
 class MessageServiceTest {
 
     @InjectMocks
-    private MessageService messageService;
+    private MessageServiceImpl messageService;
 
     @Mock
     private MessageRepository messageRepository;
@@ -51,6 +54,10 @@ class MessageServiceTest {
     @Mock
     private ReactionMessageService reactionService;
 
+    private MockedStatic<ForumUtils> forumUtilsMock;
+    private MockedStatic<CheckUtils> checkUtilsMock;
+    private MockedStatic<UtilisateurUtils> userUtilsMock;
+
     private Utilisateur utilisateur;
     private Utilisateur utilisateur2;
     private Utilisateur admin;
@@ -60,6 +67,10 @@ class MessageServiceTest {
 
     @BeforeEach
     void setUp() {
+        forumUtilsMock = mockStatic(ForumUtils.class);
+        checkUtilsMock = mockStatic(CheckUtils.class);
+        userUtilsMock  = mockStatic(UtilisateurUtils.class);
+
         utilisateur = new Utilisateur();
         utilisateur.setRole(RoleUtilisateur.UTILISATEUR);
         ReflectionTestUtils.setField(utilisateur, "id", 1L);
@@ -70,7 +81,7 @@ class MessageServiceTest {
 
         utilisateur2 = new Utilisateur();
         utilisateur2.setRole(RoleUtilisateur.UTILISATEUR);
-        ReflectionTestUtils.setField(utilisateur2, "id", 2L);
+        ReflectionTestUtils.setField(utilisateur2, "id", 3L);
 
         topic = new Topic();
         ReflectionTestUtils.setField(topic, "id", 100L);
@@ -88,6 +99,13 @@ class MessageServiceTest {
         messageDto.setId(10L);
         messageDto.setIdTopic(100L);
         messageDto.setContenu("New content");
+    }
+
+    @AfterEach
+    void tearDown() {
+        forumUtilsMock.close();
+        checkUtilsMock.close();
+        userUtilsMock.close();
     }
 
     @Test
@@ -110,7 +128,10 @@ class MessageServiceTest {
         message2.setTopic(topic);
 
         when(messageRepository.findByTopicId(100L)).thenReturn(List.of(message, message2));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        // bonne surcharge: toDto(Message, Utilisateur)
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
+        MessageDto dto2 = new MessageDto();
+        when(messageMapper.toDto(message2, utilisateur)).thenReturn(dto2);
 
         List<MessageDto> result = messageService.getMessagesByTopic(100L, utilisateur);
 
@@ -120,7 +141,10 @@ class MessageServiceTest {
 
     @Test
     void createMessage_user_shouldCreateNewMessage() throws Exception {
-        when(topicRepository.findById(100L)).thenReturn(Optional.of(topic));
+        // ForumUtils.findTopicOrThrow est appelé par le service
+        forumUtilsMock.when(() -> ForumUtils.findTopicOrThrow(eq(topicRepository), eq(100L)))
+                .thenReturn(topic);
+
         when(messageMapper.toEntity(messageDto)).thenReturn(message);
 
         MessageDto expectedDto = new MessageDto();
@@ -135,7 +159,8 @@ class MessageServiceTest {
 
     @Test
     void createMessage_shouldThrow_whenTopicNotFound() {
-        when(topicRepository.findById(100L)).thenReturn(Optional.empty());
+        forumUtilsMock.when(() -> ForumUtils.findTopicOrThrow(eq(topicRepository), eq(100L)))
+                .thenThrow(new FileNotFoundException("Topic introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.createMessage(messageDto, utilisateur)
@@ -144,8 +169,18 @@ class MessageServiceTest {
 
     @Test
     void updateMessage_author_shouldUpdateContent() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(topicRepository.findById(100L)).thenReturn(Optional.of(topic));
+        // IDs cohérents
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 10L)).thenAnswer(inv -> null);
+        // message + author ok
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        // auteur ou admin -> OK
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(utilisateur), eq(1L)))
+                .thenAnswer(inv -> null);
+        // topic cible ok
+        forumUtilsMock.when(() -> ForumUtils.findTopicOrThrow(eq(topicRepository), eq(100L)))
+                .thenReturn(topic);
+
         when(messageMapper.toDto(message)).thenReturn(messageDto);
 
         MessageDto result = messageService.updateMessage(10L, messageDto, utilisateur);
@@ -157,8 +192,14 @@ class MessageServiceTest {
 
     @Test
     void updateMessage_admin_shouldUpdateContent() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(topicRepository.findById(100L)).thenReturn(Optional.of(topic));
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 10L)).thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(admin), eq(1L)))
+                .thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findTopicOrThrow(eq(topicRepository), eq(100L)))
+                .thenReturn(topic);
+
         when(messageMapper.toDto(message)).thenReturn(messageDto);
 
         MessageDto result = messageService.updateMessage(10L, messageDto, admin);
@@ -170,7 +211,12 @@ class MessageServiceTest {
 
     @Test
     void updateMessage_userNonAuthor_shouldThrow() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 10L)).thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        // on force l'interdiction
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(utilisateur2), eq(1L)))
+                .thenThrow(new AccessDeniedException("forbidden"));
 
         assertThrows(AccessDeniedException.class, () ->
                 messageService.updateMessage(10L, messageDto, utilisateur2)
@@ -179,7 +225,9 @@ class MessageServiceTest {
 
     @Test
     void updateMessage_shouldThrow_whenMessageNotFound() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.empty());
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 10L)).thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenThrow(new FileNotFoundException("Message introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.updateMessage(10L, messageDto, utilisateur)
@@ -188,8 +236,13 @@ class MessageServiceTest {
 
     @Test
     void updateMessage_shouldThrow_whenTopicNotFound() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(topicRepository.findById(100L)).thenReturn(Optional.empty());
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 10L)).thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(utilisateur), eq(1L)))
+                .thenAnswer(inv -> null);
+        forumUtilsMock.when(() -> ForumUtils.findTopicOrThrow(eq(topicRepository), eq(100L)))
+                .thenThrow(new FileNotFoundException("Topic introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.updateMessage(10L, messageDto, utilisateur)
@@ -199,6 +252,10 @@ class MessageServiceTest {
     @Test
     void updateMessage_shouldThrow_whenIdsDoNotMatch() {
         messageDto.setId(99L);
+        // on simule la règle d'ID non concordants
+        checkUtilsMock.when(() -> CheckUtils.ensureMatchingIds(10L, 99L))
+                .thenThrow(new IllegalArgumentException("IDs mismatch"));
+
         assertThrows(IllegalArgumentException.class, () ->
                 messageService.updateMessage(10L, messageDto, utilisateur)
         );
@@ -206,21 +263,32 @@ class MessageServiceTest {
 
     @Test
     void deleteMessage_author_shouldRemoveMessage() throws FileNotFoundException {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(utilisateur), eq(1L)))
+                .thenAnswer(inv -> null);
+
         messageService.deleteMessage(10L, utilisateur);
         verify(messageRepository).delete(message);
     }
 
     @Test
     void deleteMessage_admin_shouldRemoveMessage() throws FileNotFoundException {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(admin), eq(1L)))
+                .thenAnswer(inv -> null);
+
         messageService.deleteMessage(10L, admin);
         verify(messageRepository).delete(message);
     }
 
     @Test
     void deleteMessage_shouldThrow_whenUserIsNotAdminNorAuthor() {
-       when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+        userUtilsMock.when(() -> UtilisateurUtils.checkAuthorOrAdmin(eq(utilisateur2), eq(1L)))
+                .thenThrow(new AccessDeniedException("forbidden"));
 
         assertThrows(AccessDeniedException.class, () ->
                 messageService.deleteMessage(10L, utilisateur2));
@@ -228,7 +296,8 @@ class MessageServiceTest {
 
     @Test
     void deleteMessage_shouldThrow_whenMessageNotFound() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.empty());
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenThrow(new FileNotFoundException("Message introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.deleteMessage(10L, utilisateur)
@@ -237,8 +306,13 @@ class MessageServiceTest {
 
     @Test
     void reactToMessage_like_shouldAddReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).createReaction(utilisateur, message, ReactionType.LIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        // bonne surcharge: toDto(Message, Utilisateur)
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.reactToMessage(10L, utilisateur, ReactionType.LIKE);
 
@@ -249,8 +323,12 @@ class MessageServiceTest {
 
     @Test
     void reactToMessage_dislike_shouldAddReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).createReaction(utilisateur, message, ReactionType.DISLIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.reactToMessage(10L, utilisateur, ReactionType.DISLIKE);
 
@@ -261,8 +339,12 @@ class MessageServiceTest {
 
     @Test
     void reactToMessage_report_shouldAddReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).createReaction(utilisateur, message, ReactionType.REPORT);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.reactToMessage(10L, utilisateur, ReactionType.REPORT);
 
@@ -273,7 +355,8 @@ class MessageServiceTest {
 
     @Test
     void reactToMessage_shouldThrow_whenMessageNotFound() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.empty());
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenThrow(new FileNotFoundException("Message introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.reactToMessage(10L, utilisateur, ReactionType.LIKE)
@@ -282,8 +365,12 @@ class MessageServiceTest {
 
     @Test
     void removeReaction_like_shouldRemoveReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.LIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.LIKE);
 
@@ -294,8 +381,12 @@ class MessageServiceTest {
 
     @Test
     void removeReaction_dislike_shouldRemoveReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.DISLIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.DISLIKE);
 
@@ -306,8 +397,12 @@ class MessageServiceTest {
 
     @Test
     void removeReaction_report_shouldRemoveReaction() throws Exception {
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.REPORT);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.REPORT);
 
@@ -319,8 +414,12 @@ class MessageServiceTest {
     @Test
     void removeReaction_like_shouldNotGoBelowZero() throws Exception {
         message.setNbLike(0);
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.LIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.LIKE);
 
@@ -332,8 +431,12 @@ class MessageServiceTest {
     @Test
     void removeReaction_dislike_shouldNotGoBelowZero() throws Exception {
         message.setNbDislike(0);
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.DISLIKE);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.DISLIKE);
 
@@ -345,8 +448,12 @@ class MessageServiceTest {
     @Test
     void removeReaction_report_shouldNotGoBelowZero() throws Exception {
         message.setNbSignalement(0);
-        when(messageRepository.findById(10L)).thenReturn(Optional.of(message));
-        when(messageMapper.toDto(message)).thenReturn(messageDto);
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenReturn(message);
+
+        doNothing().when(reactionService).removeReaction(utilisateur, message, ReactionType.REPORT);
+        when(messageRepository.save(message)).thenReturn(message);
+        when(messageMapper.toDto(message, utilisateur)).thenReturn(messageDto);
 
         messageService.removeReaction(10L, utilisateur, ReactionType.REPORT);
 
@@ -357,7 +464,8 @@ class MessageServiceTest {
 
     @Test
     void removeReaction_shouldThrow_whenMessageNotFound() {
-        when(messageRepository.findById(10L)).thenReturn(Optional.empty());
+        forumUtilsMock.when(() -> ForumUtils.findMessageOrThrow(eq(messageRepository), eq(10L)))
+                .thenThrow(new FileNotFoundException("Message introuvable"));
 
         assertThrows(FileNotFoundException.class, () ->
                 messageService.removeReaction(10L, utilisateur, ReactionType.LIKE)

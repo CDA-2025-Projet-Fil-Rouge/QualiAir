@@ -11,7 +11,7 @@ import fr.diginamic.qualiair.mapper.forumMapper.TopicMapper;
 import fr.diginamic.qualiair.repository.MessageRepository;
 import fr.diginamic.qualiair.repository.RubriqueRepository;
 import fr.diginamic.qualiair.repository.TopicRepository;
-import fr.diginamic.qualiair.service.forumService.TopicService;
+import fr.diginamic.qualiair.service.forumService.TopicServiceImpl;
 import fr.diginamic.qualiair.validator.forumValidator.TopicValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.*;
 class TopicServiceTest {
 
     @InjectMocks
-    private TopicService topicService;
+    private TopicServiceImpl topicService;
 
     @Mock
     private TopicRepository topicRepository;

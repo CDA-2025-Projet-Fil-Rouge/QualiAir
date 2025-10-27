@@ -12,7 +12,7 @@ import fr.diginamic.qualiair.mapper.UtilisateurMapper;
 import fr.diginamic.qualiair.repository.AdresseRepository;
 import fr.diginamic.qualiair.repository.CommuneRepository;
 import fr.diginamic.qualiair.repository.UtilisateurRepository;
-import fr.diginamic.qualiair.security.AuthService;
+import fr.diginamic.qualiair.security.AuthServiceImpl;
 import fr.diginamic.qualiair.security.IJwtAuthentificationService;
 import fr.diginamic.qualiair.validator.AdresseValidator;
 import fr.diginamic.qualiair.validator.UtilisateurValidator;
@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 public class AuthServiceTest {
 
     @InjectMocks
-    private AuthService authService;
+    private AuthServiceImpl authService;
 
     @Mock
     private UtilisateurRepository utilisateurRepository;
