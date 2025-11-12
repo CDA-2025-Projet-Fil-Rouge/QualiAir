@@ -69,13 +69,13 @@ public class RecensementParserServiceImpl implements RecensementParserService {
     private RecensementCsvMapper recensementCsvMapper;
 
     @Value("${recensement.fichier.communes-with-pop.path}")
-    private String pathFichierPop;
+    String pathFichierPop;
     @Value("${recensement.fichier.communes-with-coord.path}")
-    private String pathFichierCoord;
+    String pathFichierCoord;
     @Value("${recensement.fichier.departement.path}")
-    private String pathFichierDepartement;
+    String pathFichierDepartement;
     @Value("${recensement.fichier.region.path}")
-    private String pathFichierRegion;
+    String pathFichierRegion;
 
     @Transactional
     @Override

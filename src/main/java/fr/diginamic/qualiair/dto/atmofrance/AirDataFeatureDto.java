@@ -31,4 +31,5 @@ public class AirDataFeatureDto {
     public void setProperties(AirDataPropertiesDto properties) {
         this.properties = properties;
     }
+    
 }
