@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Service pour la base de données PostgreSQL
+  db:
+    image: postgres:14
+    container_name: qualiair-db
+    environment:
+      POSTGRES_DB: qualiair
+      POSTGRES_USER: air_user
+      POSTGRES_PASSWORD: air_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - air-network
+
+  # Service pour le backend Spring Boot
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: air-backend
+    ports:
+      - "8080:8080"
+      - "5005:5005" # Port pour le débogage Java
+    volumes:
+      - ./backend:/app
+      - maven-repo:/root/.m2
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/air
+      SPRING_DATASOURCE_USERNAME: air_user
+      SPRING_DATASOURCE_PASSWORD: air_password
+      # JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+    networks:
+      - air-network
+
+  # Service pour le frontend Angular
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: air-frontend
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - air-network
+
+  # Service pour Adminer (interface d'administration de base de données)
+  adminer:
+    image: adminer:latest
+    container_name: air-adminer
+    ports:
+      - "8081:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on:
+      - db
+    networks:
+      - air-network
+
+networks:
+  air-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  maven-repo:
+  node_modules:

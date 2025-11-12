@@ -31,7 +31,7 @@ pipeline {
                         dir('back-end') {
                             checkout([
                                 $class: 'GitSCM',
-                                branches: [[name: 'master']],
+                                branches: [[name: 'development']],
                                 userRemoteConfigs: [[
                                     url: 'https://github.com/CDA-2025-Projet-Fil-Rouge/QualiAir.git',
                                     credentialsId: 'qualiair-jenkins'

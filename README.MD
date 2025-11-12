@@ -5,7 +5,7 @@ It integrates several APIs (Atmo-France, OpenWeather) and exposes a set of REST 
 
 ---
 
-## 🧭 Overview
+##  Overview
 
 QualiAir provides a unified back-end for environmental monitoring and forecasting:
 - Aggregates **air quality** and **meteorological** data from external sources (Atmo France & OpenWeather APIs)
@@ -18,7 +18,7 @@ It is intended for use as the backend of a data visualization dashboard or open 
 
 ---
 
-## ⚙️ Tech Stack
+## ️ Tech Stack
 
 | Layer | Technology |
 |-------|-------------|
@@ -34,7 +34,7 @@ It is intended for use as the backend of a data visualization dashboard or open 
 
 ---
 
-## 🗂️ Project Structure (simplified)
+## 🗂 Project Structure (simplified)
 ```
 src
 ├── main
@@ -71,28 +71,28 @@ src
 ``` 
 ---
 
-## 🌐 Main Functional Areas
+##  Main Functional Areas
 
-### 🧩 API Layers
+###  API Layers
 - **Atmo France API Integration**  
   Retrieves official air quality indices and pollutants data.
 
 - **OpenWeather API Integration**  
   Collects meteorological forecasts (5-day, 16-day, and current weather).
 
-### 🗺️ Data Management
+### Data Management
 - Entities: `Commune`, `Departement`, `Region`, `Coordonnee`
 - Population and forecast data saved as `MesurePopulation`, `MesureAir`, and `MesurePrevision`
 - Import CSV data via `RecensementParserServiceImpl`
 
-### 💾 Caching
+### Caching
 - Custom cache system (`CacheServiceImpl`) to prevent redundant lookups and inserts (used in `findOrCreate` methods).
 
 ### 📈 Historization & Export
 - Generate historical air, population, and forecast datasets
 - Export as CSV via `CsvServiceImpl`
 
-### 🧍 User Features
+### User Features
 - Favorite communes
 - Alerts & notifications
 - Forum discussions
@@ -100,7 +100,7 @@ src
 
 ---
 
-## 🧪 Testing
+## Testing
 
 The project uses **JUnit 5** and **Mockito**.  
 Tests are organized by layer:
@@ -113,7 +113,7 @@ To run tests:
 mvn clean test
 ```
 
-## 🚀 Running the Application
+## Running the Application
 ### Prerequisites
 
 - Java 21+
@@ -130,7 +130,7 @@ mvn clean test
 ### Then access:
 `http://localhost:8080/swagger-ui/index.html`
 
-## ⚡ Quick Start (Developer Setup)
+## Quick Start (Developer Setup)
 
 * Clone the repository
 ```bash
@@ -142,17 +142,19 @@ cd QualiAir
 `mvn clean package`
 * run the application
 
-`mvn sprint-boot:run`
+`export APPLICATION_PROFILE=dev` 
+
+`mvn sprint-boot:run -Dspring-boot.run.profile=${APPLICATION_PROFILE}`
 * Access Swagger UI
 
 `http://localhost:8080/swagger-ui/index.html`
 
 
-## 🔁 CI/CD Pipeline (Jenkins Integration)
+## CI/CD Pipeline (Jenkins Integration)
 
 QualiAir uses a **continuous integration pipeline** powered by **Jenkins**, automatically triggered whenever new code is merged into the `main` branch.
 
-### 🧩 Workflow Overview
+### Workflow Overview
 
 1. **Merge to `main`**
     - A developer merges a pull request into the `main` branch.
@@ -170,15 +172,15 @@ QualiAir uses a **continuous integration pipeline** powered by **Jenkins**, auto
 
    | Stage | Description |
       |--------|-------------|
-   | 🧹 **Checkout** | Fetches the latest code from the `main` branch. |
-   | ⚙️ **Build** | Runs `mvn clean package` to compile the Spring Boot project. |
-   | ✅ **Test** | Executes all unit and integration tests (`mvn test`). |
-   | 📊 **Quality Gate** | Optionally integrates with **SonarQube** for code quality and coverage validation. |
-   | 📦 **Artifact Archiving** | Packages the application JAR and stores it in Jenkins or uploads to a repository. |
-   | 🚀 **Deployment** *(optional)* | Deploys to a staging or production environment (e.g., via SSH, Docker, or Kubernetes). |
+   |  **Checkout** | Fetches the latest code from the `main` branch. |
+   | ️**Build** | Runs `mvn clean package` to compile the Spring Boot project. |
+   |  **Test** | Executes all unit and integration tests (`mvn test`). |
+   |  **Quality Gate** | Optionally integrates with **SonarQube** for code quality and coverage validation. |
+   |  **Artifact Archiving** | Packages the application JAR and stores it in Jenkins or uploads to a repository. |
+   |  **Deployment** *(optional)* | Deploys to a staging or production environment (e.g., via SSH, Docker, or Kubernetes). |
 
 4. **Feedback Loop**
     - Jenkins reports build status back to GitHub:
-        - ✅ **Success** → merge is validated.
-        - ❌ **Failure** → GitHub PR or commit shows a red build status.
+        -  **Success** → merge is validated.
+        -  **Failure** → GitHub PR or commit shows a red build status.
     - Developers can review console output and reports directly in Jenkins.

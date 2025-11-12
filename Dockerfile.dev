@@ -1,0 +1,19 @@
+FROM maven:3.9-eclipse-temurin-21
+
+WORKDIR /app
+
+# Installation des dépendances de développement
+RUN apt-get update && \
+    apt-get install -y git vim && \
+    apt-get clean
+
+# Exposition des ports pour l'application et le débogage
+EXPOSE 8080
+EXPOSE 5005
+
+# Ajout des options pour l'encodage
+ENV MAVEN_OPTS="-Dfile.encoding=UTF-8"
+ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8"
+
+# Lancement de l'application en mode développement
+CMD ["mvn", "spring-boot:run"]
