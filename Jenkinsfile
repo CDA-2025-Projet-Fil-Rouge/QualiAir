@@ -51,7 +51,7 @@ pipeline {
                         dir('front-end') {
                             checkout([
                                 $class: 'GitSCM',
-                                branches: [[name: 'development']],
+                                branches: [[name: 'master']],
                                 userRemoteConfigs: [[
                                     url: 'https://github.com/CDA-2025-Projet-Fil-Rouge/QualiAir-Web.git',
                                     credentialsId: 'qualiair-jenkins'
@@ -92,7 +92,7 @@ pipeline {
         stage('Build Back-end') {
             steps {
                 dir('back-end') {
-                    sh 'mvn clean package -DskipTests -Dspring.config.additional-location=$SPRING_EXTRA_CONF'
+                    sh 'mvn -B -U clean verify -Dspring.config.additional-location=$SPRING_EXTRA_CONF'
                 }
             }
         }
@@ -120,7 +120,6 @@ pipeline {
                         echo "Using Chrome binary: $CHROME_BIN"
                         npm ci
                         npm run test -- --browsers=ChromeHeadless --watch=false || echo "Some front tests failed"
-                        npm run build
                     '''
                 }
             }
@@ -132,10 +131,10 @@ pipeline {
                 dir('back-end') {
                     withSonarQubeEnv('SonarQube Server') {
                         sh '''
-                            mvn clean verify sonar:sonar \
-                                -DskipTests \
+                            mvn -B sonar:sonar \
                                 -Dspring.config.additional-location=$SPRING_EXTRA_CONF \
-                                -Dspring.port=8081
+                                -Dspring.port=8081 \
+                                -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
                         '''
                     }
                 }
@@ -160,56 +159,24 @@ pipeline {
                 script {
                     sshagent(['ec2-ssh-key']) {
                         sh '''
-                            echo "🚀 Deploying to EC2..."
+                            echo "Deploying to EC2..."
 
-                            # Copy backend JAR and frontend build
-                            scp -o StrictHostKeyChecking=no back-end/target/*.jar ubuntu@15.188.10.164:/home/ubuntu/app.jar
-                            scp -o StrictHostKeyChecking=no -r front-end/dist/* ubuntu@15.188.10.164:/home/ubuntu/front/
+                            # copy artifacts (adjust target path as needed)
+                            scp -o StrictHostKeyChecking=no back-end/target/*.jar ubuntu@15.188.10.164:/opt/myapp/backend/
+                            scp -o StrictHostKeyChecking=no -r front-end/dist/* ubuntu@15.188.10.164:/var/www/html/
 
-                            # Connect via SSH and deploy
+                            # restart services
                             ssh -o StrictHostKeyChecking=no ubuntu@15.188.10.164 <<'EOF'
-                                set -e
-
-                                echo "🧹 Cleaning old containers..."
-                                docker stop myapp-backend || true
-                                docker rm myapp-backend || true
-                                docker stop myapp-db || true
-                                docker rm myapp-db || true
-
-                                echo "🗃️ Starting database..."
-                                docker run -d --name myapp-db \
-                                    -e POSTGRES_USER=myuser \
-                                    -e POSTGRES_PASSWORD=mypass \
-                                    -e POSTGRES_DB=mydb \
-                                    -v /home/ubuntu/db-data:/var/lib/postgresql/data \
-                                    -p 5432:5432 \
-                                    postgres:15
-
-                                echo "⚙️ Starting backend..."
-                                docker run -d --name myapp-backend \
-                                    --link myapp-db:db \
-                                    -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydb \
-                                    -e SPRING_DATASOURCE_USERNAME=myuser \
-                                    -e SPRING_DATASOURCE_PASSWORD=mypass \
-                                    -p 8080:8080 \
-                                    -v /home/ubuntu/app.jar:/app.jar \
-                                    openjdk:21-jdk \
-                                    java -jar /app.jar
-
-                                echo "🌐 Updating frontend..."
-                                sudo rm -rf /var/www/html/*
-                                sudo cp -r /home/ubuntu/front/* /var/www/html/
-
-                                echo "🔁 Restarting nginx..."
-                                sudo systemctl reload nginx
-
-                                echo "✅ Deployment complete."
+                                systemctl restart myapp-backend.service
+                                systemctl reload nginx
+                                echo "Deployment complete."
                             EOF
                         '''
                     }
                 }
             }
         }
+    }
 
     post {
         always {
